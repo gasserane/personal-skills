@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Environment
+.env
+.venv/
+venv/
+env/
+
+# Secrets
+*.key
+
+# Streamlit
+.streamlit/
+
+# Claude local settings (machine-specific)
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Runtime-generated data (never commit user evidence or run history)
+evidence_cache.json
+run_history.json
+agent_registry.json
+run_checkpoint.json
+programme_context.json
+knowledge_index/
+knowledge_index_meta.json
+framework_library.json
+intelligence_watchlist.json
+briefing_latest.json
+briefing_archive.json
