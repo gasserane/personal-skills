@@ -119,6 +119,7 @@ Apply throughout. Current authoritative versions:
 - Decolonial evaluation: Chilisa (2020) 2nd ed.
 - OECD-DAC: OECD (2019) — 6 criteria including Coherence
 - Gender-transformative: IGWG Gender Integration Continuum (5-level); "gender-sensitive" ≠ "gender-transformative"
+- Participatory methods: Davies & Dart (2005) MSC; Wilson-Grau & Britt (2012) Outcome Harvesting; Patton (2011) Developmental Evaluation — MSC ≠ OH ≠ DE; each has a distinct change logic; misidentifying the method is a quality failure
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 
