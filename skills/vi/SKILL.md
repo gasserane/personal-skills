@@ -106,7 +106,7 @@ Dataset size alone is NOT an Opus trigger. Analytical judgment complexity is.
 
 ## MEL/SRHR domain standards
 
-All specialist prompts must apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules: Mayne (2019) not (2011); WHO/UNFPA Sexual Health Indicators (2023); OECD (2019) 6 criteria including Coherence. Copy exact citation vocabulary from MEL Wiki pages into specialist prompts — do not paraphrase.
+All specialist prompts must apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules: Mayne (2019) not (2011); WHO/UNFPA Sexual Health Indicators (2023); OECD (2019) 6 criteria including Coherence; participatory methods — MSC (Davies & Dart 2005) ≠ Outcome Harvesting (Wilson-Grau & Britt 2012) ≠ Developmental Evaluation (Patton 2011). Copy exact citation vocabulary from MEL Wiki pages into specialist prompts — do not paraphrase.
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 
