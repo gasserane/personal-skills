@@ -81,51 +81,38 @@ Structure:
 
 ---
 
-### STEP 5 — KNOWLEDGE STORAGE
+### STEP 5 — RETURN
 
-Spawn Li as Agent subagent with INGEST-FROM-RESEARCHER operation. Pass:
+Return Artifact A (Evidence Brief) to Ann, delimited as:
+
+```
+=== EVIDENCE BRIEF ===
+[Artifact A content]
+=== END EVIDENCE BRIEF ===
+```
+
+Append one line after the delimiter: `📚 Knowledge artifacts stored — see CLAUDE MEL new RESOURCES/literature-reviews/[YYYY-MM-DD]_[task-slug]/`
+
+### STEP 6 — KNOWLEDGE STORAGE
+
+After returning the Evidence Brief, spawn Li as Agent subagent with INGEST-FROM-RESEARCHER operation. Pass:
 - Artifact B (full literature review + source list + MEL Wiki insights)
 - Task slug: derived from task objective, lowercase-hyphenated, max 5 words (e.g. `contribution-analysis-srhr-kenya`)
 - Today's date in YYYY-MM-DD format
 
-Wait for Li to confirm storage before proceeding.
-
-### STEP 6 — RETURN
-
-Return Artifact A (Evidence Brief) to Ann.
-Append one line: `📚 Knowledge artifacts stored — see CLAUDE MEL new RESOURCES/literature-reviews/[YYYY-MM-DD]_[task-slug]/`
+Do not block on Li's confirmation. If Li returns an error, log it and close the run.
 
 ## Specialist taxonomy (include in Evidence Brief — recommended specialist types for Vi)
 
-| MEL task type | Specialist name | Model |
-|---|---|---|
-| Contribution analysis / plausibility | contribution-plausibility-analyst | Opus |
-| SRHR indicator design | srhr-indicator-designer | Sonnet |
-| Feminist / decolonial review | feminist-decolonial-reviewer | Opus |
-| Theory of Change development | toc-architect | Sonnet |
-| Data quality audit | data-quality-auditor | Sonnet |
-| Evaluation design | evaluation-design-specialist | Opus |
-| OECD-DAC criteria application | oecd-dac-reviewer | Sonnet |
-| Intersectionality analysis | intersectionality-analyst | Opus |
-| Gender-transformative assessment | gender-transformative-assessor | Sonnet |
-| Participatory methods design | participatory-methods-designer | Sonnet |
-| MEL framework architecture | mel-framework-architect | Opus (mandatory for all MEL tasks) |
-| Report drafting / writing | mel-report-writer | Sonnet |
-| QA review | qa-reviewer | Opus (mandatory, highest execution_order) |
+In the "Recommended specialist roster" section of Artifact A, list only the specialist names the task requires — no model recommendation (Vi owns model selection). Use these names exactly:
 
-Select only the specialists the task actually requires. No more, no fewer.
+`contribution-plausibility-analyst`, `srhr-indicator-designer`, `feminist-decolonial-reviewer`, `toc-architect`, `data-quality-auditor`, `evaluation-design-specialist`, `oecd-dac-reviewer`, `intersectionality-analyst`, `gender-transformative-assessor`, `participatory-methods-designer`, `mel-framework-architect` (mandatory for all MEL tasks), `mel-report-writer`, `qa-reviewer` (mandatory, runs last)
+
+Select only what the task requires. No more, no fewer.
 
 ## MEL/SRHR domain standards
 
-Apply current authoritative versions only. Using an outdated version when a current one exists is a quality failure — flag it.
-
-- Contribution analysis: Mayne (2019) Evaluation 25(3) — "contribution plausibility" vocabulary; not Mayne (2011)
-- SRHR indicators: WHO/UNFPA Sexual Health Indicators (2023); disaggregate minimum: age, gender identity, disability, geography
-- Feminist evaluation: Cornwall & Rivas (2015) TWQ 36(2); feminist evaluation ≠ gender-disaggregated data
-- Decolonial: Chilisa (2020) 2nd ed.; examine whose knowledge is centred
-- OECD-DAC: OECD (2019) — 6 criteria including Coherence; flag any output citing only 5 criteria
-- Theory of Change: Vogel (2012) DFID; van Eerdewijk et al. (2017) KIT for SRHR/gender
-- Gender-transformative: IGWG Gender Integration Continuum (5-level); "gender-sensitive" ≠ "gender-transformative"
+Apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules: Mayne (2019) not (2011); WHO/UNFPA Sexual Health Indicators (2023); OECD (2019) 6 criteria including Coherence. Flag any source in your literature review that cites a superseded version.
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 
