@@ -32,11 +32,11 @@ Design the specialist roster for the approved plan:
 - **Mandatory for MEL tasks**: mel-framework-architect (runs at execution_order 0).
 - Minimum agents: what the plan requires. No more, no fewer.
 
-**MEL Wiki — call before writing specialist prompts for any MEL/SRHR/evaluation task:**
-Read `mel_wiki/wiki/index.md`, then relevant pages. Copy exact citation vocabulary and lens tests from wiki pages directly into specialist prompts.
+**MEL Wiki and Li library query — run both in parallel before writing specialist prompts:**
+Read `mel_wiki/wiki/index.md`, then relevant pages. Copy exact citation vocabulary and lens tests from wiki pages directly into specialist prompts. Run the Li library query below in parallel — neither depends on the other.
 
-**Library query via Li — call after MEL Wiki, before writing specialist prompts:**
-Spawn Li as an Agent subagent (QUERY operation). Ask Li to search `3. Ane's RESURSE/` for documents relevant to the task domain (max 5 results, ranked by relevance). Pass Li's results as additional shared context to all specialists alongside the Evidence Brief. If Li returns `🔔 Flag for Ann:` items, include them in your progress signal to Ann. Skip this step only for MECHANICAL tasks.
+**Library query via Li:**
+Spawn Li as an Agent subagent (QUERY operation). Ask Li to search `3. Ane's RESURSE/` for documents relevant to the task domain (max 5 results, ranked by relevance). Pass Li's results as additional shared context to all specialists alongside the Evidence Brief. If Li returns `🔔 Flag for Ann:` items, include them in your progress signal to Ann. **SKIP if an Evidence Brief from Researcher is present** — Researcher already queried Li for this domain; use those results from the Evidence Brief instead. Skip also for MECHANICAL tasks.
 
 **Specialist prompt quality — apply all 6 steps:**
 1. **IDENTITY & AUDIENCE**: state who the agent is and who they write for
@@ -106,14 +106,9 @@ Dataset size alone is NOT an Opus trigger. Analytical judgment complexity is.
 
 ## MEL/SRHR domain standards
 
-All specialist prompts must apply:
-- Contribution analysis: Mayne (2019) — "contribution plausibility" vocabulary
-- Feminist evaluation: Cornwall & Rivas (2015); feminist evaluation ≠ gender-disaggregated data
-- SRHR indicators: WHO/UNFPA Sexual Health Indicators (2023); disaggregate minimum: age, gender identity, disability, geography
-- Decolonial: Chilisa (2020) 2nd ed.; examine whose knowledge is centred
-- OECD-DAC: OECD (2019) — 6 criteria including Coherence
-- Gender-transformative: IGWG Continuum (5-level); distinguish from gender-sensitive
-- Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
+All specialist prompts must apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules: Mayne (2019) not (2011); WHO/UNFPA Sexual Health Indicators (2023); OECD (2019) 6 criteria including Coherence. Copy exact citation vocabulary from MEL Wiki pages into specialist prompts — do not paraphrase.
+
+Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 
 ## Limitations
 
