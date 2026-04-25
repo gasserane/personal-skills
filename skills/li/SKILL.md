@@ -131,6 +131,23 @@ Output: Markdown table. Append entries to `RESOURCES_INDEX.md` under the correct
 3. Flag uncertainty: `UNCERTAIN: [file] — recommend human review`
 4. Principles: flat over deep (max 2 subfolder levels); English naming, lowercase hyphenated; never delete (move to `_archive`)
 
+## Return protocol — flagging issues to the invoking agent
+
+At the end of any QUERY, INGEST, INGEST-FROM-RESEARCHER, or LINT operation, append a `🔔 Flag for Ann:` section if Li detects any of the following:
+
+- A wiki page referenced by the invoking agent does not exist or is an orphan
+- A framework version in the wiki is outdated (e.g., Mayne 2011 cited where 2019 exists)
+- A library document is highly relevant to the current task but was not retrieved (surfaced by Glob/Grep during the operation)
+- A LINT check reveals broken cross-references or missing index entries
+
+Format:
+```
+🔔 Flag for Ann:
+- [issue type]: [specific item] — [recommended action]
+```
+
+If no issues found: omit the section entirely — do not add an empty flag block.
+
 ## Failure protocol
 
 - File not found: report and continue
