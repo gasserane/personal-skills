@@ -56,6 +56,15 @@ Extract an explicit list of research questions before proceeding. If fewer than 
 - One WebSearch for UNFPA SoWP 2024 ("Interwoven Lives, Threads of Hope") for the 30-year equity audit findings on excluded populations in the task's geographic context
 - For humanitarian/conflict/displacement contexts: one WebSearch for IAWG MISP (2020) implementation guidance and country-specific MISP assessment data
 
+**Default ECA additions — for any task naming a Europe/Central Asia country, region, or population (Ane's most frequent context):**
+- Mandatorily read `mel_wiki/wiki/concepts/europe-central-asia-srhr-context.md` before STEP 4 SYNTHESIZE
+- One WebSearch for the latest UNAIDS EECA Regional Profile (annual) — flag that EECA HIV trend is opposite to global (currently increasing)
+- For EU-funded programmes: one WebSearch for EU GAP III (2021–2025) thematic indicators relevant to the task; for EU candidate countries also IPA III
+- For Roma populations: one WebSearch for EU Roma Strategic Framework 2020–2030 country-specific data
+- For Ukraine 2022+ / refugee-receiving countries: combine MISP search above with UNHCR coordination data + EU Temporary Protection Directive frame
+- Do NOT cite Chilisa et al. (2023) ARE for ECA contexts — apply Chilisa (2020) general decolonial epistemology with the three ECA adaptations (post-Soviet, EU centre-periphery, Russian-language epistemology)
+- SRHR indicators: cite WHO (2010) WHO/RHR/10.12 (verified) — do NOT cite "WHO/UNFPA Sexual Health Indicators (2023 update)" until externally verified
+
 **Source quality tiers — apply before including any source in artifacts:**
 - **Tier 1:** Peer-reviewed journal articles (cite with DOI or PMID where available)
 - **Tier 2:** Institutional publications (WHO, UNFPA, IPPF, UNAIDS, OECD, UN agencies)
@@ -145,7 +154,7 @@ Read `mel_wiki/wiki/domain-standards.md` for full current authoritative versions
 
 Apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules:
 - Contribution analysis: Mayne (2019) *CJPE* 34(2) "Revisiting contribution analysis" — primary; ⚠️ "Coming of age?" is Mayne (2012) *Evaluation* 18(3), NOT 2019 — verifiable citation error to flag in any source you find that uses the wrong combination
-- SRHR indicators: WHO/UNFPA Sexual Health Indicators (2023); cross-map to ICPD+25 Nairobi commitments AND ICPD+30 (2024) accountability framework
+- SRHR indicators: WHO (2010) *Measuring sexual health* (WHO/RHR/10.12) — verified canonical; ⚠️ "WHO/UNFPA Sexual Health Indicators (2023 update)" is referenced informally but not externally verified — do not cite as canonical until verified; cross-map to ICPD+25 Nairobi commitments AND ICPD+30 (2024) accountability framework; minimum disability disaggregation = Washington Group Short Set (WG-SS)
 - SRHR scope definition: Guttmacher-Lancet Commission (2018) *The Lancet* 391(10140) 2642–2692 — mandatory scope verification reference for any SRHR Evidence Brief
 - MISP for SRHR in crisis: IAWG (2020) — mandatory baseline standard for humanitarian/conflict/displacement contexts; precedes WHO/UNFPA (2023) comprehensive indicators
 - Intersectionality: Crenshaw (1989) *U Chicago Legal Forum* 1989(1) 139–167; Crenshaw (1991) *Stanford LR* 43(6) 1241–1299; ⚠️ NOT UCLA Law Review for the 1989 citation
