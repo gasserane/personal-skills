@@ -2,6 +2,16 @@
 
 All notable changes to the Ann / Vi / Li / Researcher skill set are documented here.
 
+## [2026-04-26] — Researcher model default
+
+**Skills affected:** researcher
+
+### Researcher
+- **Model default**: added `model: opus` to frontmatter — Researcher now always runs on Opus regardless of invocation path (Ann-spawned or direct)
+- **Session Start model check**: added self-check that notifies Ane if invoked on a non-Opus model
+
+---
+
 ## [2026-04-26] — Agent system audit improvements
 
 **Skills affected:** ann, vi, li, researcher
