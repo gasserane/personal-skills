@@ -100,12 +100,27 @@ Spawn Vi as an Agent subagent using the `vi` skill. Pass:
 - The original task description
 - The Evidence Brief from Researcher (for COMPLEX tasks) — Vi passes this to all specialists as shared context
 - Any additional evidence retrieved in PHASE 1
+- **Standing instructions block** — see below
+
+**Standing instructions — assemble before delegating.** Standing instructions are Ane's validated preferences that should propagate to every specialist this run. Assemble from:
+1. The "Writing style" and "Interaction approach" sections of `CLAUDE.md` (rules that apply to every output Ane sees).
+2. Any entries in `agent-improvements/ann-overlay.md` under `## Active Improvements` that are tagged as standing preferences (e.g., format choices, depth choices, lens emphases Ane has confirmed apply to all tasks of this type).
+3. Task-specific preferences Ane has stated in this conversation (e.g., "use only Tier 1 sources for this one").
+
+Format the block as:
+```
+## Standing instructions
+- [preference, one line, actionable]
+- [preference, one line, actionable]
+```
+
+Pass the block to Vi as part of the delegation. If no standing instructions apply, omit the block entirely (do not pass an empty header). When the delegation includes Researcher (COMPLEX tasks), pass the same block to Researcher in PHASE 1's research brief — Researcher applies them to source selection, lens emphasis, and Evidence Brief structure.
 
 ### PHASE 5 — FINAL GATE
 
 Receive Vi's compiled product. Run a 5-point check:
 1. **COVERAGE**: addresses every element of the approved plan?
-2. **DOMAIN STANDARDS**: MEL framework citations current and correct? (Mayne 2019, WHO/UNFPA 2023, OECD 2019 six criteria) Feminist/decolonial lens applied substantively?
+2. **DOMAIN STANDARDS**: MEL framework citations current and correct? (Mayne 2019 *CJPE* 34(2), WHO 2010 WHO/RHR/10.12 — NOT "WHO/UNFPA 2023" which remains unverified, OECD 2019 six criteria) Feminist/decolonial lens applied substantively?
 3. **INTERNAL CONSISTENCY**: no contradictions; findings flow from evidence?
 4. **DATA GAP PROTOCOL**: unsupported claims flagged with ⚠️ markers?
 5. **QUALITY STANDARD**: IPPF/UNFPA publication level, not generic NGO level?
@@ -133,21 +148,18 @@ Narrate each step in 1–2 sentences and state checklist status at each major tr
 
 ## MEL/SRHR domain standards
 
-Read `mel_wiki/wiki/domain-standards.md` for full current authoritative versions (same step as reading `index.md`). Quick reference below:
+**Single source of truth:** `mel_wiki/wiki/domain-standards.md` — read at session start alongside `index.md`. The full table of current authoritative versions, full citations, Pending-verification list, and Citation-errors-to-actively-avoid all live there. Update propagates to all four agents automatically.
 
-Apply throughout. Current authoritative versions:
-- Contribution analysis: Mayne (2019) *CJPE* 34(2) "Revisiting contribution analysis" — primary; ⚠️ "Coming of age?" is Mayne (2012) *Evaluation* 18(3), NOT 2019 — verifiable citation error to avoid; vocabulary: "contribution plausibility"
-- Feminist evaluation: Cornwall & Rivas (2015); CARE/WPHF (2024) Feminist MEAL for fragile/humanitarian contexts; feminist evaluation ≠ gender-disaggregated data
-- Intersectionality: Crenshaw (1989) *U Chicago Legal Forum* 139–167; Crenshaw (1991) *Stanford LR* 43(6); cite Crenshaw whenever the lens is named; parallel disaggregation ≠ intersectionality
-- SRHR indicators: WHO (2010) *Measuring sexual health* (WHO/RHR/10.12) — verified canonical; ⚠️ "WHO/UNFPA Sexual Health Indicators (2023 update)" referenced informally has not been externally verified — do not cite as canonical until verified; cross-map to ICPD+25 Nairobi commitments AND ICPD+30 (2024) accountability framework; disaggregate minimum: age, gender identity, disability (Washington Group WG-SS or WG-SS-Enhanced), geography
-- SRHR scope definition: Guttmacher-Lancet Commission (2018) *The Lancet* 391(10140) — 10+ component essential services package; verify evaluation covers full scope
-- MISP for SRHR in crisis: IAWG (2020) — mandatory baseline standard in humanitarian/conflict/displacement contexts; precedes WHO/UNFPA (2023) comprehensive indicators
-- Rights-based SRHR: UNFPA HRBAP + UN Common Understanding (2003); WHO/OHCHR sexual rights (2010); UNFPA SoWP 2021 (bodily autonomy), SoWP 2024 (ICPD+30 equity audit), SoWP 2025 (reproductive agency); apply PANEL principles
-- Theory of Change: Vogel (2012) DFID; van Eerdewijk et al. (2017) KIT for SRHR/gender
-- Decolonial evaluation: Chilisa (2020) 2nd ed.; Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) African Relational Evaluation (ARE) — apply ARE specifically in Sub-Saharan African contexts
-- OECD-DAC: OECD (2019) — 6 criteria including Coherence
-- Gender-transformative: IGWG Gender Integration Continuum (5-level); "gender-sensitive" ≠ "gender-transformative"
-- Participatory methods: Davies & Dart (2005) MSC; Wilson-Grau (2018) IAP "Outcome Harvesting" — supersedes 2012 working paper; Earl, Carden & Smutylo (2001) Outcome Mapping; Patton (2011) Developmental Evaluation — MSC ≠ OH ≠ Outcome Mapping ≠ DE; each has a distinct change logic; misidentifying the method is a quality failure
+**Critical citation errors to never propagate (quick-glance only):**
+- Mayne (2019) = "Revisiting contribution analysis" *CJPE* 34(2) — NOT "Coming of age?" (that is Mayne 2012 *Evaluation* 18(3))
+- SRHR indicators = WHO (2010) *Measuring sexual health* (WHO/RHR/10.12) — NOT "WHO/UNFPA 2023" (unverified)
+- Crenshaw (1989) = *U Chicago Legal Forum* 139–167 — NOT *UCLA Law Review*
+- Wilson-Grau (2018) IAP "Outcome Harvesting" — supersedes the 2012 working paper
+- OECD (2019) = 6 criteria including Coherence — NOT 5
+- ARE = Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) *CJPE* 30(3), 313–328 — NOT Chilisa, Tsheko & Metz (2023)
+- Apply ARE only in Sub-Saharan Africa; for ECA use Chilisa (2020) with three post-Soviet adaptations (see ECA wiki page)
+- MISP (IAWG 2020) precedes WHO (2010) comprehensive indicators in humanitarian/conflict/displacement contexts
+- Intersectionality requires interaction effects across axes — parallel disaggregation alone is not intersectional
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 

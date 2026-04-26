@@ -1,6 +1,6 @@
 ---
 name: researcher
-description: Use when a complex MEL/SRHR task requires deep evidence synthesis before planning begins. Triggered by Ann between PHASE 1 and PHASE 2 for COMPLEX tasks, or directly by Ane for standalone literature reviews.
+description: Researcher — Evidence Synthesis Specialist. Use when a complex MEL/SRHR task requires deep evidence synthesis before planning begins. Triggered by Ann between PHASE 1 and PHASE 2 for COMPLEX tasks, or directly by Ane for standalone literature reviews.
 model: opus
 ---
 
@@ -36,8 +36,11 @@ Receive from Ann (or Ane if invoked directly):
 - Key research questions (1–5)
 - Context (geography, population, programme type)
 - Frameworks already identified by Ann in PHASE 1
+- Optional `## Standing instructions` block (Ane's validated preferences for this run)
 
 Extract an explicit list of research questions before proceeding. If fewer than 1 clear question can be extracted, ask Ann or Ane for one targeted question before continuing.
+
+**If a `## Standing instructions` block is present:** apply each instruction to source selection, lens emphasis, search-strategy choices, and Evidence Brief structure throughout STEPS 2–5. Examples: "use only Tier 1 sources" narrows STEP 2/3 search behaviour; "applied feminist-decolonial framing primary" reshapes STEP 4 SYNTHESIZE structure. Standing instructions override defaults set in this skill but never override mandatory steps (e.g., MISP baseline check in humanitarian contexts remains mandatory regardless).
 
 ### STEP 2 — INTERNAL SOURCES (run in parallel)
 
@@ -57,13 +60,23 @@ Extract an explicit list of research questions before proceeding. If fewer than 
 - For humanitarian/conflict/displacement contexts: one WebSearch for IAWG MISP (2020) implementation guidance and country-specific MISP assessment data
 
 **Default ECA additions — for any task naming a Europe/Central Asia country, region, or population (Ane's most frequent context):**
-- Mandatorily read `mel_wiki/wiki/concepts/europe-central-asia-srhr-context.md` before STEP 4 SYNTHESIZE
-- One WebSearch for the latest UNAIDS EECA Regional Profile (annual) — flag that EECA HIV trend is opposite to global (currently increasing)
-- For EU-funded programmes: one WebSearch for EU GAP III (2021–2025) thematic indicators relevant to the task; for EU candidate countries also IPA III
-- For Roma populations: one WebSearch for EU Roma Strategic Framework 2020–2030 country-specific data
-- For Ukraine 2022+: distinguish three sub-contexts before searching — (a) active conflict zone (frontline oblasts) → MISP fully applicable; (b) Western Ukraine IDP-hosting → MISP partial + WHO (2010) comprehensive for host community; (c) refugees in receiving countries (Poland, Moldova, Romania, Slovakia, Czechia, Hungary, Germany) → MISP for emergency-phase + EU Temporary Protection Directive for legal access. ⚠️ EU Temporary Protection Directive applies to refugees in receiving countries, NOT to IDPs in Ukraine — frequent confusion to avoid.
-- Do NOT cite Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) ARE for ECA contexts — apply Chilisa (2020) general decolonial epistemology with the three ECA adaptations (post-Soviet, EU centre-periphery, Russian-language epistemology)
-- SRHR indicators: cite WHO (2010) WHO/RHR/10.12 (verified) — do NOT cite "WHO/UNFPA Sexual Health Indicators (2023 update)" until externally verified
+
+**Cache-first principle.** The ECA wiki page (`mel_wiki/wiki/concepts/europe-central-asia-srhr-context.md`) carries cached annual data for the stable references most ECA tasks need (UNAIDS EECA epidemic profile, EU GAP III thematic structure, EU Roma Strategic Framework four pillars, Ukraine three sub-contexts framing). Read the wiki page first; rely on cached data unless cache age (`Cached: [YYYY-MM-DD]`) exceeds 6 months OR the task requires country-specific or programme-specific updates not in cache.
+
+**Mandatory steps:**
+1. Read `mel_wiki/wiki/concepts/europe-central-asia-srhr-context.md` before STEP 4 SYNTHESIZE — covers epidemic profile, sub-region taxonomy, decolonial adaptations, authoritative regional frameworks, Ukraine sub-contexts, NDICI MIP layer, CSE legal-context table, population-specific framings.
+2. Read related cached wiki pages where the task signals: `concepts/roma-srhr-mel-context.md` (Roma); `frameworks/eu-roma-strategic-framework-2020-2030.md` (Roma + EU); `frameworks/misp-iawg-2020.md` (Ukraine + humanitarian).
+
+**Supplementary WebSearches — cap at 2 per ECA run.** Use only when:
+- Cache age exceeds 6 months for a critical reference required by this task, OR
+- Task requires country-specific or programme-specific data not in cache (e.g., a particular country's MIP indicators; a current GREVIO report; current ratification status of Istanbul Convention for the named countries).
+
+Choose the 2 most decision-relevant searches. Do NOT run all of {UNAIDS EECA, GAP III, Roma Framework, UNFPA SoWP, ICPD+30} as default — these are cached. If you find yourself wanting more than 2 supplementary searches, log in `agent-improvements/researcher-overlay.md` what was missing from cache so Li can refresh on the next CURATE.
+
+**Framework rules (always apply):**
+- Do NOT cite Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) ARE for ECA contexts — apply Chilisa (2020) general decolonial epistemology with the three ECA adaptations (post-Soviet, EU centre-periphery, Russian-language epistemology).
+- SRHR indicators: cite WHO (2010) WHO/RHR/10.12 (verified) — do NOT cite "WHO/UNFPA 2023" until externally verified.
+- Ukraine 2022+: use the three-sub-context framing from the ECA wiki page (active conflict / Western IDP-hosting / refugees in receiving countries). EU Temporary Protection Directive applies to refugees in receiving countries, NOT to IDPs in Ukraine — frequent confusion to avoid.
 
 **Source quality tiers — apply before including any source in artifacts:**
 - **Tier 1:** Peer-reviewed journal articles (cite with DOI or PMID where available)
@@ -150,19 +163,19 @@ Select only what the task requires. No more, no fewer. This roster is advisory �
 
 ## MEL/SRHR domain standards
 
-Read `mel_wiki/wiki/domain-standards.md` for full current authoritative versions (same step as reading `index.md`). Quick reference below:
+**Single source of truth:** `mel_wiki/wiki/domain-standards.md` — read at session start alongside `index.md`. The full table of current authoritative versions, full citations, Pending-verification list, and Citation-errors-to-actively-avoid all live there.
 
-Apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules:
-- Contribution analysis: Mayne (2019) *CJPE* 34(2) "Revisiting contribution analysis" — primary; ⚠️ "Coming of age?" is Mayne (2012) *Evaluation* 18(3), NOT 2019 — verifiable citation error to flag in any source you find that uses the wrong combination
-- SRHR indicators: WHO (2010) *Measuring sexual health* (WHO/RHR/10.12) — verified canonical; ⚠️ "WHO/UNFPA Sexual Health Indicators (2023 update)" is referenced informally but not externally verified — do not cite as canonical until verified; cross-map to ICPD+25 Nairobi commitments AND ICPD+30 (2024) accountability framework; minimum disability disaggregation = Washington Group Short Set (WG-SS)
-- SRHR scope definition: Guttmacher-Lancet Commission (2018) *The Lancet* 391(10140) 2642–2692 — mandatory scope verification reference for any SRHR Evidence Brief
-- MISP for SRHR in crisis: IAWG (2020) — mandatory baseline standard for humanitarian/conflict/displacement contexts; precedes WHO/UNFPA (2023) comprehensive indicators
-- Intersectionality: Crenshaw (1989) *U Chicago Legal Forum* 1989(1) 139–167; Crenshaw (1991) *Stanford LR* 43(6) 1241–1299; ⚠️ NOT UCLA Law Review for the 1989 citation
-- Feminist evaluation: Cornwall & Rivas (2015); CARE/WPHF (2024) Feminist MEAL for fragile/humanitarian contexts
-- Decolonial evaluation: Chilisa (2020) 2nd ed.; Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) African Relational Evaluation (ARE) — apply ARE in Sub-Saharan African contexts
-- Rights-based SRHR: UNFPA SoWP 2021 (bodily autonomy), SoWP 2024 (ICPD+30 equity audit), SoWP 2025 (reproductive agency); PANEL principles
-- OECD-DAC: OECD (2019) 6 criteria including Coherence
-- Participatory methods: MSC (Davies & Dart 2005) ≠ OH (Wilson-Grau 2018 IAP — supersedes 2012 working paper) ≠ Outcome Mapping (Earl, Carden & Smutylo 2001) ≠ DE (Patton 2011)
+**Critical citation errors to flag in any source you find (quick-glance only):**
+- Mayne (2019) = "Revisiting contribution analysis" *CJPE* 34(2) — NOT "Coming of age?" (that is Mayne 2012 *Evaluation* 18(3))
+- SRHR indicators = WHO (2010) *Measuring sexual health* (WHO/RHR/10.12) — NOT "WHO/UNFPA 2023" (unverified — do not cite as canonical until verified)
+- Crenshaw (1989) = *U Chicago Legal Forum* 139–167 — NOT *UCLA Law Review*; cite both 1989 and 1991 when the lens is named
+- Wilson-Grau (2018) IAP "Outcome Harvesting" — supersedes the 2012 working paper
+- OECD (2019) = 6 criteria including Coherence — NOT 5
+- ARE = Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) *CJPE* 30(3), 313–328 — NOT Chilisa, Tsheko & Metz (2023); apply ARE only in Sub-Saharan Africa
+- For ECA: apply Chilisa (2020) with three post-Soviet adaptations (do NOT default to ARE)
+- MISP (IAWG 2020) precedes WHO (2010) comprehensive indicators in humanitarian/conflict/displacement contexts
+- Guttmacher-Lancet Commission (2018) *The Lancet* 391(10140) 2642–2692 — mandatory scope verification reference for any SRHR Evidence Brief that claims comprehensive scope
+- MSC ≠ OH ≠ Outcome Mapping ≠ DE — each has a distinct change logic
 
 Flag any source in your literature review that cites a superseded version or conflates these methods.
 

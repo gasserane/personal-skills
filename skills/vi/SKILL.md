@@ -34,7 +34,7 @@ Design the specialist roster for the approved plan:
 - Read the agent registry (`agent_registry.json`) for existing specialist definitions. Improve existing agents, create new ones as needed.
 - **Mandatory for ALL tasks**: qa-reviewer (runs last, highest execution_order).
 - **Mandatory for MEL tasks**: mel-framework-architect (runs at execution_order 0).
-- **Mandatory when sensitive populations are named** (adolescents, displaced populations, persons with disabilities, indigenous communities, LGBTQ+ populations, ethnic minorities): intersectionality-analyst — apply Crenshaw (1989) *U Chicago Legal Forum* + Crenshaw (1991) *Stanford LR* 43(6); aggregated outputs without intersection analysis systematically underrepresent the most marginalised.
+- **Mandatory when 2+ intersecting axes are named, OR a single sensitive-population axis is combined with explicit power asymmetry on a second dimension**: intersectionality-analyst — apply Crenshaw (1989) *U Chicago Legal Forum* + Crenshaw (1991) *Stanford LR* 43(6). Intersectionality means *interaction effects across axes*, not single-axis disaggregation. Triggers: e.g., "adolescent + displaced", "Roma + female + adolescent", "LGBTI+ + restrictive policy context", "disability + rural + female". A single axis alone (e.g., "adolescents") does NOT trigger — that is age-disaggregation, not intersectionality. Aggregated outputs without intersection analysis systematically underrepresent the most marginalised when 2+ axes are present.
 - **Mandatory in humanitarian/conflict/displacement contexts**: humanitarian-srhr-specialist (MISP-aware) — apply IAWG (2020) MISP as baseline before any WHO/UNFPA (2023) comprehensive indicators; the five MISP priority areas require separate assessment.
 - **Mandatory for any SRHR scope claim**: include scope verification against Guttmacher-Lancet Commission (2018) 10+ component essential services package — the mel-framework-architect or srhr-indicator-designer carries this responsibility; out-of-scope components must be documented with operational rationale, not silently omitted.
 - **Mandatory in Sub-Saharan African contexts**: feminist-decolonial-reviewer must apply Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) African Relational Evaluation (ARE), not generic Chilisa (2020) — Ubuntu-grounded paradigm + four-continuum methodological model.
@@ -119,11 +119,23 @@ Return the compiled product to Ann (or deliver directly to Ane if Vi was invoked
 
 ## Model selection for specialists
 
-- **claude-opus-4-6**: qa-reviewer (mandatory); mel-framework-architect (mandatory); intersectional interaction effects; contribution plausibility under data uncertainty; contradictory findings requiring reconciliation; 3+ analytical frameworks simultaneously
-- **claude-sonnet-4-6** (default): scoped analysis, indicator drafting, writing sections, structured reporting, workshop design, code generation. ~80% cheaper — handles vast majority of MEL tasks.
+Model assignment is **conditional on task complexity** (passed from Ann's classification):
+
+- **claude-opus-4-6** — use for COMPLEX tasks only:
+  - qa-reviewer (COMPLEX): multi-specialist reconciliation, contradiction handling
+  - mel-framework-architect (COMPLEX): novel framework selection, multi-framework integration
+  - intersectional interaction effects across 2+ axes
+  - contribution plausibility under data uncertainty
+  - contradictory findings requiring reconciliation
+  - 3+ analytical frameworks applied simultaneously
+- **claude-sonnet-4-6** (default for SIMPLE and most COMPLEX subtasks):
+  - qa-reviewer (SIMPLE): single-output structured check, no multi-specialist reconciliation
+  - mel-framework-architect (SIMPLE): framework already selected by Ann; specialist applies it
+  - scoped analysis, indicator drafting, writing sections, structured reporting, workshop design, code generation
+  - ~80% cheaper than Opus — handles vast majority of MEL tasks
 - **claude-haiku-4-5-20251001**: purely mechanical tasks only (formatting, data extraction, simple assembly)
 
-Dataset size alone is NOT an Opus trigger. Analytical judgment complexity is.
+**Rule:** For SIMPLE tasks, qa-reviewer and mel-framework-architect run on Sonnet. Promote to Opus only when COMPLEX classification justifies it. Dataset size alone is NOT an Opus trigger. Analytical judgment complexity is.
 
 ## Standing instructions (optional)
 
@@ -138,21 +150,21 @@ Ann passes standing instructions in this format:
 
 ## MEL/SRHR domain standards
 
-Read `mel_wiki/wiki/domain-standards.md` for full current authoritative versions (same step as reading `index.md`). Quick reference below:
+**Single source of truth:** `mel_wiki/wiki/domain-standards.md` — read at session start alongside `index.md`. The full table of current authoritative versions, full citations, Pending-verification list, and Citation-errors-to-actively-avoid all live there.
 
-All specialist prompts must apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules:
-- Contribution analysis: Mayne (2019) *CJPE* 34(2) "Revisiting contribution analysis" — primary; ⚠️ "Coming of age?" is Mayne (2012) *Evaluation* 18(3), NOT 2019 — verifiable citation error to avoid
-- SRHR indicators: WHO (2010) *Measuring sexual health* (WHO/RHR/10.12) — verified canonical; ⚠️ "WHO/UNFPA 2023 update" is unverified — do not cite as canonical; cross-map to ICPD+25 AND ICPD+30 (2024) accountability framework; minimum disability disaggregation = Washington Group Short Set (WG-SS)
-- SRHR scope: Guttmacher-Lancet Commission (2018) *The Lancet* 391(10140) — verify scope coverage of 10+ component package
-- MISP for humanitarian/crisis: IAWG (2020) — mandatory baseline standard before WHO/UNFPA (2023) comprehensive indicators
-- Intersectionality: Crenshaw (1989) *U Chicago Legal Forum* 1989(1) 139–167; Crenshaw (1991) *Stanford LR* 43(6) 1241–1299; cite Crenshaw whenever the lens is named
-- Feminist evaluation: Cornwall & Rivas (2015); CARE/WPHF (2024) for fragile/humanitarian contexts
-- Decolonial evaluation: Chilisa (2020) 2nd ed.; Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) African Relational Evaluation (ARE) for Sub-Saharan African contexts
-- OECD-DAC: OECD (2019) 6 criteria including Coherence
-- Participatory methods: MSC (Davies & Dart 2005) ≠ Outcome Harvesting (Wilson-Grau 2018 IAP — supersedes 2012 working paper) ≠ Outcome Mapping (Earl, Carden & Smutylo 2001) ≠ Developmental Evaluation (Patton 2011)
-- Rights-based SRHR: UNFPA HRBAP + UN Common Understanding (2003); WHO/OHCHR sexual rights (2010); UNFPA SoWP 2021/2024/2025; PANEL principles
+**Critical citation errors specialists must never propagate (quick-glance only):**
+- Mayne (2019) = "Revisiting contribution analysis" *CJPE* 34(2) — NOT "Coming of age?" (that is Mayne 2012 *Evaluation* 18(3))
+- SRHR indicators = WHO (2010) *Measuring sexual health* (WHO/RHR/10.12) — NOT "WHO/UNFPA 2023" (unverified)
+- Crenshaw (1989) = *U Chicago Legal Forum* 139–167 — NOT *UCLA Law Review*; cite both 1989 and 1991 whenever the lens is named
+- Wilson-Grau (2018) IAP "Outcome Harvesting" — supersedes the 2012 working paper
+- OECD (2019) = 6 criteria including Coherence — NOT 5
+- ARE = Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) *CJPE* 30(3), 313–328 — NOT Chilisa, Tsheko & Metz (2023); apply ARE only in Sub-Saharan Africa
+- For ECA: apply Chilisa (2020) with three post-Soviet adaptations (do NOT default to ARE) — see ECA wiki page
+- MISP (IAWG 2020) precedes WHO (2010) comprehensive indicators in humanitarian/conflict/displacement contexts
+- MSC ≠ Outcome Harvesting ≠ Outcome Mapping ≠ Developmental Evaluation — each has a distinct change logic
+- "Gender-sensitive" ≠ "gender-transformative" — IGWG GIC level distinction is technical, not stylistic
 
-Copy exact citation vocabulary from MEL Wiki pages into specialist prompts — do not paraphrase.
+Copy exact citation vocabulary from `domain-standards.md` and the relevant framework page into specialist prompts — do not paraphrase.
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 
