@@ -77,7 +77,7 @@ Structure:
 **Artifact B — Knowledge Artifacts.** Stored via Li for future use and wiki integration.
 1. Full literature review — Background, Applicable Frameworks (cited), Evidence by Research Question, Data Gaps, References.
 2. Source list with tier ratings.
-3. MEL Wiki insights — bulleted list of new framework distinctions, new sources, methodological updates worth adding to the wiki; ready for Li's INGEST staging (which goes to `_pending-ingest.md` for Ane's approval).
+3. MEL Wiki insights — bulleted list of new framework distinctions, new sources, methodological updates worth adding to the wiki. **Each bullet MUST start with a tier tag**: `[TIER 1]` (peer-reviewed source with DOI/PMID), `[TIER 2]` (institutional — WHO/UNFPA/IPPF/UNAIDS/OECD/UN agency), `[TIER 3]` (reputable grey literature — national governments, established INGOs). Tier 1 bullets with verifiable citations auto-merge to wiki via Li (logged to `wiki/log.md`); Tier 2/3 stage to `_pending-ingest.md` for Ane's approval. Untagged bullets default to Tier 3.
 
 ### STEP 5 — RETURN
 Return Artifact A delimited:

@@ -15,7 +15,7 @@ Read `agent-improvements/li-overlay.md`; apply `## Active Improvements`.
 - **Library root:** `C:\Users\AGasser\OneDrive\3. Ane's RESURSE\`
 - **MEL Wiki:** `C:\Users\AGasser\OneDrive\5 ANE CLAUDE work folder\mel_wiki\`
 - **Research Artifacts:** `C:\Users\AGasser\OneDrive\3. Ane's RESURSE\CLAUDE MEL new RESOURCES\` — `artifact-log.md` (append-only), `literature-reviews/YYYY-MM-DD_[task-slug]/`
-- **Personal-skills clone (for CURATE pushes):** `/c/Users/AGasser/OneDrive - International Planned Parenthood Federation/Documents/GitHub/personal-skills`
+- **Personal-skills clone (for CURATE pushes):** `C:/Users/AGasser/OneDrive/GitHub/personal-skills` (matches `tests/run_tests.py` constant; the IPPF-tenant path is being deprecated post-migration — do not push there).
 
 ## File reading priority
 PDF, DOCX, XLSX/CSV, MD/TXT/HTM/RTF — read directly. Legacy `.doc/.ppt/.xls` — SKIP and log as `LEGACY: [filename] — not readable. Recommend conversion to PDF/DOCX.`
@@ -39,18 +39,15 @@ PDF, DOCX, XLSX/CSV, MD/TXT/HTM/RTF — read directly. Legacy `.doc/.ppt/.xls` �
 
 **Step 2 — Artifact log.** Append to `CLAUDE MEL new RESOURCES/artifact-log.md` (create with header `| Date | Task slug | Folder path | Source count | Wiki status |` if missing): `| [date] | [slug] | literature-reviews/[date]_[slug]/ | [N] new sources | Wiki staged: PENDING |`.
 
-**Step 3 — Stage wiki insights for Ane's review (HUMAN GATE).** Wiki insights are NOT auto-merged. For each bullet in `wiki-insights.md`:
+**Step 3 — Tier-branch: auto-merge Tier-1 verified, stage all others.** For each bullet in `wiki-insights.md`:
 
-1. Append a row to `agent-improvements/_pending-ingest.md` (create with header below if missing) — columns: date, task slug, insight, target wiki page (`frameworks/[name]` or `NEW PAGE: [proposed name]`), source citation as Researcher provided, status `PENDING`.
-   ```
-   # Pending MEL Wiki Ingests — Awaiting Ane's Approval
-   *Researcher proposes insights here. Ane reviews with `/li approve-ingest [task-slug]` or `/li reject-ingest [task-slug] — [reason]`.*
+1. **Tier classification.** Read the tier tag Researcher prepended (`[TIER 1]`, `[TIER 2]`, `[TIER 3]`). Untagged → treat as Tier 3 and flag for Researcher.
+2. **Citation existence check (mandatory for all tiers).** Attempt DOI lookup via WebSearch (`[author] [year] [title] DOI`) or institutional URL verification.
+3. **Branch:**
+   - **Tier 1 with verified DOI/PMID → AUTO-MERGE.** Read the target wiki page (or create it for `NEW PAGE: [name]`); add the insight with full citation, preserving page structure and confidence frontmatter; if a new page, update `mel_wiki/wiki/index.md`. Append to `mel_wiki/wiki/log.md`: `[YYYY-MM-DD HH:MM] AUTO-MERGE-TIER1: [task-slug] — [insight summary] — page: [target] — citation: [author year venue]`. Skip `_pending-ingest.md`.
+   - **Tier 1 without verifiable citation, OR Tier 2, OR Tier 3 → STAGE PENDING.** Append a row to `agent-improvements/_pending-ingest.md` — columns: date, task slug, insight (prefix with `⚠️ Citation not yet verified — recommend Ane confirms before approval` if Tier 1 unverified), target wiki page, source citation as Researcher provided, status `PENDING`. Do NOT modify wiki pages.
 
-   | Date | Task slug | Insight | Target wiki page | Source citation | Status |
-   |---|---|---|---|---|---|
-   ```
-2. Citation existence check (during staging): for each new citation, attempt DOI lookup via WebSearch (e.g., `[author] [year] [title] DOI`) or institutional URL verification. If none can be produced, prefix the staged insight with `⚠️ Citation not yet verified — recommend Ane confirms before approval`.
-3. Do NOT modify `mel_wiki/wiki/` pages, `index.md`, or `log.md`.
+Auto-merge protocol design rationale: Ane authorised auto-merge for Tier-1 verified sources (2026-04-27) to cut friction. Logged Tier-1 merges remain auditable in `wiki/log.md`; Ane can revoke any via a manual REJECT-INGEST referencing the log line.
 
 **Step 4 — RESOURCES_INDEX.** Add the run folder under a heading derived from the basename of the Research Artifacts path (currently `## CLAUDE MEL new RESOURCES`) in `3. Ane's RESURSE/RESOURCES_INDEX.md`. If the folder is renamed, update both the constant and this heading together.
 
@@ -67,8 +64,8 @@ PDF, DOCX, XLSX/CSV, MD/TXT/HTM/RTF — read directly. Legacy `.doc/.ppt/.xls` �
 
 **Failure handling:** missing file → surface message; malformed row → flag and continue; wiki write fails → log, retain as PENDING, return diagnostic.
 
-### INGEST — Add document to MEL Wiki
-**Trigger:** new document in `mel_wiki/raw/`, or Ann asks. Steps: read document; create/update `mel_wiki/wiki/sources/` summary page; update affected framework / indicator / concept / lens pages; update `index.md`; append to `log.md`; report what was added, contradictions, data gaps.
+### INGEST-DOCUMENT — Add a raw document to the MEL Wiki
+**Trigger:** new document placed in `mel_wiki/raw/`, or Ann's PHASE 6 explicitly invokes `INGEST-DOCUMENT`. (Distinct from `INGEST-FROM-RESEARCHER` above — that operation handles synthesised insights from a Researcher run, not raw documents.) Steps: read document; create/update `mel_wiki/wiki/sources/` summary page; update affected framework / indicator / concept / lens pages; update `index.md`; append to `log.md`; report what was added, contradictions, data gaps.
 
 ### CATALOG — Add entries to library index
 **Trigger:** Ane asks to catalog new documents or update RESOURCES_INDEX.md.

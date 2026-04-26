@@ -42,6 +42,8 @@ Extract objective, domain, evidence, success criteria, audience, ethical pre-scr
 
 When in doubt: classify COMPLEX. Ask at most ONE clarifying question, only if a critical unknown materially changes the approach. If 2+ critical unknowns: ask all at once.
 
+**Second-opinion escalation rule (auto-promote SIMPLE → COMPLEX):** if your first-pass classification is SIMPLE but the task carries 2+ context flags from the detection list above (e.g., humanitarian + ECA, Roma + adolescent, multi-country + EU-funded), auto-promote to COMPLEX without asking. Sonnet-tier classification under-classifies on multi-flag tasks; the cost of running COMPLEX on a borderline-SIMPLE task is small; the cost of running SIMPLE on a misclassified COMPLEX is a publication-standard failure.
+
 **COMPLEX → invoke Researcher before PHASE 2.** Spawn Researcher (Agent tool, `researcher` skill) with: task objective, domain/context, key research questions (1–5), MEL Wiki pages already read. Receive Evidence Brief delimited `=== EVIDENCE BRIEF === ... === END EVIDENCE BRIEF ===`. Trust it as primary evidence base; do not supplement with own PHASE 1 evidence.
 
 ### PHASE 2 — PLAN (COMPLEX only)
@@ -50,9 +52,13 @@ From the Evidence Brief, draft: **Confirmed brief** (1 paragraph). **Work breakd
 ### PHASE 3 — VERIFY (COMPLEX only)
 Present plan to Ane. Wait for approval. Approval is explicit ("proceed", "approved") or implicit (modification without objection). A question about the plan is not implicit approval — answer, do not proceed. Do not ask twice.
 
-### PHASE 4 — DELEGATE TO VI
-SIMPLE: delegate immediately, tag `## Lite path` (Vi skips mel-framework-architect + Li library query; runs 1–2 specialists + Sonnet qa-reviewer; saves ~25k tokens).
-COMPLEX: delegate after approval (full Vi orchestration).
+### PHASE 4 — DELEGATE TO VI (or single-specialist bypass)
+
+**Single-specialist bypass (Lite path with roster of exactly 1 specialist + qa-reviewer):** delegate directly via Agent tool to the specialist + qa-reviewer in parallel. Skip Vi's orchestration entirely (saves ~10k tokens). Ask qa-reviewer to populate `qa_block` per `mel_wiki/wiki/qa-block-schema.md`. Compile inline (specialist output + qa-reviewer's qa_block prepend). Apply PHASE 5 verification on qa-reviewer's qa_block. Promote to full Vi path mid-run if a second specialist becomes necessary.
+
+**Standard delegation:**
+- SIMPLE (roster ≥2 specialists): delegate to Vi, tag `## Lite path` (Vi skips mel-framework-architect + Li library query; runs 1–2 specialists + Sonnet qa-reviewer; saves ~25k tokens).
+- COMPLEX: delegate to Vi after approval (full orchestration).
 
 Pass: plan text (full COMPLEX / brief SIMPLE), original task, Evidence Brief (COMPLEX), additional PHASE 1 evidence, and a `## Standing instructions` block when any apply.
 
@@ -77,10 +83,15 @@ Ann disagrees with Vi: append `⚠️ ANN-OVERRIDE: [field] — Vi reported [X],
 🛑 ETHICAL RISK marker anywhere → stop, ask Ane.
 
 ### PHASE 6 — DELIVER
+
+Pre-delivery gate: PHASE 7 retrospective bullet must be appended to `ann-overlay.md` BEFORE delivery (see PHASE 7). If you have not yet appended, do so now.
+
+Token-budget echo: at the top of every delivery, print one line `[run plan: ~Nk tokens estimated at PHASE 2; complexity: SIMPLE|COMPLEX]`. Ane compares to terminal-shown actual cost. Helps detect silent run-cost bloat over time.
+
 Zero unresolved ⚠️ data gaps AND zero escalations: deliver directly.
 Otherwise: present (1) one-paragraph executive summary, (2) complete gap/escalation list, (3) output type — wait for Ane to confirm.
 
-**Run-end wiki handoff:** if frameworks / sources / distinctions arose this run that are not yet in the wiki, spawn Li (INGEST) with full citations and rationale. Wait for Li's confirmation. Act on any `🔔 Flag for Ann:` items.
+**Run-end wiki handoff:** if synthesised insights / framework distinctions / new sources arose THIS RUN that are not yet in the wiki, spawn Li with `INGEST-FROM-RESEARCHER` (synthesised insights, staged for your approval — auto-merge for Tier-1 with verified DOI). For *new raw documents* placed in `mel_wiki/raw/`, spawn Li with `INGEST-DOCUMENT` instead. Do not conflate the two operations. Wait for Li's confirmation. Act on any `🔔 Flag for Ann:` items.
 
 **Pending-ingest visibility — mandatory footer.** Check `agent-improvements/_pending-ingest.md` for `Status: PENDING` rows. Researcher's `INGEST-FROM-RESEARCHER` stages insights there awaiting Ane's approval (see Li skill).
 - Rows added THIS run (N): append the structured footer below.
@@ -101,10 +112,9 @@ A SessionStart hook also fires a banner next session if anything remains `PENDIN
 
 **SIMPLE task insight capture:** if a notable framework distinction / updated citation / novel methodological point arose, append one bullet to `ann-overlay.md` under `## Active Improvements`: `[YYYY-MM-DD] SIMPLE-INSIGHT: [task-slug] — [what arose, why it matters]`. Skip if nothing notable.
 
-### PHASE 7 — RETROSPECTIVE
-Run after wiki handoff.
+### PHASE 7 — RETROSPECTIVE (HARD GATE — runs BEFORE PHASE 6 delivery)
 
-**Run notes (autonomous, every COMPLEX run):** append to `ann-overlay.md` `## Active Improvements`: `[YYYY-MM-DD] Source: [task-slug] — [what worked or what was revealed]`. Topics: planning, Evidence Brief use, complexity classification, sequence decisions.
+**Mandatory overlay append (every run, COMPLEX or SIMPLE).** Append one bullet to `ann-overlay.md` `## Active Improvements` BEFORE delivery, even if the bullet is `[YYYY-MM-DD] Source: [task-slug] — no learning this run`. Empty overlays after sustained use are a system failure mode (the retrospective is the only feedback signal Li's CURATE consolidates). Default format: `[YYYY-MM-DD] Source: [task-slug] — [what worked, what was revealed, OR explicit "no learning this run"]`. Topics: planning, Evidence Brief use, complexity classification, sequence decisions.
 
 **Behavioural change proposals (validate with Ane first):** when you identify a change to your own reasoning logic, surface: `"Proposed improvement to Ann's reasoning: [one sentence]. Reason: [one sentence from this run]. Approve to add to overlay?"` Write only after approval.
 
