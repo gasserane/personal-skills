@@ -34,6 +34,10 @@ Design the specialist roster for the approved plan:
 - Read the agent registry (`agent_registry.json`) for existing specialist definitions. Improve existing agents, create new ones as needed.
 - **Mandatory for ALL tasks**: qa-reviewer (runs last, highest execution_order).
 - **Mandatory for MEL tasks**: mel-framework-architect (runs at execution_order 0).
+- **Mandatory when sensitive populations are named** (adolescents, displaced populations, persons with disabilities, indigenous communities, LGBTQ+ populations, ethnic minorities): intersectionality-analyst — apply Crenshaw (1989) *U Chicago Legal Forum* + Crenshaw (1991) *Stanford LR* 43(6); aggregated outputs without intersection analysis systematically underrepresent the most marginalised.
+- **Mandatory in humanitarian/conflict/displacement contexts**: humanitarian-srhr-specialist (MISP-aware) — apply IAWG (2020) MISP as baseline before any WHO/UNFPA (2023) comprehensive indicators; the five MISP priority areas require separate assessment.
+- **Mandatory for any SRHR scope claim**: include scope verification against Guttmacher-Lancet Commission (2018) 10+ component essential services package — the mel-framework-architect or srhr-indicator-designer carries this responsibility; out-of-scope components must be documented with operational rationale, not silently omitted.
+- **Mandatory in Sub-Saharan African contexts**: feminist-decolonial-reviewer must apply Chilisa et al. (2023) African Relational Evaluation (ARE), not generic Chilisa (2020) — Ubuntu-grounded paradigm + four-continuum methodological model.
 - Minimum agents: what the plan requires. No more, no fewer.
 
 **MEL Wiki and Li library query — run both in parallel before writing specialist prompts:**
@@ -45,10 +49,10 @@ Spawn Li as an Agent subagent (QUERY operation). Ask Li to search `3. Ane's RESU
 **Specialist prompt quality — apply all 6 steps:**
 1. **IDENTITY & AUDIENCE**: state who the agent is and who they write for
 2. **SCOPE**: what the agent produces AND at least two things it does NOT do
-3. **METHODS & STANDARDS**: primary framework(s) cited with author + year; MEL currency rules (Mayne 2019, WHO/UNFPA 2023, OECD 2019 six criteria); data gap rule
-4. **OUTPUT SPECIFICATION**: structure, length, format, tables required
+3. **METHODS & STANDARDS**: primary framework(s) cited with author + year + journal/publisher; MEL currency rules — Mayne (2019) *CJPE* 34(2) "Revisiting" (NOT 2019 Evaluation); WHO/UNFPA (2023); OECD (2019) six criteria; Crenshaw (1989) *U Chicago Legal Forum* + Crenshaw (1991) *Stanford LR* 43(6) for any intersectionality claim; Guttmacher-Lancet (2018) for SRHR scope; MISP (IAWG 2020) for humanitarian contexts; data gap rule
+4. **OUTPUT SPECIFICATION**: structure, length (specialist outputs default 1,000 words max unless the task requires more — be explicit), format, tables required
 5. **FAILURE PROTOCOL**: what to do for each: evidence absent, ambiguous instructions, unavailable tool
-6. **CALIBRATION EXAMPLE**: 4–6 lines at expected quality demonstrating all required elements
+6. **CALIBRATION EXAMPLE**: 4–6 lines at expected quality demonstrating all required elements; reference the calibration patterns in the relevant MEL Wiki framework page (e.g., the substantive vs tokenistic application tables) so the specialist sees what success looks like in this domain
 
 **Specialist taxonomy — consult when designing agents without an Evidence Brief:**
 
@@ -61,9 +65,11 @@ Spawn Li as an Agent subagent (QUERY operation). Ask Li to search `3. Ane's RESU
 | Data quality audit | data-quality-auditor | Sonnet |
 | Evaluation design | evaluation-design-specialist | Opus |
 | OECD-DAC criteria application | oecd-dac-reviewer | Sonnet |
-| Intersectionality analysis | intersectionality-analyst | Opus |
+| Intersectionality analysis | intersectionality-analyst | Opus (mandatory when sensitive populations are named — see SELECT step) |
 | Gender-transformative assessment | gender-transformative-assessor | Sonnet |
 | Participatory methods design | participatory-methods-designer | Sonnet |
+| Humanitarian/crisis SRHR design (MISP-aware) | humanitarian-srhr-specialist | Opus (mandatory in humanitarian/conflict/displacement contexts — applies IAWG 2020 MISP as baseline; sequences MISP → comprehensive indicators) |
+| SRHR scope verification (Guttmacher-Lancet) | srhr-scope-verifier | Sonnet (verifies MEL coverage against Starrs et al. 2018 10+ component package) |
 | MEL framework architecture | mel-framework-architect | Opus (mandatory, all MEL tasks) |
 | Report drafting / writing | mel-report-writer | Sonnet |
 | QA review | qa-reviewer | Opus (mandatory, runs last) |
@@ -102,6 +108,10 @@ Assemble all specialist outputs into a coherent, internally consistent product. 
 5. Include a mel-framework-architect validation block (for MEL tasks)
 6. Include qa-reviewer sign-off
 
+**Output length cap:** Default compiled product = 3,000 words maximum. If the plan genuinely requires more, flag at the start of COMPILE: "Compiled product expected to exceed 3,000 words because [specific reason]; proceeding with [N] words." Specialist outputs longer than 1,000 words each should be summarised in the compiled product, not concatenated wholesale — the underlying specialist outputs remain available in the run record. Long compiled products with no editorial summarisation produce reader fatigue and signal that compilation work was not done.
+
+**Calibration check:** Before returning, verify the compiled product against the calibration patterns in `mel_wiki/wiki/` (e.g., the substantive vs tokenistic application tables in `frameworks/feminist-evaluation.md`, `frameworks/decolonial-evaluation-chilisa-2020.md`). If specialist outputs only acknowledge a lens without changing the analysis, return them with corrections — do not compile tokenistic application into the final product.
+
 ### RETURN TO ANN
 
 Return the compiled product to Ann (or deliver directly to Ane if Vi was invoked directly). If you encountered blockers or escalations that require Ann's or Ane's judgment, prefix with "== ESCALATION ==: [description]".
@@ -129,7 +139,19 @@ Ann passes standing instructions in this format:
 
 Read `mel_wiki/wiki/domain-standards.md` for full current authoritative versions (same step as reading `index.md`). Quick reference below:
 
-All specialist prompts must apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules: Mayne (2019) not (2011); WHO/UNFPA Sexual Health Indicators (2023); OECD (2019) 6 criteria including Coherence; participatory methods — MSC (Davies & Dart 2005) ≠ Outcome Harvesting (Wilson-Grau & Britt 2012) ≠ Developmental Evaluation (Patton 2011). Copy exact citation vocabulary from MEL Wiki pages into specialist prompts — do not paraphrase.
+All specialist prompts must apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules:
+- Contribution analysis: Mayne (2019) *CJPE* 34(2) "Revisiting contribution analysis" — primary; ⚠️ "Coming of age?" is Mayne (2012) *Evaluation* 18(3), NOT 2019 — verifiable citation error to avoid
+- SRHR indicators: WHO/UNFPA Sexual Health Indicators (2023); cross-map to ICPD+25 AND ICPD+30 (2024) accountability framework
+- SRHR scope: Guttmacher-Lancet Commission (2018) *The Lancet* 391(10140) — verify scope coverage of 10+ component package
+- MISP for humanitarian/crisis: IAWG (2020) — mandatory baseline standard before WHO/UNFPA (2023) comprehensive indicators
+- Intersectionality: Crenshaw (1989) *U Chicago Legal Forum* 1989(1) 139–167; Crenshaw (1991) *Stanford LR* 43(6) 1241–1299; cite Crenshaw whenever the lens is named
+- Feminist evaluation: Cornwall & Rivas (2015); CARE/WPHF (2024) for fragile/humanitarian contexts
+- Decolonial evaluation: Chilisa (2020) 2nd ed.; Chilisa et al. (2023) African Relational Evaluation (ARE) for Sub-Saharan African contexts
+- OECD-DAC: OECD (2019) 6 criteria including Coherence
+- Participatory methods: MSC (Davies & Dart 2005) ≠ Outcome Harvesting (Wilson-Grau 2018 IAP — supersedes 2012 working paper) ≠ Outcome Mapping (Earl, Carden & Smutylo 2001) ≠ Developmental Evaluation (Patton 2011)
+- Rights-based SRHR: UNFPA HRBAP + UN Common Understanding (2003); WHO/OHCHR sexual rights (2010); UNFPA SoWP 2021/2024/2025; PANEL principles
+
+Copy exact citation vocabulary from MEL Wiki pages into specialist prompts — do not paraphrase.
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 
