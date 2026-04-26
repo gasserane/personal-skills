@@ -37,7 +37,7 @@ Design the specialist roster for the approved plan:
 - **Mandatory when sensitive populations are named** (adolescents, displaced populations, persons with disabilities, indigenous communities, LGBTQ+ populations, ethnic minorities): intersectionality-analyst — apply Crenshaw (1989) *U Chicago Legal Forum* + Crenshaw (1991) *Stanford LR* 43(6); aggregated outputs without intersection analysis systematically underrepresent the most marginalised.
 - **Mandatory in humanitarian/conflict/displacement contexts**: humanitarian-srhr-specialist (MISP-aware) — apply IAWG (2020) MISP as baseline before any WHO/UNFPA (2023) comprehensive indicators; the five MISP priority areas require separate assessment.
 - **Mandatory for any SRHR scope claim**: include scope verification against Guttmacher-Lancet Commission (2018) 10+ component essential services package — the mel-framework-architect or srhr-indicator-designer carries this responsibility; out-of-scope components must be documented with operational rationale, not silently omitted.
-- **Mandatory in Sub-Saharan African contexts**: feminist-decolonial-reviewer must apply Chilisa et al. (2023) African Relational Evaluation (ARE), not generic Chilisa (2020) — Ubuntu-grounded paradigm + four-continuum methodological model.
+- **Mandatory in Sub-Saharan African contexts**: feminist-decolonial-reviewer must apply Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) African Relational Evaluation (ARE), not generic Chilisa (2020) — Ubuntu-grounded paradigm + four-continuum methodological model.
 - **Mandatory in Europe and Central Asia (ECA) contexts**: every specialist prompt must include the ECA calibration page reference (`mel_wiki/wiki/concepts/europe-central-asia-srhr-context.md`); feminist-decolonial-reviewer must apply Chilisa (2020) general decolonial epistemology with the three post-Soviet/EU-centre-periphery/Russian-language adaptations — do NOT default to ARE; HIV-relevant specialists must use UNAIDS EECA Regional Profile (latest annual) and flag that EECA HIV trend is opposite to global; SRHR-indicator specialists must use WHO (2010) WHO/RHR/10.12 (verified) and not the unverified "WHO/UNFPA 2023".
 - Minimum agents: what the plan requires. No more, no fewer.
 
@@ -147,7 +147,7 @@ All specialist prompts must apply current authoritative versions per CLAUDE.md F
 - MISP for humanitarian/crisis: IAWG (2020) — mandatory baseline standard before WHO/UNFPA (2023) comprehensive indicators
 - Intersectionality: Crenshaw (1989) *U Chicago Legal Forum* 1989(1) 139–167; Crenshaw (1991) *Stanford LR* 43(6) 1241–1299; cite Crenshaw whenever the lens is named
 - Feminist evaluation: Cornwall & Rivas (2015); CARE/WPHF (2024) for fragile/humanitarian contexts
-- Decolonial evaluation: Chilisa (2020) 2nd ed.; Chilisa et al. (2023) African Relational Evaluation (ARE) for Sub-Saharan African contexts
+- Decolonial evaluation: Chilisa (2020) 2nd ed.; Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) African Relational Evaluation (ARE) for Sub-Saharan African contexts
 - OECD-DAC: OECD (2019) 6 criteria including Coherence
 - Participatory methods: MSC (Davies & Dart 2005) ≠ Outcome Harvesting (Wilson-Grau 2018 IAP — supersedes 2012 working paper) ≠ Outcome Mapping (Earl, Carden & Smutylo 2001) ≠ Developmental Evaluation (Patton 2011)
 - Rights-based SRHR: UNFPA HRBAP + UN Common Understanding (2003); WHO/OHCHR sexual rights (2010); UNFPA SoWP 2021/2024/2025; PANEL principles
