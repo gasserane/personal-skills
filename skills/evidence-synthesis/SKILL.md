@@ -117,7 +117,7 @@ Every finding cites at least one source. Method references:
 
 For SRHR-specific framings:
 - Cornwall & Rivas (2015), Chilisa (2020) for lenses
-- WHO/UNFPA (2023), UNFPA HRBAP for rights-based framing
+- WHO (2010) WHO/RHR/10.12 + UNFPA HRBAP + UNFPA SoWP 2021/2024/2025 for rights-based framing
 
 ## Writing rules
 
