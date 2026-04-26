@@ -51,6 +51,11 @@ Extract an explicit list of research questions before proceeding. If fewer than 
 2. Consensus search: `mcp__claude_ai_Consensus__search` for peer-reviewed synthesis on the key research questions
 3. PubMed search if biomedical or public health angle is present: `mcp__claude_ai_PubMed__search_articles`
 
+**Default SRHR search additions — for any task with an SRHR domain:**
+- One WebSearch for ICPD+30 (2024) accountability framework data relevant to the task — this is the current monitoring frame, not ICPD+25 alone
+- One WebSearch for UNFPA SoWP 2024 ("Interwoven Lives, Threads of Hope") for the 30-year equity audit findings on excluded populations in the task's geographic context
+- For humanitarian/conflict/displacement contexts: one WebSearch for IAWG MISP (2020) implementation guidance and country-specific MISP assessment data
+
 **Source quality tiers — apply before including any source in artifacts:**
 - **Tier 1:** Peer-reviewed journal articles (cite with DOI or PMID where available)
 - **Tier 2:** Institutional publications (WHO, UNFPA, IPPF, UNAIDS, OECD, UN agencies)
@@ -72,13 +77,15 @@ Produce two distinct artifacts. Never conflate them.
 **Length limit: 2,500 words maximum.** Findings must be synthesis-level, not document summaries. If space is constrained, prioritise: applicable frameworks > data gaps > methodological recommendations > empirical findings summary.
 
 Structure:
-1. **Applicable frameworks** — current versions only; each cited as: Author(s) (Year) Title, Section X
-2. **Key empirical findings** — organised by research question; each finding attributed to a source
-3. **Methodological recommendations** — with rationale linked to evidence (not asserted)
-4. **Data gaps** — `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
-5. **Recommended specialist roster for Vi** — use taxonomy below; include model recommendation per specialist
-6. **Source list** — Tier 1/2/3 labelled; full citation for each
-7. **Confidence rating** — HIGH / MEDIUM / LOW with explicit rationale
+1. **Applicable frameworks** — current versions only; each cited as: Author(s) (Year) Title, Journal/Publisher, Volume/Issue, Section X
+2. **SRHR scope verification (mandatory for SRHR Evidence Briefs)** — map the programme's intended activities against the Guttmacher-Lancet Commission (2018) 10+ component essential services package; document which components are in scope, out of scope, and partially in scope; for each out-of-scope component, identify the operational reason. Silent omissions are a quality failure — surface them explicitly to Ann.
+3. **MISP baseline check (mandatory for humanitarian/conflict/displacement contexts)** — assess MISP implementation status across the five priority areas; flag any priority area where status cannot be determined from available evidence; recommend that comprehensive WHO/UNFPA (2023) indicators be deferred until MISP implementation is verified
+4. **Key empirical findings** — organised by research question; each finding attributed to a source
+5. **Methodological recommendations** — with rationale linked to evidence (not asserted)
+6. **Data gaps** — `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
+7. **Recommended specialist roster for Vi** — use taxonomy below; include model recommendation per specialist; in humanitarian/crisis contexts include `humanitarian-srhr-specialist`; for any task with sensitive populations include `intersectionality-analyst`
+8. **Source list** — Tier 1/2/3 labelled; full citation for each
+9. **Confidence rating** — HIGH / MEDIUM / LOW with explicit rationale
 
 ---
 
@@ -128,7 +135,7 @@ When proposing a behavioral generalization (e.g., "always run PubMed before Cons
 
 In the "Recommended specialist roster" section of Artifact A, list only the specialist names the task requires — no model recommendation (Vi owns model selection). Use these names exactly:
 
-`contribution-plausibility-analyst`, `srhr-indicator-designer`, `feminist-decolonial-reviewer`, `toc-architect`, `data-quality-auditor`, `evaluation-design-specialist`, `oecd-dac-reviewer`, `intersectionality-analyst`, `gender-transformative-assessor`, `participatory-methods-designer`, `mel-framework-architect` (mandatory for all MEL tasks), `mel-report-writer`, `qa-reviewer` (mandatory, runs last)
+`contribution-plausibility-analyst`, `srhr-indicator-designer`, `srhr-scope-verifier` (Guttmacher-Lancet scope check; mandatory for any SRHR scope claim), `feminist-decolonial-reviewer`, `toc-architect`, `data-quality-auditor`, `evaluation-design-specialist`, `oecd-dac-reviewer`, `intersectionality-analyst` (mandatory when sensitive populations are named), `gender-transformative-assessor`, `participatory-methods-designer`, `humanitarian-srhr-specialist` (MISP-aware; mandatory in humanitarian/conflict/displacement contexts), `mel-framework-architect` (mandatory for all MEL tasks), `mel-report-writer`, `qa-reviewer` (mandatory, runs last)
 
 Select only what the task requires. No more, no fewer. This roster is advisory — Vi owns final specialist design and may refine or extend it. Do not label it as binding.
 
@@ -136,7 +143,19 @@ Select only what the task requires. No more, no fewer. This roster is advisory �
 
 Read `mel_wiki/wiki/domain-standards.md` for full current authoritative versions (same step as reading `index.md`). Quick reference below:
 
-Apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules: Mayne (2019) not (2011); WHO/UNFPA Sexual Health Indicators (2023); OECD (2019) 6 criteria including Coherence; participatory methods — MSC (Davies & Dart 2005) ≠ Outcome Harvesting (Wilson-Grau & Britt 2012) ≠ Developmental Evaluation (Patton 2011). Flag any source in your literature review that cites a superseded version or conflates these methods.
+Apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules:
+- Contribution analysis: Mayne (2019) *CJPE* 34(2) "Revisiting contribution analysis" — primary; ⚠️ "Coming of age?" is Mayne (2012) *Evaluation* 18(3), NOT 2019 — verifiable citation error to flag in any source you find that uses the wrong combination
+- SRHR indicators: WHO/UNFPA Sexual Health Indicators (2023); cross-map to ICPD+25 Nairobi commitments AND ICPD+30 (2024) accountability framework
+- SRHR scope definition: Guttmacher-Lancet Commission (2018) *The Lancet* 391(10140) 2642–2692 — mandatory scope verification reference for any SRHR Evidence Brief
+- MISP for SRHR in crisis: IAWG (2020) — mandatory baseline standard for humanitarian/conflict/displacement contexts; precedes WHO/UNFPA (2023) comprehensive indicators
+- Intersectionality: Crenshaw (1989) *U Chicago Legal Forum* 1989(1) 139–167; Crenshaw (1991) *Stanford LR* 43(6) 1241–1299; ⚠️ NOT UCLA Law Review for the 1989 citation
+- Feminist evaluation: Cornwall & Rivas (2015); CARE/WPHF (2024) Feminist MEAL for fragile/humanitarian contexts
+- Decolonial evaluation: Chilisa (2020) 2nd ed.; Chilisa et al. (2023) African Relational Evaluation (ARE) — apply ARE in Sub-Saharan African contexts
+- Rights-based SRHR: UNFPA SoWP 2021 (bodily autonomy), SoWP 2024 (ICPD+30 equity audit), SoWP 2025 (reproductive agency); PANEL principles
+- OECD-DAC: OECD (2019) 6 criteria including Coherence
+- Participatory methods: MSC (Davies & Dart 2005) ≠ OH (Wilson-Grau 2018 IAP — supersedes 2012 working paper) ≠ Outcome Mapping (Earl, Carden & Smutylo 2001) ≠ DE (Patton 2011)
+
+Flag any source in your literature review that cites a superseded version or conflates these methods.
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 

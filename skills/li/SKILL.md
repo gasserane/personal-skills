@@ -130,7 +130,17 @@ Output: Markdown table with these columns, appended to `RESOURCES_INDEX.md` unde
 
 1. Check all pages are in `index.md` (flag orphans)
 2. Check for broken cross-references
-3. Check for framework version errors (Mayne 2019 not 2011; OECD 2019 not pre-2019)
+3. Check for framework version errors and citation conflations:
+   - **Mayne (2019) cited as "Coming of age?" in *Evaluation* 25(3)** — WRONG combination. Correct: 2019 is "Revisiting contribution analysis" in *CJPE* 34(2). "Coming of age?" is the 2012 article in *Evaluation* 18(3). This conflation has appeared in the wiki and agent skills — flag every instance.
+   - **Crenshaw (1989) cited in *UCLA Law Review*** — WRONG. Correct journal is *University of Chicago Legal Forum*, 1989(1), 139–167.
+   - **Wilson-Grau & Britt (2012) cited as the current Outcome Harvesting reference** — outdated. Correct current reference: Wilson-Grau (2018) IAP "Outcome Harvesting: Principles, Steps, and Evaluation Applications".
+   - **OECD-DAC cited with only 5 criteria** — outdated. OECD (2019) introduced Coherence as the 6th criterion.
+   - **Mayne (2011) cited as the current version in complex-system contexts** — outdated. Use Mayne (2019) CJPE.
+   - **SRHR programme in Sub-Saharan African context citing only Chilisa (2020) generic** — flag as incomplete. Chilisa et al. (2023) African Relational Evaluation (ARE) is the regional standard.
+   - **SRHR MEL framework in humanitarian/conflict context without MISP (IAWG 2020) baseline** — flag as incomplete. MISP precedes WHO/UNFPA (2023) comprehensive indicators in acute crisis settings.
+   - **SRHR scope claim without Guttmacher-Lancet (2018) scope verification** — flag as incomplete. The Commission's 10+ component package is the definitional standard.
+   - **Intersectionality named without Crenshaw (1989) and (1991) citations** — flag as incomplete. Crenshaw is the foundational citation.
+   - **SRHR indicators cross-referenced only to ICPD+25** — flag as incomplete. ICPD+30 (2024) is the current accountability frame; both should be cross-referenced.
 4. Append lint summary to `mel_wiki/wiki/log.md`
 5. Return prioritised fix list
 6. Read `agent-improvements/` directory: check all four overlay files for stale entries (same entry present across 10+ runs without consolidation), flag entries with broken format (missing date or task-slug), and route any `coordination-log.md` entries whose "Proposed fix" names an agent but have no matching entry in that agent's overlay. Append findings to the lint summary.
