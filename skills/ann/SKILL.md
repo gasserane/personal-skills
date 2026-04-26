@@ -44,6 +44,21 @@ Read `mel_wiki/wiki/index.md`, then read relevant pages. Use as primary framewor
 
 **Sub-Saharan African context detection:** If task names a Sub-Saharan African country/region or AfrEA Member Association, flag Chilisa et al. (2023) African Relational Evaluation (ARE) as the more appropriate decolonial frame than generic Chilisa (2020) for the Researcher Evidence Brief.
 
+**Europe and Central Asia (ECA) context detection — Ane's most frequent context:** Scan task description for ECA country/region keywords. ECA triggers are critical because generic Global South framing produces calibration errors here. If any of the following are present, mandatorily read `mel_wiki/wiki/concepts/europe-central-asia-srhr-context.md` before delegating to Researcher, and pass the ECA context page reference in the brief:
+- EECA (post-Soviet, non-EU): Russia, Belarus, Ukraine, Moldova, Armenia, Azerbaijan, Georgia, Kazakhstan, Uzbekistan, Kyrgyzstan, Tajikistan, Turkmenistan
+- EU candidate / Western Balkans: Albania, Bosnia, Kosovo, Montenegro, North Macedonia, Serbia
+- EU member states with IPPF MAs: Romania, Bulgaria, Poland, Hungary, Czechia, Slovakia, Slovenia, Croatia (and other EU MAs)
+- Roma populations (any country)
+- "Russian-speaking minorities", LGBTI+ in restrictive contexts, "post-Soviet"
+- Ukraine + 2022/refugees/IDPs/humanitarian (combine with MISP trigger)
+
+ECA-specific mandatory framings (must appear in the brief to Researcher):
+- HIV epidemic in EECA is *increasing* (UNAIDS 2024: 20% increase since 2010) — opposite to global trend; do not use global success narrative
+- Do NOT apply ARE (Ubuntu) to ECA — apply Chilisa (2020) general decolonial epistemology with three post-Soviet/EU-centre-periphery/Russian-language adaptations per the ECA wiki page
+- WHO Europe Action Plan 2017–2021 (EUR/RC66/13) is the canonical regional SRHR plan; flag if a successor plan is published
+- For EU-funded work: EU GAP III (2021–2025) thematic indicators are the donor reporting standard alongside global frameworks
+- Roma populations: ethnicity disaggregation mandatory; flag as structural data gap if HMIS does not capture
+
 When in doubt between SIMPLE and COMPLEX, classify as COMPLEX.
 
 Ask at most ONE clarifying question — only if something genuinely critical is missing. Apply the test: "If I assumed the most reasonable default, would the output still serve Ane well?" If yes, proceed.
@@ -129,7 +144,7 @@ Apply throughout. Current authoritative versions:
 - Contribution analysis: Mayne (2019) *CJPE* 34(2) "Revisiting contribution analysis" — primary; ⚠️ "Coming of age?" is Mayne (2012) *Evaluation* 18(3), NOT 2019 — verifiable citation error to avoid; vocabulary: "contribution plausibility"
 - Feminist evaluation: Cornwall & Rivas (2015); CARE/WPHF (2024) Feminist MEAL for fragile/humanitarian contexts; feminist evaluation ≠ gender-disaggregated data
 - Intersectionality: Crenshaw (1989) *U Chicago Legal Forum* 139–167; Crenshaw (1991) *Stanford LR* 43(6); cite Crenshaw whenever the lens is named; parallel disaggregation ≠ intersectionality
-- SRHR indicators: WHO/UNFPA Sexual Health Indicators (2023); cross-map to ICPD+25 Nairobi commitments AND ICPD+30 (2024) accountability framework; disaggregate minimum: age, gender identity, disability, geography
+- SRHR indicators: WHO (2010) *Measuring sexual health* (WHO/RHR/10.12) — verified canonical; ⚠️ "WHO/UNFPA Sexual Health Indicators (2023 update)" referenced informally has not been externally verified — do not cite as canonical until verified; cross-map to ICPD+25 Nairobi commitments AND ICPD+30 (2024) accountability framework; disaggregate minimum: age, gender identity, disability (Washington Group WG-SS or WG-SS-Enhanced), geography
 - SRHR scope definition: Guttmacher-Lancet Commission (2018) *The Lancet* 391(10140) — 10+ component essential services package; verify evaluation covers full scope
 - MISP for SRHR in crisis: IAWG (2020) — mandatory baseline standard in humanitarian/conflict/displacement contexts; precedes WHO/UNFPA (2023) comprehensive indicators
 - Rights-based SRHR: UNFPA HRBAP + UN Common Understanding (2003); WHO/OHCHR sexual rights (2010); UNFPA SoWP 2021 (bodily autonomy), SoWP 2024 (ICPD+30 equity audit), SoWP 2025 (reproductive agency); apply PANEL principles

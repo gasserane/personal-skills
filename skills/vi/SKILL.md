@@ -38,6 +38,7 @@ Design the specialist roster for the approved plan:
 - **Mandatory in humanitarian/conflict/displacement contexts**: humanitarian-srhr-specialist (MISP-aware) — apply IAWG (2020) MISP as baseline before any WHO/UNFPA (2023) comprehensive indicators; the five MISP priority areas require separate assessment.
 - **Mandatory for any SRHR scope claim**: include scope verification against Guttmacher-Lancet Commission (2018) 10+ component essential services package — the mel-framework-architect or srhr-indicator-designer carries this responsibility; out-of-scope components must be documented with operational rationale, not silently omitted.
 - **Mandatory in Sub-Saharan African contexts**: feminist-decolonial-reviewer must apply Chilisa et al. (2023) African Relational Evaluation (ARE), not generic Chilisa (2020) — Ubuntu-grounded paradigm + four-continuum methodological model.
+- **Mandatory in Europe and Central Asia (ECA) contexts**: every specialist prompt must include the ECA calibration page reference (`mel_wiki/wiki/concepts/europe-central-asia-srhr-context.md`); feminist-decolonial-reviewer must apply Chilisa (2020) general decolonial epistemology with the three post-Soviet/EU-centre-periphery/Russian-language adaptations — do NOT default to ARE; HIV-relevant specialists must use UNAIDS EECA Regional Profile (latest annual) and flag that EECA HIV trend is opposite to global; SRHR-indicator specialists must use WHO (2010) WHO/RHR/10.12 (verified) and not the unverified "WHO/UNFPA 2023".
 - Minimum agents: what the plan requires. No more, no fewer.
 
 **MEL Wiki and Li library query — run both in parallel before writing specialist prompts:**
@@ -141,7 +142,7 @@ Read `mel_wiki/wiki/domain-standards.md` for full current authoritative versions
 
 All specialist prompts must apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules:
 - Contribution analysis: Mayne (2019) *CJPE* 34(2) "Revisiting contribution analysis" — primary; ⚠️ "Coming of age?" is Mayne (2012) *Evaluation* 18(3), NOT 2019 — verifiable citation error to avoid
-- SRHR indicators: WHO/UNFPA Sexual Health Indicators (2023); cross-map to ICPD+25 AND ICPD+30 (2024) accountability framework
+- SRHR indicators: WHO (2010) *Measuring sexual health* (WHO/RHR/10.12) — verified canonical; ⚠️ "WHO/UNFPA 2023 update" is unverified — do not cite as canonical; cross-map to ICPD+25 AND ICPD+30 (2024) accountability framework; minimum disability disaggregation = Washington Group Short Set (WG-SS)
 - SRHR scope: Guttmacher-Lancet Commission (2018) *The Lancet* 391(10140) — verify scope coverage of 10+ component package
 - MISP for humanitarian/crisis: IAWG (2020) — mandatory baseline standard before WHO/UNFPA (2023) comprehensive indicators
 - Intersectionality: Crenshaw (1989) *U Chicago Legal Forum* 1989(1) 139–167; Crenshaw (1991) *Stanford LR* 43(6) 1241–1299; cite Crenshaw whenever the lens is named

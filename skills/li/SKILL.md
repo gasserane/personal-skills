@@ -141,6 +141,10 @@ Output: Markdown table with these columns, appended to `RESOURCES_INDEX.md` unde
    - **SRHR scope claim without Guttmacher-Lancet (2018) scope verification** — flag as incomplete. The Commission's 10+ component package is the definitional standard.
    - **Intersectionality named without Crenshaw (1989) and (1991) citations** — flag as incomplete. Crenshaw is the foundational citation.
    - **SRHR indicators cross-referenced only to ICPD+25** — flag as incomplete. ICPD+30 (2024) is the current accountability frame; both should be cross-referenced.
+   - **"WHO/UNFPA Sexual Health Indicators (2023 update)" cited as canonical SRHR indicator reference** — this citation has not been externally verified. The verified canonical reference is WHO (2010) *Measuring sexual health* (WHO/RHR/10.12). Until 2023 update is verified or supersedence documented, flag any 2023 citation as `⚠️ pending verification`.
+   - **ECA programme context applying ARE (Chilisa et al. 2023)** — flag as a calibration error. ARE is Ubuntu-grounded for Sub-Saharan African contexts. ECA contexts require Chilisa (2020) general decolonial epistemology with three post-Soviet/EU-centre-periphery/Russian-language adaptations. See `mel_wiki/wiki/concepts/europe-central-asia-srhr-context.md`.
+   - **EECA HIV programme citing global HIV decline narrative** — flag as a regional calibration error. UNAIDS EECA Regional Profile (latest annual) shows EECA new infections increasing (20% increase since 2010). Global success narratives are wrong for this region.
+   - **Disability disaggregation without naming Washington Group Short Set (WG-SS)** — flag as below current standard. WG-SS is the international standard for disability disaggregation; "presence of disability" without WG-SS instrument named is insufficient for international comparability.
 4. Append lint summary to `mel_wiki/wiki/log.md`
 5. Return prioritised fix list
 6. Read `agent-improvements/` directory: check all four overlay files for stale entries (same entry present across 10+ runs without consolidation), flag entries with broken format (missing date or task-slug), and route any `coordination-log.md` entries whose "Proposed fix" names an agent but have no matching entry in that agent's overlay. Append findings to the lint summary.
@@ -225,6 +229,85 @@ Output: Markdown table with these columns, appended to `RESOURCES_INDEX.md` unde
 - Push fails: log error; retain diff in PROPOSED-SKILL-UPDATES.md with `Status: PUSH FAILED — retry on next CURATE`; continue to next diff.
 - `npx skills add` fails: log error; flag to Ane: "skills-lock.json not updated — run `npx skills add gasserane/personal-skills --all -y` manually."
 - Ane declines proposed diffs: mark PROPOSED-SKILL-UPDATES.md `Status: DECLINED [YYYY-MM-DD]`; add `[DECLINED YYYY-MM-DD]` tag to each affected overlay entry so the same change is not re-proposed without new evidence.
+
+### SYNC-CLAUDE-AI — Generate diff for claude.ai system update
+
+**Triggered when:** Ane types `/li sync` | LINT detects a divergence between `mel_wiki/wiki/domain-standards.md` and `claude-ai/mel-framework-reference.md` | weekly schedule (alongside CURATE) | after any `INGEST-FROM-RESEARCHER` that updated `domain-standards.md`
+
+**Purpose:** Keep the claude.ai system in sync with the Claude Code MEL Wiki canonical standards. The two systems will diverge if updates flow only one direction. This operation reads the Claude Code single source of truth (`mel_wiki/wiki/domain-standards.md`) and produces a structured diff for Ane to re-paste into the claude.ai Project knowledge files.
+
+**claude.ai files in scope (in working folder, not committed alongside skills):**
+- `claude-ai-project-instructions.md` — system prompt; minimal updates only (paste-able context block, complexity classification, workflow steps)
+- `mel-framework-reference.md` — canonical framework reference; primary sync target
+- `writing-style-guide.md` — writing conventions; rarely needs sync
+- `calibration-examples.md` — worked examples for each complexity class
+
+**Steps:**
+
+1. Read `mel_wiki/wiki/domain-standards.md` — extract the Current authoritative versions table, the Pending verification list, and the Citation errors to actively avoid list.
+
+2. Read `claude-ai-project-instructions.md` quality standard table + `mel-framework-reference.md` framework standards quick reference table.
+
+3. For each row in the Claude Code domain-standards table, check whether the corresponding row in `mel-framework-reference.md` matches:
+   - Citation (author, year, journal, volume, title)
+   - Current standard wording
+   - Key distinction wording
+   - If mismatched: add to diff
+   - If absent in mel-framework-reference.md: add to diff as "ADD"
+   - If `mel-framework-reference.md` has a row not in domain-standards.md: add to diff as "REVIEW — claude.ai has [X] not in Claude Code canonical; verify direction of correctness"
+
+4. Check the Pending verification list — any pending citation that has been newly added to mel-framework-reference.md without being in pending verification: flag as "PROMOTION REVIEW".
+
+5. Check the Citation errors to actively avoid list — any error pattern that does not yet appear as an explicit warning in mel-framework-reference.md: flag as "ADD WARNING".
+
+6. Check whether the calibration patterns in `mel_wiki/wiki/calibration.md` are reflected in `calibration-examples.md`. If new substantive-vs-tokenistic patterns have been added to the wiki calibration.md but not to calibration-examples.md: add to diff.
+
+7. Check whether new framework pages added to MEL Wiki (e.g., `concepts/europe-central-asia-srhr-context.md`, `frameworks/guttmacher-lancet-srhr-2018.md`, `frameworks/misp-iawg-2020.md`) have a corresponding entry in `mel-framework-reference.md`. If not: add to diff as "ADD framework entry".
+
+8. Write the diff to `agent-improvements/PROPOSED-CLAUDE-AI-SYNC.md`:
+   ```
+   # Proposed claude.ai sync — [YYYY-MM-DD]
+   *Generated by Li SYNC-CLAUDE-AI from mel_wiki/wiki/domain-standards.md (last updated: [date]).*
+   *Status: AWAITING ANE'S RE-PASTE TO CLAUDE.AI PROJECT*
+
+   ## File: mel-framework-reference.md
+
+   ### Citation corrections
+   [diff blocks: Section | Current claude.ai text | Corrected text | Source — domain-standards.md row]
+
+   ### Additions
+   [diff blocks: New section | Content to add | Source]
+
+   ### Pending verification updates
+   [items moved to/from pending verification]
+
+   ### Warnings to add
+   [citation-error-to-avoid patterns to surface]
+
+   ## File: claude-ai-project-instructions.md
+   [if any minimal updates needed]
+
+   ## File: calibration-examples.md
+   [if any calibration pattern updates needed]
+
+   ## How to apply this sync
+   1. Open the relevant file in the working folder.
+   2. Apply each diff block — paste the corrected text replacing the current.
+   3. Re-paste the full updated file content into the corresponding claude.ai Project knowledge file (or instructions field for claude-ai-project-instructions.md).
+   4. Mark `Status: COMPLETED [YYYY-MM-DD]` in this file.
+   ```
+
+9. Surface to Ane: "SYNC complete — claude.ai diff ready in `agent-improvements/PROPOSED-CLAUDE-AI-SYNC.md`. [N] citation corrections; [N] additions; [N] warnings. Review and re-paste into claude.ai Project."
+
+10. After Ane confirms re-paste: append to `mel_wiki/wiki/log.md`:
+    ```
+    [YYYY-MM-DD HH:MM] SYNC-CLAUDE-AI: claude.ai system updated to match Claude Code canonical — [N] changes applied
+    ```
+
+**Failure handling:**
+- If `mel-framework-reference.md` does not exist at expected path: surface "claude.ai sync skipped — mel-framework-reference.md not found at [path]; confirm the working folder contains the claude.ai system files."
+- If domain-standards.md and mel-framework-reference.md are already in sync: write "SYNC complete — no diff. Both systems in alignment as of [date]." and skip steps 8–10.
+- Do not modify the claude.ai files automatically — Li produces the diff; Ane applies and re-pastes. This is intentional: the claude.ai Project knowledge files are updated by Ane in the claude.ai UI, not by Li in the local file. Only after Ane re-pastes do the local files match the claude.ai canonical state.
 
 ### REORGANIZE — Propose restructuring
 
