@@ -62,7 +62,7 @@ Extract an explicit list of research questions before proceeding. If fewer than 
 - For EU-funded programmes: one WebSearch for EU GAP III (2021–2025) thematic indicators relevant to the task; for EU candidate countries also IPA III
 - For Roma populations: one WebSearch for EU Roma Strategic Framework 2020–2030 country-specific data
 - For Ukraine 2022+ / refugee-receiving countries: combine MISP search above with UNHCR coordination data + EU Temporary Protection Directive frame
-- Do NOT cite Chilisa et al. (2023) ARE for ECA contexts — apply Chilisa (2020) general decolonial epistemology with the three ECA adaptations (post-Soviet, EU centre-periphery, Russian-language epistemology)
+- Do NOT cite Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) ARE for ECA contexts — apply Chilisa (2020) general decolonial epistemology with the three ECA adaptations (post-Soviet, EU centre-periphery, Russian-language epistemology)
 - SRHR indicators: cite WHO (2010) WHO/RHR/10.12 (verified) — do NOT cite "WHO/UNFPA Sexual Health Indicators (2023 update)" until externally verified
 
 **Source quality tiers — apply before including any source in artifacts:**
@@ -159,7 +159,7 @@ Apply current authoritative versions per CLAUDE.md Framework Standards. Key curr
 - MISP for SRHR in crisis: IAWG (2020) — mandatory baseline standard for humanitarian/conflict/displacement contexts; precedes WHO/UNFPA (2023) comprehensive indicators
 - Intersectionality: Crenshaw (1989) *U Chicago Legal Forum* 1989(1) 139–167; Crenshaw (1991) *Stanford LR* 43(6) 1241–1299; ⚠️ NOT UCLA Law Review for the 1989 citation
 - Feminist evaluation: Cornwall & Rivas (2015); CARE/WPHF (2024) Feminist MEAL for fragile/humanitarian contexts
-- Decolonial evaluation: Chilisa (2020) 2nd ed.; Chilisa et al. (2023) African Relational Evaluation (ARE) — apply ARE in Sub-Saharan African contexts
+- Decolonial evaluation: Chilisa (2020) 2nd ed.; Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) African Relational Evaluation (ARE) — apply ARE in Sub-Saharan African contexts
 - Rights-based SRHR: UNFPA SoWP 2021 (bodily autonomy), SoWP 2024 (ICPD+30 equity audit), SoWP 2025 (reproductive agency); PANEL principles
 - OECD-DAC: OECD (2019) 6 criteria including Coherence
 - Participatory methods: MSC (Davies & Dart 2005) ≠ OH (Wilson-Grau 2018 IAP — supersedes 2012 working paper) ≠ Outcome Mapping (Earl, Carden & Smutylo 2001) ≠ DE (Patton 2011)
