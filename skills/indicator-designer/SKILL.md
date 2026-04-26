@@ -1,6 +1,6 @@
 ---
 name: indicator-designer
-description: Design MEL/SRHR indicators to IPPF/UNFPA/UNAIDS publication standard. Use when Ane asks for "indicators", "KPIs", "results framework", "M&E indicators", "measurement framework", or equivalent. Enforces WHO/UNFPA (2023) disaggregation, applies Tier 1/2/3 integrity markers, defines measurement mechanisms, and flags data gaps. Distinguishes output, outcome, and impact indicators precisely.
+description: Design MEL/SRHR indicators to IPPF/UNFPA/UNAIDS publication standard. Use when Ane asks for "indicators", "KPIs", "results framework", "M&E indicators", "measurement framework", or equivalent. Enforces WHO (2010) WHO/RHR/10.12 standards plus Washington Group disaggregation, applies Tier 1/2/3 integrity markers, defines measurement mechanisms, and flags data gaps. Distinguishes output, outcome, and impact indicators precisely.
 ---
 
 # Indicator Designer
@@ -44,7 +44,7 @@ For each outcome or output, propose 2-4 candidate indicators. Mix quantitative a
 - **Numerator / denominator**: if rate or proportion; if count, say so
 - **Data source**: survey, routine service data, secondary source, qualitative interview, observation
 - **Frequency**: how often measured
-- **Disaggregation**: at minimum age cohort, gender identity, disability status, geographic stratum (WHO/UNFPA 2023). Flag any missing.
+- **Disaggregation**: at minimum age cohort, gender identity, disability status (Washington Group Short Set WG-SS), geographic stratum — per WHO (2010) WHO/RHR/10.12 cross-mapped with current UN authoritative guidance. Flag any missing.
 - **Tier**:
   - **Tier 1** — globally validated indicator from an authoritative source (WHO, UNFPA, SDG indicator framework). Cite source and year.
   - **Tier 2** — validated indicator adapted for this context. Note the original and the adaptation.

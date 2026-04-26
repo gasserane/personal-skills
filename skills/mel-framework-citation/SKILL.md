@@ -30,7 +30,7 @@ Use these. Flag any alternative as below current standard.
 | Gender-transformative | IGWG Gender Integration Continuum | — | Pair with Rao & Kelleher (2005) for institutional change |
 | Theory of Change | Vogel (2012) DFID review | — | Feminist ToC: van Eerdewijk et al. (2017) KIT |
 | Decolonial evaluation | Chilisa (2020) 2nd ed. | Chilisa (2012) 1st ed. | Pair with Chouinard & Cousins (2015) for practitioner application |
-| Participatory methods | Davies & Dart (2005) MSC; Wilson-Grau & Britt (2012) Outcome Harvesting; Patton (2011) Developmental Evaluation | — | Fals Borda (1987) for PAR epistemology |
+| Participatory methods | Davies & Dart (2005) MSC; Wilson-Grau (2018) IAP "Outcome Harvesting" — supersedes the 2012 Wilson-Grau & Britt working paper; Earl, Carden & Smutylo (2001) Outcome Mapping; Patton (2011) Developmental Evaluation | Wilson-Grau & Britt (2012) — superseded | Fals Borda (1987) for PAR epistemology |
 | OECD-DAC criteria | OECD (2019) "Better Criteria for Better Evaluation" | 1991 edition (5 criteria) | Must include Coherence or flag omission |
 
 ### Mandatory disaggregation for indicators
