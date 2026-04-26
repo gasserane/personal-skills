@@ -111,7 +111,7 @@ Assemble all specialist outputs into a coherent, internally consistent product. 
 
 **Output length cap:** Default compiled product = 3,000 words maximum. If the plan genuinely requires more, flag at the start of COMPILE: "Compiled product expected to exceed 3,000 words because [specific reason]; proceeding with [N] words." Specialist outputs longer than 1,000 words each should be summarised in the compiled product, not concatenated wholesale — the underlying specialist outputs remain available in the run record. Long compiled products with no editorial summarisation produce reader fatigue and signal that compilation work was not done.
 
-**Calibration check:** Before returning, verify the compiled product against the calibration patterns in `mel_wiki/wiki/` (e.g., the substantive vs tokenistic application tables in `frameworks/feminist-evaluation.md`, `frameworks/decolonial-evaluation-chilisa-2020.md`). If specialist outputs only acknowledge a lens without changing the analysis, return them with corrections — do not compile tokenistic application into the final product.
+**Calibration check:** Before returning, verify the compiled product against `mel_wiki/wiki/calibration.md` — the consolidated substantive vs tokenistic application patterns for feminist, decolonial, intersectionality, contribution analysis, and participatory lenses. If specialist outputs match any tokenistic-column pattern (lens acknowledged without changing the analysis), return them for revision — do not compile tokenistic application into the final product. The calibration page is the single source for this check.
 
 ### RETURN TO ANN
 

@@ -40,24 +40,19 @@ Read `mel_wiki/wiki/index.md`, then read relevant pages. Use as primary framewor
 - **SIMPLE**: single analytical output, unambiguous scope, framework known, no ethical flags. Skip PHASE 2 and 3. Run knowledge retrieval + one WebSearch in parallel, then delegate to Vi with a brief plan summary. *Example: "Is gender-transformative the right label for our female-CHW programme?"; "What is the six-step contribution analysis process?"*
 - **COMPLEX**: multiple output types, framework selection required, ethical considerations, synthesis across sources. Full PHASE 2 → 3 → 4. Skip knowledge retrieval and web search — Researcher supersedes both. *Example: "Design a feminist MEL framework for our SRHR programme in a conflict context"; "Evaluate this programme using OECD-DAC criteria with a contribution analysis."*
 
-**Humanitarian/conflict context detection:** During UNDERSTAND, scan task description for: "conflict", "displacement", "humanitarian", "fragile", "crisis", "refugee", "IDP", "emergency". If any are present, classify as COMPLEX (intersectionality + decolonial lens are mandatory) and flag MISP (IAWG 2020) as the relevant baseline standard for any SRHR component — the Researcher Evidence Brief and Vi specialist roster must include MISP-aware specialists.
+**Context detection — applied during UNDERSTAND, before complexity classification:**
 
-**Sub-Saharan African context detection:** If task names a Sub-Saharan African country/region or AfrEA Member Association, flag Chilisa et al. (2023) African Relational Evaluation (ARE) as the more appropriate decolonial frame than generic Chilisa (2020) for the Researcher Evidence Brief.
+Scan the task for context triggers. Multiple may apply simultaneously (e.g., Ukraine 2022+ triggers ECA + humanitarian). Apply all that match.
 
-**Europe and Central Asia (ECA) context detection — Ane's most frequent context:** Scan task description for ECA country/region keywords. ECA triggers are critical because generic Global South framing produces calibration errors here. If any of the following are present, mandatorily read `mel_wiki/wiki/concepts/europe-central-asia-srhr-context.md` before delegating to Researcher, and pass the ECA context page reference in the brief:
-- EECA (post-Soviet, non-EU): Russia, Belarus, Ukraine, Moldova, Armenia, Azerbaijan, Georgia, Kazakhstan, Uzbekistan, Kyrgyzstan, Tajikistan, Turkmenistan
-- EU candidate / Western Balkans: Albania, Bosnia, Kosovo, Montenegro, North Macedonia, Serbia
-- EU member states with IPPF MAs: Romania, Bulgaria, Poland, Hungary, Czechia, Slovakia, Slovenia, Croatia (and other EU MAs)
-- Roma populations (any country)
-- "Russian-speaking minorities", LGBTI+ in restrictive contexts, "post-Soviet"
-- Ukraine + 2022/refugees/IDPs/humanitarian (combine with MISP trigger)
-
-ECA-specific mandatory framings (must appear in the brief to Researcher):
-- HIV epidemic in EECA is *increasing* (UNAIDS 2024: 20% increase since 2010) — opposite to global trend; do not use global success narrative
-- Do NOT apply ARE (Ubuntu) to ECA — apply Chilisa (2020) general decolonial epistemology with three post-Soviet/EU-centre-periphery/Russian-language adaptations per the ECA wiki page
-- WHO Europe Action Plan 2017–2021 (EUR/RC66/13) is the canonical regional SRHR plan; flag if a successor plan is published
-- For EU-funded work: EU GAP III (2021–2025) thematic indicators are the donor reporting standard alongside global frameworks
-- Roma populations: ethnicity disaggregation mandatory; flag as structural data gap if HMIS does not capture
+| Trigger | Keywords | Mandatory action |
+|---|---|---|
+| **Humanitarian / conflict / displacement** | "conflict", "displacement", "humanitarian", "fragile", "crisis", "refugee", "IDP", "emergency" | Classify COMPLEX; MISP (IAWG 2020) as baseline before WHO (2010) comprehensive indicators; intersectionality + decolonial mandatory; Researcher must include `humanitarian-srhr-specialist` in roster; if Ukraine 2022+, distinguish three sub-contexts (active conflict / Western IDP-hosting / refugees in receiving countries) per ECA wiki page |
+| **Sub-Saharan Africa** | SSA country/region or IPPF MA in SSA country; AfrEA references | Apply Chilisa et al. (2023) African Relational Evaluation (ARE) framework, NOT generic Chilisa (2020); Ubuntu-grounded outcome framing; relational accountability |
+| **Europe and Central Asia (ECA — Ane's most frequent context)** | EECA: Russia, Belarus, Ukraine, Moldova, Armenia, Azerbaijan, Georgia, Kazakhstan, Uzbekistan, Kyrgyzstan, Tajikistan, Turkmenistan; EU candidate/Western Balkans: Albania, Bosnia, Kosovo, Montenegro, North Macedonia, Serbia; EU member states with IPPF MAs: Romania, Bulgaria, Poland, Hungary, Czechia, Slovakia, Slovenia, Croatia; "Russian-speaking minorities"; LGBTI+ in restrictive contexts; "post-Soviet" | Mandatorily read `mel_wiki/wiki/concepts/europe-central-asia-srhr-context.md` before delegating; pass ECA context page reference in Researcher brief; do NOT apply ARE; apply Chilisa (2020) with three ECA adaptations; UNAIDS EECA HIV trend is opposite to global (do not use global success narrative); WHO Europe Action Plan 2017–2021 (EUR/RC66/13) is canonical regional plan; for EU-funded work cross-map EU GAP III + country-level NDICI MIPs |
+| **Roma populations** (any country) | "Roma", "Romani", "Sinti", "Gypsy" (in policy or programme context, not slur), Roma sub-group names | Mandatorily read `mel_wiki/wiki/concepts/roma-srhr-mel-context.md` and `mel_wiki/wiki/frameworks/eu-roma-strategic-framework-2020-2030.md`; ethnicity disaggregation mandatory; flag as structural data gap if HMIS does not capture; voluntary self-identification only; address historical involuntary sterilisation legacy in research ethics |
+| **Adolescents + sensitive content** | "adolescent" OR "<18" OR "youth" combined with "GBV"/"VAW"/"sexual violence"/"abortion"/"LGBTI" | Read `mel_wiki/wiki/frameworks/ethics-adolescent-srhr-research.md`; WHO (2007/2016) ethics protocols + UNICEF (2015) child research ethics + IPPF Vision 2030 Safeguarding + GDPR Art. 8 mandatory; care referral pathway must exist before data collection |
+| **Multi-country programme** | 2+ countries named in task | Read `mel_wiki/wiki/concepts/multi-country-mel-design.md`; design for three reporting layers (country-specific / aggregable common / regional pattern); flag aggregation method explicitly (population-weighted vs country-weighted) |
+| **EU-funded** | "NDICI", "GAP III", "IPA III", "EU funded", "European Commission", "DG INTPA", "DG NEAR" | Cross-map programme outcomes to country-level NDICI Multi-Annual Indicative Programme (MIP) indicators — these are the binding reporting target, not GAP III thematic indicators alone |
 
 When in doubt between SIMPLE and COMPLEX, classify as COMPLEX.
 
