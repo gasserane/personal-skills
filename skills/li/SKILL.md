@@ -84,15 +84,37 @@ Append one row to `CLAUDE MEL new RESOURCES/artifact-log.md`:
 | [YYYY-MM-DD] | [task-slug] | literature-reviews/[YYYY-MM-DD]_[task-slug]/ | [count] new sources | Wiki ingested: YES |
 ```
 
-**Step 3 — Ingest MEL Wiki insights**
+**Step 3 — Stage MEL Wiki insights for Ane's review (HUMAN GATE)**
+
+Wiki insights from Researcher are NOT auto-merged into canonical wiki pages. They are staged for Ane's approval to prevent propagation of unverified citations or framework claims.
+
 For each bullet in `wiki-insights.md` that represents a new framework distinction, updated source version, or methodology update:
-1. Read the relevant MEL Wiki page (via `mel_wiki/wiki/index.md`)
-2. Add the insight with citation
-3. Update `mel_wiki/wiki/index.md` if a new page is created
-4. Append to `mel_wiki/wiki/log.md`
+
+1. Append the bullet to `agent-improvements/_pending-ingest.md` (create file with the header below if it does not exist):
+   ```
+   # Pending MEL Wiki Ingests — Awaiting Ane's Approval
+   *Researcher proposes insights here via Li's INGEST-FROM-RESEARCHER. Ane reviews and approves/rejects with `/li approve-ingest [task-slug]` or `/li reject-ingest [task-slug] — [reason]`.*
+
+   | Date | Task slug | Insight | Target wiki page | Source citation | Status |
+   |---|---|---|---|---|---|
+   ```
+
+2. For each row added, fill: date, task slug, the insight bullet, target wiki page (e.g. `frameworks/[name]` or `NEW PAGE: [proposed name]`), source citation as Researcher provided it, status `PENDING`.
+
+3. Do NOT modify `mel_wiki/wiki/` pages, `index.md`, or `log.md` at this step.
+
+4. Surface to Ane in the return message: `🔔 [N] new wiki insights staged in agent-improvements/_pending-ingest.md — review with /li approve-ingest [task-slug] or /li reject-ingest [task-slug] — [reason] before merging into canonical wiki.`
+
+**Approval flow (triggered separately by Ane):**
+
+When Ane runs `/li approve-ingest [task-slug]`: for each PENDING row matching the task slug, perform the original auto-ingest steps (read target wiki page, add insight with citation, update `index.md` if new page created, append to `log.md`). Update the row status to `APPROVED [YYYY-MM-DD]`.
+
+When Ane runs `/li reject-ingest [task-slug] — [reason]`: update the row status to `REJECTED [YYYY-MM-DD] — [reason]`. Do not touch the wiki.
+
+**Citation existence check (run during staging, before surfacing to Ane):** for each new citation in the staged insights, attempt a quick verification — DOI lookup via WebSearch (e.g., `[author] [year] [title] DOI`), or institutional source verification for grey literature. If no DOI/URL can be produced for a citation, prefix the insight with `⚠️ Citation not yet verified — recommend Ane confirms before approval` in the staged row.
 
 **Step 4 — Update RESOURCES_INDEX.md**
-Add the new run folder as an entry under a heading `## CLAUDE MEL new RESOURCES` in `3. Ane's RESURSE/RESOURCES_INDEX.md` (create the heading if absent). Include: date, task slug, folder path, source count.
+Add the new run folder as an entry under a heading derived from the basename of the `Research Artifacts:` path defined in the **Library** section above (currently `## CLAUDE MEL new RESOURCES`) in `3. Ane's RESURSE/RESOURCES_INDEX.md` (create the heading if absent). If the folder is renamed, update both the path constant in the Library section and this heading together — they must match. Include in each entry: date, task slug, folder path, source count.
 
 **Step 5 — Confirm**
 Return to Researcher: `✅ Stored: [YYYY-MM-DD]_[task-slug]/ — [N] files written — MEL Wiki updated: [YES/NO] — artifact-log updated`
