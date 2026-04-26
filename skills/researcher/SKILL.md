@@ -61,7 +61,7 @@ Extract an explicit list of research questions before proceeding. If fewer than 
 - One WebSearch for the latest UNAIDS EECA Regional Profile (annual) — flag that EECA HIV trend is opposite to global (currently increasing)
 - For EU-funded programmes: one WebSearch for EU GAP III (2021–2025) thematic indicators relevant to the task; for EU candidate countries also IPA III
 - For Roma populations: one WebSearch for EU Roma Strategic Framework 2020–2030 country-specific data
-- For Ukraine 2022+ / refugee-receiving countries: combine MISP search above with UNHCR coordination data + EU Temporary Protection Directive frame
+- For Ukraine 2022+: distinguish three sub-contexts before searching — (a) active conflict zone (frontline oblasts) → MISP fully applicable; (b) Western Ukraine IDP-hosting → MISP partial + WHO (2010) comprehensive for host community; (c) refugees in receiving countries (Poland, Moldova, Romania, Slovakia, Czechia, Hungary, Germany) → MISP for emergency-phase + EU Temporary Protection Directive for legal access. ⚠️ EU Temporary Protection Directive applies to refugees in receiving countries, NOT to IDPs in Ukraine — frequent confusion to avoid.
 - Do NOT cite Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) ARE for ECA contexts — apply Chilisa (2020) general decolonial epistemology with the three ECA adaptations (post-Soviet, EU centre-periphery, Russian-language epistemology)
 - SRHR indicators: cite WHO (2010) WHO/RHR/10.12 (verified) — do NOT cite "WHO/UNFPA Sexual Health Indicators (2023 update)" until externally verified
 
