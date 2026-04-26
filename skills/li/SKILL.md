@@ -124,7 +124,7 @@ Output: Markdown table. Append entries to `RESOURCES_INDEX.md` under the correct
 3. Check for framework version errors (Mayne 2019 not 2011; OECD 2019 not pre-2019)
 4. Append lint summary to `mel_wiki/wiki/log.md`
 5. Return prioritised fix list
-10. Read `agent-improvements/` directory: check all four overlay files for stale entries (same entry present across 10+ runs without consolidation), flag entries with broken format (missing date or task-slug), and route any `coordination-log.md` entries whose "Proposed fix" names an agent but have no matching entry in that agent's overlay. Append findings to the lint summary.
+6. Read `agent-improvements/` directory: check all four overlay files for stale entries (same entry present across 10+ runs without consolidation), flag entries with broken format (missing date or task-slug), and route any `coordination-log.md` entries whose "Proposed fix" names an agent but have no matching entry in that agent's overlay. Append findings to the lint summary.
 
 ### CURATE — Consolidate and propose skill updates
 
@@ -160,6 +160,7 @@ Output: Markdown table. Append entries to `RESOURCES_INDEX.md` under the correct
 
    [diff blocks from step 4]
    ```
+   Before step 5 is first run, `PROPOSED-SKILL-UPDATES.md` does not exist — this is the EMPTY state. Do not create the file until step 5.
    If no diffs qualify (no pattern reached 3-run threshold and no behavioral change proposals pending): write "No updates ready for consolidation — overlays contain [N] active entries below threshold." and halt.
 
 6. Surface to Ane: "CURATE complete — skill update proposals ready for [N] agents. Review `agent-improvements/PROPOSED-SKILL-UPDATES.md` and reply 'approve' to push, or request changes."
