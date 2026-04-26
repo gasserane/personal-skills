@@ -54,6 +54,10 @@ Extract an explicit list of research questions before proceeding. If fewer than 
 - **Tier 3:** Grey literature from reputable organisations (national governments, established INGOs)
 - **EXCLUDE:** Blog posts, news articles, non-institutional grey literature, undated sources
 
+**Tool unavailability:** If any external search tool (Consensus, PubMed, knowledge MCP) returns an error or rate limit: record the failure in Artifact A's source list as `⚠️ [Tool] unavailable during this run — additional peer-reviewed sources may be missing`. Continue with available tools. Do not block the run.
+
+**Conflicting evidence:** If Tier 1 sources contradict each other on a material finding: document the conflict in the "Key empirical findings" section using `⚠️ CONFLICT: [Source A] finds [X]; [Source B] finds [Y] — weight of evidence favours [position] because [reason]`. Do not suppress contradictions or present contested findings as settled.
+
 ### STEP 4 — SYNTHESIZE
 
 Produce two distinct artifacts. Never conflate them.
@@ -62,6 +66,7 @@ Produce two distinct artifacts. Never conflate them.
 
 **Artifact A — Evidence Brief**
 *Purpose: consumed by Ann for planning; passed to Vi's specialists as shared context for execution.*
+**Length limit: 2,500 words maximum.** Findings must be synthesis-level, not document summaries. If space is constrained, prioritise: applicable frameworks > data gaps > methodological recommendations > empirical findings summary.
 
 Structure:
 1. **Applicable frameworks** — current versions only; each cited as: Author(s) (Year) Title, Section X
@@ -122,9 +127,11 @@ In the "Recommended specialist roster" section of Artifact A, list only the spec
 
 `contribution-plausibility-analyst`, `srhr-indicator-designer`, `feminist-decolonial-reviewer`, `toc-architect`, `data-quality-auditor`, `evaluation-design-specialist`, `oecd-dac-reviewer`, `intersectionality-analyst`, `gender-transformative-assessor`, `participatory-methods-designer`, `mel-framework-architect` (mandatory for all MEL tasks), `mel-report-writer`, `qa-reviewer` (mandatory, runs last)
 
-Select only what the task requires. No more, no fewer.
+Select only what the task requires. No more, no fewer. This roster is advisory — Vi owns final specialist design and may refine or extend it. Do not label it as binding.
 
 ## MEL/SRHR domain standards
+
+Read `mel_wiki/wiki/domain-standards.md` for full current authoritative versions (same step as reading `index.md`). Quick reference below:
 
 Apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules: Mayne (2019) not (2011); WHO/UNFPA Sexual Health Indicators (2023); OECD (2019) 6 criteria including Coherence; participatory methods — MSC (Davies & Dart 2005) ≠ Outcome Harvesting (Wilson-Grau & Britt 2012) ≠ Developmental Evaluation (Patton 2011). Flag any source in your literature review that cites a superseded version or conflates these methods.
 

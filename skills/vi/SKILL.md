@@ -73,7 +73,7 @@ Spawn each specialist as an Agent subagent. Respect execution_order:
 - Specialists at the same execution_order with no unmet dependencies can be spawned in parallel (multiple Agent calls in one turn).
 - Pass each specialist: their system prompt, their specific subtask, the Evidence Brief (if present — pass it in full as shared context to every specialist), any shared premises with other specialists.
 
-**After your first batch**: send one progress signal — key findings, any direction risk, whether to continue as planned or adjust.
+**After your first batch**: send one progress signal — key findings, any direction risk, whether to continue as planned or adjust. This is informational — Ann and Ane do not need to respond. Continue to execution_order 1 immediately.
 
 ### REVIEW
 
@@ -94,8 +94,8 @@ When proposing a change to Vi's own orchestration logic (execution order, mandat
 ### COMPILE
 
 Assemble all specialist outputs into a coherent, internally consistent product. The compiled product must:
-1. Cover every element of the approved plan
-2. Use consistent framework vocabulary throughout (no contradictions between specialists)
+1. Cover every element of the approved plan (escalated subtasks are excluded from this check — they appear in the ESCALATION annex)
+2. Use consistent framework vocabulary throughout. If specialists contradict on a material point: (a) flag explicitly with ⚠️ CONTRADICTION: [Specialist A position] vs [Specialist B position]; (b) state which position took precedence and why; (c) mark for Ane's verification if not resolvable from evidence
 3. Apply feminist/decolonial lens substantively — not as appended paragraphs
 4. Flag all ⚠️ data gaps clearly
 5. Include a mel-framework-architect validation block (for MEL tasks)
@@ -113,7 +113,20 @@ Return the compiled product to Ann (or deliver directly to Ane if Vi was invoked
 
 Dataset size alone is NOT an Opus trigger. Analytical judgment complexity is.
 
+## Standing instructions (optional)
+
+If Ann's delegation includes a `## Standing instructions` block, apply those preferences to all specialist prompt design for this run. Standing instructions are Ane's validated preferences from prior runs. Do not override them without explicit instruction from Ann or Ane.
+
+Ann passes standing instructions in this format:
+```
+## Standing instructions
+- [preference applied to all specialists]
+- [another validated preference]
+```
+
 ## MEL/SRHR domain standards
+
+Read `mel_wiki/wiki/domain-standards.md` for full current authoritative versions (same step as reading `index.md`). Quick reference below:
 
 All specialist prompts must apply current authoritative versions per CLAUDE.md Framework Standards. Key currency rules: Mayne (2019) not (2011); WHO/UNFPA Sexual Health Indicators (2023); OECD (2019) 6 criteria including Coherence; participatory methods — MSC (Davies & Dart 2005) ≠ Outcome Harvesting (Wilson-Grau & Britt 2012) ≠ Developmental Evaluation (Patton 2011). Copy exact citation vocabulary from MEL Wiki pages into specialist prompts — do not paraphrase.
 

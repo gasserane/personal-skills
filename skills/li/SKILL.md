@@ -73,6 +73,12 @@ Create `CLAUDE MEL new RESOURCES/literature-reviews/[YYYY-MM-DD]_[task-slug]/` w
 - `wiki-insights.md` — MEL Wiki insights bulleted list
 
 **Step 2 — Update artifact log**
+If `CLAUDE MEL new RESOURCES/artifact-log.md` does not exist, create it with this header first:
+```
+| Date | Task slug | Folder path | Source count | Wiki status |
+| --- | --- | --- | --- | --- |
+```
+
 Append one row to `CLAUDE MEL new RESOURCES/artifact-log.md`:
 ```
 | [YYYY-MM-DD] | [task-slug] | literature-reviews/[YYYY-MM-DD]_[task-slug]/ | [count] new sources | Wiki ingested: YES |
@@ -113,11 +119,14 @@ For each document, extract:
 - quality: peer-reviewed / institutional / practitioner / unknown
 - readable: YES / NO / PARTIAL
 
-Output: Markdown table. Append entries to `RESOURCES_INDEX.md` under the correct subfolder heading.
+Output: Markdown table with these columns, appended to `RESOURCES_INDEX.md` under the correct subfolder heading:
+
+`| Title | Author(s) | Year | Language | Doc_type | Key_topics | Quality | Readable |`
+`| --- | --- | --- | --- | --- | --- | --- | --- |`
 
 ### LINT — Audit MEL Wiki
 
-**Triggered weekly or on request.**
+**Triggered on request or automatically as part of CURATE (weekly schedule).**
 
 1. Check all pages are in `index.md` (flag orphans)
 2. Check for broken cross-references

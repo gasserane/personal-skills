@@ -64,7 +64,7 @@ Create a structured implementation plan from the Evidence Brief:
 - **Work breakdown**: what outputs are needed, execution sequence
 - **Required specialist roster**: list each specialist type named in the Evidence Brief with a one-line profile description and model recommendation — this is Vi's direct brief for agent design
 - **Quality criteria**: what defines success for each major output
-- **Cost estimate**: rough range based on task complexity
+- **Cost estimate**: SIMPLE ≈ 10–30k tokens; COMPLEX ≈ 40–100k tokens (Researcher + 3–6 specialists); COMPLEX with full literature review ≈ 80–150k tokens
 - **Ethical flags** (if any from UNDERSTAND or Evidence Brief): surfaced explicitly
 - **Plan confidence score**: what you are UNCERTAIN about (rate 1–5), which uncertainties would most change the approach
 - **Evidence Brief confidence**: record the Researcher's confidence rating (HIGH/MEDIUM/LOW) and any unresolved data gaps flagged
@@ -93,7 +93,7 @@ Receive Vi's compiled product. Run a 5-point check:
 4. **DATA GAP PROTOCOL**: unsupported claims flagged with ⚠️ markers?
 5. **QUALITY STANDARD**: IPPF/UNFPA publication level, not generic NGO level?
 
-If CRITICAL issues (fails point 1, 3, or 4): re-delegate to Vi with specific corrections. Maximum 2 return cycles.
+If CRITICAL issues (fails point 1, 3, or 4): re-delegate to Vi with specific corrections. Maximum 2 return cycles. If Vi fails both cycles without resolving the issue: halt. Present Ane with (1) the partial output from Vi's last attempt, (2) a specific description of what failed, (3) a recommendation — proceed with caveated partial output or abandon the run.
 
 If a 🛑 ETHICAL RISK marker is detected anywhere: stop and ask Ane directly before any further action.
 
@@ -105,6 +105,8 @@ If ANY unresolved data gaps or escalations: first present (1) one-paragraph exec
 
 **Run-end wiki handoff:** After delivery, if any frameworks, sources, or distinctions arose during this run that are not yet in the MEL Wiki, spawn Li as an Agent subagent (INGEST operation). Pass: list of items with full citations and why each matters. Wait for Li's confirmation before closing the run. If Li returns `🔔 Flag for Ann:` items, act on them before closing. If nothing new to add, skip this step.
 
+**SIMPLE task insight capture:** For SIMPLE tasks (which do not generate an Evidence Brief), after delivery, if any framework distinction, updated citation, or novel methodological point arose, append one bullet to `agent-improvements/ann-overlay.md` under `## Active Improvements`: `[YYYY-MM-DD] SIMPLE-INSIGHT: [task-slug] — [what arose and why it matters]`. Skip if nothing notable arose.
+
 ## Task state tracking
 
 Maintain an internal checklist throughout:
@@ -113,6 +115,8 @@ Maintain an internal checklist throughout:
 Narrate each step in 1–2 sentences and state checklist status at each major transition.
 
 ## MEL/SRHR domain standards
+
+Read `mel_wiki/wiki/domain-standards.md` for full current authoritative versions (same step as reading `index.md`). Quick reference below:
 
 Apply throughout. Current authoritative versions:
 - Contribution analysis: Mayne (2019) — "contribution plausibility" vocabulary
