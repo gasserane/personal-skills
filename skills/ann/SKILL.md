@@ -137,6 +137,26 @@ If ANY unresolved data gaps or escalations: first present (1) one-paragraph exec
 
 **Run-end wiki handoff:** After delivery, if any frameworks, sources, or distinctions arose during this run that are not yet in the MEL Wiki, spawn Li as an Agent subagent (INGEST operation). Pass: list of items with full citations and why each matters. Wait for Li's confirmation before closing the run. If Li returns `🔔 Flag for Ann:` items, act on them before closing. If nothing new to add, skip this step.
 
+**Pending-ingest visibility — mandatory delivery footer.** Before closing any run (SIMPLE or COMPLEX), check `agent-improvements/_pending-ingest.md` for rows with `Status: PENDING`. Researcher's `INGEST-FROM-RESEARCHER` stages insights there awaiting Ane's approval (see Li skill). Apply the following logic:
+
+- **Rows added in THIS run (N):** append the structured footer below to the delivery.
+- **Rows from PRIOR runs (M, still PENDING):** append a one-line reminder `🔔 [M] earlier wiki ingest(s) still pending review — /li list-ingests to see them.`
+- **Both:** append both. Do not collapse the counts — the distinction (this run vs prior backlog) matters for action prioritisation.
+- **Neither:** omit entirely.
+
+Footer template for THIS-run staging:
+
+```
+---
+🔔 **Wiki ingests staged this run — your approval required before merge.**
+[N] new insight(s) from Researcher staged in `agent-improvements/_pending-ingest.md`. These are NOT yet in the canonical MEL Wiki. Review at your convenience and respond with one of:
+- `/li list-ingests` — show the staged rows
+- `/li approve-ingest [task-slug]` — merge into wiki
+- `/li reject-ingest [task-slug] — [reason]` — reject and log reason
+```
+
+The footer is the immediate notification. Ane will additionally see a SessionStart banner at the next session if any rows remain `PENDING` — that backstop catches insights staged in runs where Ann forgot the footer or where Researcher's INGEST happened after Ann had already returned to Ane.
+
 **SIMPLE task insight capture:** For SIMPLE tasks (which do not generate an Evidence Brief), after delivery, if any framework distinction, updated citation, or novel methodological point arose, append one bullet to `agent-improvements/ann-overlay.md` under `## Active Improvements`: `[YYYY-MM-DD] SIMPLE-INSIGHT: [task-slug] — [what arose and why it matters]`. Skip if nothing notable arose.
 
 ## Task state tracking

@@ -105,19 +105,59 @@ For each bullet in `wiki-insights.md` that represents a new framework distinctio
 
 4. Surface to Ane in the return message: `🔔 [N] new wiki insights staged in agent-improvements/_pending-ingest.md — review with /li approve-ingest [task-slug] or /li reject-ingest [task-slug] — [reason] before merging into canonical wiki.`
 
-**Approval flow (triggered separately by Ane):**
-
-When Ane runs `/li approve-ingest [task-slug]`: for each PENDING row matching the task slug, perform the original auto-ingest steps (read target wiki page, add insight with citation, update `index.md` if new page created, append to `log.md`). Update the row status to `APPROVED [YYYY-MM-DD]`.
-
-When Ane runs `/li reject-ingest [task-slug] — [reason]`: update the row status to `REJECTED [YYYY-MM-DD] — [reason]`. Do not touch the wiki.
-
 **Citation existence check (run during staging, before surfacing to Ane):** for each new citation in the staged insights, attempt a quick verification — DOI lookup via WebSearch (e.g., `[author] [year] [title] DOI`), or institutional source verification for grey literature. If no DOI/URL can be produced for a citation, prefix the insight with `⚠️ Citation not yet verified — recommend Ane confirms before approval` in the staged row.
+
+**Approval flow:** documented in the dedicated `LIST-INGESTS / APPROVE-INGEST / REJECT-INGEST` operation below — Ane invokes those commands when ready to review.
 
 **Step 4 — Update RESOURCES_INDEX.md**
 Add the new run folder as an entry under a heading derived from the basename of the `Research Artifacts:` path defined in the **Library** section above (currently `## CLAUDE MEL new RESOURCES`) in `3. Ane's RESURSE/RESOURCES_INDEX.md` (create the heading if absent). If the folder is renamed, update both the path constant in the Library section and this heading together — they must match. Include in each entry: date, task slug, folder path, source count.
 
 **Step 5 — Confirm**
-Return to Researcher: `✅ Stored: [YYYY-MM-DD]_[task-slug]/ — [N] files written — MEL Wiki updated: [YES/NO] — artifact-log updated`
+Return to Researcher: `✅ Stored: [YYYY-MM-DD]_[task-slug]/ — [N] files written — MEL Wiki staging: [N] insights pending Ane's approval — artifact-log updated`
+
+### LIST-INGESTS / APPROVE-INGEST / REJECT-INGEST — Manage staged wiki insights
+
+**Triggered when:** Ane types `/li list-ingests`, `/li approve-ingest [task-slug]`, or `/li reject-ingest [task-slug] — [reason]`. Also surfaced automatically by the SessionStart hook when `agent-improvements/_pending-ingest.md` contains rows with status `PENDING`.
+
+**Purpose:** Give Ane direct control over what enters the canonical MEL Wiki. Researcher's `INGEST-FROM-RESEARCHER` stages insights; this operation reviews, merges, or rejects them. Without this gate, unverified citations or framework claims could contaminate the wiki at IPPF/UNFPA publication standard.
+
+#### LIST-INGESTS — Show staged rows
+
+1. Read `agent-improvements/_pending-ingest.md`. If file does not exist or has zero `PENDING` rows: return `No wiki insights pending review.`
+2. Print the table of `PENDING` rows grouped by task slug, with: date, task slug, insight (truncated to 200 chars if longer), target wiki page, source citation, citation-verification status (verified DOI/URL or ⚠️ unverified). Show full insight text on request.
+3. Append a one-line summary: `[N] PENDING — to merge: /li approve-ingest [task-slug]; to reject: /li reject-ingest [task-slug] — [reason].`
+4. Do NOT modify the wiki at this step.
+
+#### APPROVE-INGEST [task-slug] — Merge staged rows into canonical wiki
+
+1. Read `agent-improvements/_pending-ingest.md`. Filter rows by `task-slug` AND status `PENDING`. If no matching rows: return `No PENDING rows for task slug [task-slug] — possibly already approved/rejected, or task slug typo. Run /li list-ingests to verify.` and halt.
+2. For each matching row, perform the canonical wiki merge:
+   - Read the target wiki page (or create it if status indicates `NEW PAGE: [name]`)
+   - Add the insight with full citation; preserve the page's existing structure and confidence frontmatter
+   - If a new page is created, update `mel_wiki/wiki/index.md` with the new entry under the correct section (frameworks / concepts / indicators / lenses / sources)
+3. Append to `mel_wiki/wiki/log.md`:
+   ```
+   [YYYY-MM-DD HH:MM] APPROVE-INGEST: [task-slug] — [N] insights merged into wiki — pages updated: [list]
+   ```
+4. Update each row's status in `_pending-ingest.md` from `PENDING` to `APPROVED [YYYY-MM-DD]`.
+5. Return: `✅ APPROVE-INGEST [task-slug]: [N] insight(s) merged into wiki — pages updated: [list of pages]. Logged in mel_wiki/wiki/log.md.`
+
+#### REJECT-INGEST [task-slug] — [reason] — Mark staged rows as rejected
+
+1. Read `agent-improvements/_pending-ingest.md`. Filter rows by `task-slug` AND status `PENDING`. If no matching rows: return same not-found message as APPROVE-INGEST.
+2. If `[reason]` is empty: prompt Ane for a reason before proceeding (rejection without reason creates a stale row that future LINT will flag). Acceptable reasons: citation could not be verified; insight contradicts existing canonical content; insight out of scope for the wiki; insight already covered by an existing page.
+3. Update each matching row's status in `_pending-ingest.md` from `PENDING` to `REJECTED [YYYY-MM-DD] — [reason]`. Do NOT modify the wiki.
+4. Append to `mel_wiki/wiki/log.md`:
+   ```
+   [YYYY-MM-DD HH:MM] REJECT-INGEST: [task-slug] — [N] insights rejected — reason: [reason]
+   ```
+5. Return: `✅ REJECT-INGEST [task-slug]: [N] insight(s) rejected. Wiki not modified. Logged in mel_wiki/wiki/log.md.`
+
+#### Failure handling
+
+- File missing: surface `_pending-ingest.md does not exist — no insights staged. Researcher INGEST-FROM-RESEARCHER creates it on first staged insight.`
+- Malformed row (missing required column): flag with `⚠️ Skipped row [N]: [reason]` and continue with valid rows.
+- Wiki page write fails: log error, retain row as `PENDING`, return `⚠️ Merge failed for [page] — [error]. Row remains PENDING; investigate before re-running approve.`
 
 ### INGEST — Add document to MEL Wiki
 
