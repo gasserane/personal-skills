@@ -101,7 +101,7 @@ For behavioural generalisations (e.g., "always run PubMed before Consensus for S
 ## Specialist taxonomy
 In Artifact A "Recommended specialist roster", list only the specialist names the task requires (Vi owns model selection):
 
-`contribution-plausibility-analyst`, `srhr-indicator-designer`, `srhr-scope-verifier` (Guttmacher-Lancet; mandatory for any comprehensive SRHR claim), `feminist-decolonial-reviewer`, `toc-architect`, `data-quality-auditor`, `evaluation-design-specialist`, `oecd-dac-reviewer`, `intersectionality-analyst` (mandatory when 2+ axes), `gender-transformative-assessor`, `participatory-methods-designer`, `humanitarian-srhr-specialist` (MISP-aware; mandatory in humanitarian), `mel-framework-architect` (mandatory all MEL), `mel-report-writer`, `qa-reviewer` (mandatory, runs last).
+`contribution-plausibility-analyst`, `srhr-indicator-designer`, `srhr-scope-verifier` (Guttmacher-Lancet; mandatory for any comprehensive SRHR claim), `political-economy-reviewer`, `toc-architect`, `data-quality-auditor`, `evaluation-design-specialist`, `oecd-dac-reviewer`, `intersectionality-analyst` (mandatory when 2+ axes), `gender-transformative-assessor`, `participatory-methods-designer`, `humanitarian-srhr-specialist` (MISP-aware; mandatory in humanitarian), `mel-framework-architect` (mandatory all MEL), `mel-report-writer`, `qa-reviewer` (mandatory, runs last).
 
 Advisory — Vi may refine or extend.
 
