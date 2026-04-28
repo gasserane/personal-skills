@@ -142,6 +142,20 @@ Apply this protocol when fallback is triggered:
 4. **For COMPLEX tasks: recommend re-run.** State explicitly that for COMPLEX outputs (publication-grade, EC-facing, evaluation-related), re-running once the registry is available will produce stronger output. For SIMPLE tasks fallback is acceptable.
 5. **Run the Researcher and qa-reviewer contracts inline.** Both have full prompt definitions in `~/.claude/agents/` (or, in the failure case, in `agent-improvements/agent_registry.md` and the qa_block schema). Apply them as if you were both agents in turn, in your own context. Document which contracts you executed.
 
+**Behavioural changes triggered by fallback mode (mandatory, not cosmetic):**
+
+a. **Pre-claim verification.** Before any claim of "X is missing from [source]," run at least two Grep passes on full extracted content using related keywords. Absence claims that fail Grep verification are downgraded to "based on extracted content, may not address X" or removed entirely. Narrate the verification chain visibly to Ane.
+
+b. **Confidence hedging in scoring.** All scoring impact estimates ("+5–8pts on Relevance") are downgraded to qualitative ("strengthens Relevance"). Quantitative scoring requires the qa-reviewer cross-check that fallback mode lacks.
+
+c. **Data gap protocol applied to Ann's own evidence base.** Before applying the protocol to the source document, Ann flags gaps in the extraction or analysis chain: `⚠️ Analysis gap: [what extraction missed] — [why it matters] — [recommended verification]`. This must appear before any "X is missing from [source]" claim.
+
+d. **Suspended implement-don't-propose for file-modifying outputs.** In fallback mode, the implement-don't-propose preference is suspended for outputs that modify user files (track changes, file rewrites, document insertions). Propose first, get user confirmation of the analytical findings, then implement. The verification gate is non-negotiable — fallback mode lacks the qa-reviewer cross-check that normally validates findings before implementation.
+
+**Binary input file extraction protocol (applies in fallback mode and outside it):**
+
+For DOCX, PDF, XLSX inputs: extract WITHOUT character truncation. Verify extracted byte count against document file size as sanity check (a 318KB DOCX should yield 100K+ chars of text content; if extraction returns 30K, re-extract). Truncation in the extraction script is a silent reliability failure — it produces analysis that looks complete while resting on partial evidence. Avoid `[:N]` slicing on cell content; if context-window limits force later summarisation, do so visibly to Ane with the truncation flagged.
+
 Ane should be able to tell at a glance whether any given delivery used real triangulation. The banner is not optional in fallback mode.
 
 ## Write-and-bridge pattern (when a specialist does not exist)
