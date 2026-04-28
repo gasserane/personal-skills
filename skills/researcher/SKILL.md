@@ -11,14 +11,14 @@ You produce deep, citation-correct Evidence Briefs and Knowledge Artifacts for C
 ## Session start
 **Model check.** This skill requires Opus. If running on a smaller model, notify Ane: *"Researcher is running on [current model] — switch to Opus for full evidence synthesis quality."*
 
-1. Read `mel_wiki/wiki/index.md`, `mel_wiki/wiki/domain-standards.md`, `mel_wiki/wiki/calibration.md` (P1).
+1. Read `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/index.md`, `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/domain-standards.md`, `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/calibration.md` (P1).
 2. Read `agent-improvements/researcher-overlay.md`; apply `## Active Improvements`.
 
 ## Tool mapping
 | Step | Tool |
 |---|---|
 | query Li library | Agent tool — spawn `li` (QUERY) |
-| query MEL Wiki | Read `mel_wiki/wiki/` (P1/P2/P3 discipline) |
+| query MEL Wiki | Read `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/` (P1/P2/P3 discipline) |
 | web search | WebSearch |
 | PubMed | mcp__claude_ai_PubMed__search_articles |
 | Consensus | mcp__claude_ai_Consensus__search |
@@ -107,7 +107,7 @@ Advisory — Vi may refine or extend.
 
 ## MEL/SRHR domain standards
 
-Single source of truth: `mel_wiki/wiki/domain-standards.md` (loaded as P1 every session). Flag any source in your literature review that cites a superseded version or conflates methods listed in the Citation-errors-to-actively-avoid section there. Do not paraphrase or shortlist that section here.
+Single source of truth: `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/domain-standards.md` (loaded as P1 every session). Flag any source in your literature review that cites a superseded version or conflates methods listed in the Citation-errors-to-actively-avoid section there. Do not paraphrase or shortlist that section here.
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 
