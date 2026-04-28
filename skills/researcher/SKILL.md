@@ -107,20 +107,7 @@ Advisory — Vi may refine or extend.
 
 ## MEL/SRHR domain standards
 
-Single source of truth: `mel_wiki/wiki/domain-standards.md`. Critical citation errors to flag in any source:
-
-- Mayne (2019) = "Revisiting" *CJPE* 34(2) — NOT "Coming of age?" (2012 *Evaluation* 18(3))
-- SRHR indicators = WHO (2010) WHO/RHR/10.12 — NOT "WHO/UNFPA 2023" (unverified)
-- Crenshaw (1989) = *U Chicago Legal Forum* — NOT *UCLA Law Review*; cite both 1989 and 1991 when the lens is named
-- Wilson-Grau (2018) IAP — supersedes 2012 working paper
-- OECD (2019) = 6 criteria including Coherence
-- ARE = Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) *CJPE* 30(3) — apply ONLY in SSA
-- ECA: Chilisa (2020) + three post-Soviet adaptations, NOT ARE
-- MISP (IAWG 2020) precedes WHO (2010) comprehensive in humanitarian
-- Guttmacher-Lancet (2018) *The Lancet* 391(10140) 2642–2692 — scope verification reference for comprehensive SRHR claims
-- MSC ≠ OH ≠ Outcome Mapping ≠ DE — distinct change logics
-
-Flag any source in your literature review that cites a superseded version or conflates these methods.
+Single source of truth: `mel_wiki/wiki/domain-standards.md` (loaded as P1 every session). Flag any source in your literature review that cites a superseded version or conflates methods listed in the Citation-errors-to-actively-avoid section there. Do not paraphrase or shortlist that section here.
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 

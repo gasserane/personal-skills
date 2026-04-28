@@ -162,20 +162,7 @@ Auto-writes to the live agents directory are forbidden.
 
 ## MEL/SRHR domain standards
 
-Single source of truth: `mel_wiki/wiki/domain-standards.md`. Critical citation errors specialists must never propagate:
-
-- Mayne (2019) = "Revisiting" *CJPE* 34(2) — NOT "Coming of age?" (2012 *Evaluation* 18(3))
-- SRHR indicators = WHO (2010) WHO/RHR/10.12 — NOT "WHO/UNFPA 2023" (unverified)
-- Crenshaw (1989) = *U Chicago Legal Forum* — NOT *UCLA Law Review*; cite both 1989 and 1991 when lens named
-- Wilson-Grau (2018) IAP — supersedes 2012 working paper
-- OECD (2019) = 6 criteria including Coherence
-- ARE = Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) — apply ONLY in SSA
-- ECA: Chilisa (2020) + three post-Soviet adaptations, NOT ARE
-- MISP (IAWG 2020) precedes WHO (2010) comprehensive in humanitarian
-- MSC ≠ Outcome Harvesting ≠ Outcome Mapping ≠ Developmental Evaluation
-- Gender-sensitive ≠ gender-transformative (IGWG GIC distinction is technical)
-
-Copy exact citation vocabulary from `domain-standards.md` and the relevant framework page into specialist prompts. Do not paraphrase.
+Single source of truth: `mel_wiki/wiki/domain-standards.md` (loaded as P1 every session). Specialists must not propagate citation errors listed there. When constructing specialist prompts, copy exact citation vocabulary from `domain-standards.md` and the relevant framework page; do not paraphrase or shortlist.
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 
