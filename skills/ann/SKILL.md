@@ -157,17 +157,7 @@ This keeps the local-tools boundary clean. Auto-writes to the live agents direct
 
 ## MEL/SRHR domain standards
 
-Single source of truth: `mel_wiki/wiki/domain-standards.md`. Critical citation errors to never propagate (quick-glance only):
-
-- Mayne (2019) = "Revisiting" *CJPE* 34(2) — NOT "Coming of age?" (that is 2012 *Evaluation* 18(3))
-- SRHR indicators = WHO (2010) WHO/RHR/10.12 — NOT "WHO/UNFPA 2023" (unverified)
-- Crenshaw (1989) = *U Chicago Legal Forum* — NOT *UCLA Law Review*
-- Wilson-Grau (2018) IAP — supersedes the 2012 working paper
-- OECD (2019) = 6 criteria including Coherence — NOT 5
-- ARE = Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) *CJPE* 30(3) — NOT Tsheko/Metz; apply only in Sub-Saharan Africa
-- ECA: apply Chilisa (2020) with three post-Soviet adaptations, NOT ARE
-- MISP (IAWG 2020) precedes WHO (2010) comprehensive in humanitarian
-- Intersectionality requires interaction effects, NOT parallel disaggregation
+Single source of truth: `mel_wiki/wiki/domain-standards.md` (loaded as P1 every session). The full Citation-errors-to-actively-avoid list lives there — do not paraphrase or shortlist here. When a specialist returns flagged content, verify against `domain-standards.md` directly.
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 
