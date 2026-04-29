@@ -172,7 +172,10 @@ If no diffs qualify: write `No updates ready for consolidation — overlays cont
 
 **Step 8 — Refresh skills-lock:** `npx -y skills add gasserane/personal-skills --all -y`. Stage and commit `skills-lock.json` with `chore: update skills-lock.json hashes after CURATE push`.
 
-**Step 9 — Archive overlay entries:** move consolidated entries from `## Active Improvements` to `## Archived` with suffix `[consolidated into skill YYYY-MM-DD]`. Update `Last updated:` line.
+**Step 9 — Archive overlay entries:**
+- **Consolidated entries:** move from `## Active Improvements` to `## Archived` with suffix `[consolidated into skill YYYY-MM-DD]`.
+- **Aged session-retrospective entries (added 2026-04-29):** move any session-retrospective bullet (i.e., one not tagged STANDING PREFERENCE or behavioural-change) older than 4 weeks from `## Active Improvements` to `## Archived` with suffix `[aged out YYYY-MM-DD — session retrospective only; no consolidation]`. Date comparison uses the `[YYYY-MM-DD]` prefix on the bullet. Rationale: session-retrospective bullets accumulate one-per-task and cannot be consolidated into skill text, so absent an aging path the overlay grows past the 12 KB saturation threshold (issue raised 2026-04-29 when ann-overlay reached 22.4 KB after a prior archive-only pass).
+- **Update `Last updated:` line.**
 
 **Step 10 — Status:** mark PROPOSED-SKILL-UPDATES.md `Status: COMPLETED [YYYY-MM-DD]`. Append to `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/log.md`: `[YYYY-MM-DD HH:MM] CURATE: [N] skill updates pushed — agents: [list] — entries consolidated: [N] — skills-lock.json updated`.
 
