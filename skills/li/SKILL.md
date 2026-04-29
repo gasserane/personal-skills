@@ -67,6 +67,24 @@ Auto-merge protocol design rationale: Ane authorised auto-merge for Tier-1 verif
 ### INGEST-DOCUMENT — Add a raw document to the MEL Wiki
 **Trigger:** new document placed in `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/raw/`, or Ann's PHASE 6 explicitly invokes `INGEST-DOCUMENT`. (Distinct from `INGEST-FROM-RESEARCHER` above — that operation handles synthesised insights from a Researcher run, not raw documents.) Steps: read document; create/update `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/sources/` summary page; update affected framework / indicator / concept / lens pages; update `index.md`; append to `log.md`; report what was added, contradictions, data gaps.
 
+### INGEST-AD-HOC — Store Ann-direct verified sources and stage wiki insights
+**Trigger:** Ann's PHASE 4.5 hands off after a deliverable with 3+ in-session verified sources. Receives task slug, date, and the three artefact files Ann wrote. (Distinct from `INGEST-FROM-RESEARCHER` above — that operation handles synthesised insights from a full Researcher literature review with multi-source triangulation; this operation handles Ann-direct WebSearch verification, which has lower triangulation discipline and therefore a more conservative tier gate.)
+
+**Step 1 — Verify run folder.** Confirm `C:/Users/AGasser/OneDrive/3. Ane's RESURSE/CLAUDE MEL new RESOURCES/literature-reviews/[YYYY-MM-DD]_[task-slug]/` exists with the three required files (`full-literature-review.md`, `sources-list.md`, `wiki-insights.md`). If any missing → flag to Ann as `🔔 Flag for Ann: ad-hoc handoff incomplete — [missing files]`.
+
+**Step 2 — Origin marker.** Append "(Ann-direct)" to the wiki-status field in `artifact-log.md` so future LINT can distinguish ad-hoc captures from Researcher-led reviews. This matters because Ann-direct verification has lower triangulation discipline than Researcher's protocol; tier classification is therefore more conservative.
+
+**Step 3 — Tier-branch with Ann-direct caveat.** Same auto-merge vs. PENDING logic as `INGEST-FROM-RESEARCHER`, BUT:
+- Tier-1 with verified DOI/PMID → AUTO-MERGE (same as Researcher path).
+- Tier-1 with verified institutional URL only (no DOI/PMID) → STAGE PENDING (more conservative than Researcher path, where institutional Tier-1 also auto-merges). Reason: Ann-direct does not have Researcher's multi-source triangulation, so a single-source institutional URL is insufficient evidence for auto-merge.
+- Tier 2 / Tier 3 → STAGE PENDING (same).
+
+**Step 4 — RESOURCES_INDEX.** Same as Step 4 of INGEST-FROM-RESEARCHER (add the run folder under `## CLAUDE MEL new RESOURCES` heading in `3. Ane's RESURSE/RESOURCES_INDEX.md`).
+
+**Step 5 — Confirm.** Return: `✅ INGEST-AD-HOC stored: [date]_[slug]/ — [N] files written — [M] insights staged in _pending-ingest.md awaiting Ane's approval — [P] insights auto-merged to wiki — artifact-log updated`.
+
+**Failure handling:** Same as INGEST-FROM-RESEARCHER (missing file → surface; malformed row → flag and continue; wiki write fails → log, retain as PENDING, return diagnostic).
+
 ### CATALOG — Add entries to library index
 **Trigger:** Ane asks to catalog new documents or update RESOURCES_INDEX.md.
 For each: extract title, author(s), year, language, doc_type (framework / manual / report / article / case_study / template / training / dataset), key_topics (3–5), quality (peer-reviewed / institutional / practitioner / unknown), readable (YES / NO / PARTIAL). Append a markdown table under the correct subfolder heading: `| Title | Author(s) | Year | Language | Doc_type | Key_topics | Quality | Readable |`.
@@ -113,7 +131,8 @@ If all overlays empty AND `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/me
 3. **Citation errors:** apply the full Citation-errors-to-actively-avoid list from `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/domain-standards.md`. Flag every match in wiki pages and SKILL.md files. The list is canonical there — do not duplicate here.
 4. **Disability disaggregation:** "presence of disability" without Washington Group Short Set (WG-SS) named is below current standard. Flag.
 5. **Overlay hygiene:** check four overlay files for stale entries (same entry across 10+ runs without consolidation), broken format (missing date or task-slug), and `coordination-log.md` entries whose "Proposed fix" names an agent with no matching overlay entry.
-6. Append summary to `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/log.md`. Return prioritised fix list.
+6. **Ad-hoc capture coverage:** Sample three recent multi-source MEL/SRHR deliveries from `coordination-log.md` or session logs; for each, check whether a corresponding `literature-reviews/[date]_[slug]/` folder exists in `3. Ane's RESURSE/CLAUDE MEL new RESOURCES/`. Missing folders for sessions with 3+ verified sources → flag `⚠️ AD-HOC GAP: session [date] delivered [task] with [N] sources but no ad-hoc capture folder — Ann PHASE 4.5 may have skipped`. This catches drift on the ad-hoc capture pattern.
+7. Append summary to `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/log.md`. Return prioritised fix list.
 
 ### CURATE — Consolidate overlays and propose skill updates
 **Trigger:** weekly | any overlay file >10 Active entries | Ane: `/li curate`.
