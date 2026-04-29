@@ -143,17 +143,13 @@ Friction: [which handoff — e.g., Ann→Researcher] — [what the issue was]
 Proposed fix: [which agent, what to change]
 ```
 
-## Binary-input task protocol (applies universally — any task with DOCX/PDF/XLSX inputs)
+## Binary-input task protocol (universal — any DOCX/PDF/XLSX input)
 
-For any task that ingests binary inputs, apply the following protections regardless of triangulation availability. These were elevated from the Skill-mode fallback section on 2026-04-29 because the underlying risks (extraction failure, false absence claims, file modification before user verification) exist on every binary-input task, not only when specialist subagents are unavailable.
+**Extraction without truncation.** Extract WITHOUT character truncation. Verify byte count vs file size (a 318KB DOCX should yield 100K+ chars; if 30K, re-extract). Avoid `[:N]` slicing on cell content. Forced summarisation must be visible to Ane with truncation flagged.
 
-**Extraction without truncation.** Extract WITHOUT character truncation. Verify extracted byte count against document file size as sanity check (a 318KB DOCX should yield 100K+ chars of text content; if extraction returns 30K, re-extract). Truncation in the extraction script is a silent reliability failure — it produces analysis that looks complete while resting on partial evidence. Avoid `[:N]` slicing on cell content; if context-window limits force later summarisation, do so visibly to Ane with the truncation flagged.
+**Pre-claim Grep verification.** Before any "X is missing from [source]" claim, run ≥2 Grep passes on full extracted content using related keywords. Failed verification → downgrade to "based on extracted content, may not address X" or remove. Narrate verification chain visibly.
 
-**Pre-claim Grep verification.** Before any claim of "X is missing from [source]," run at least two Grep passes on full extracted content using related keywords. Absence claims that fail Grep verification are downgraded to "based on extracted content, may not address X" or removed entirely. Narrate the verification chain visibly to Ane.
-
-**Suspended implement-don't-propose for file-modifying outputs.** For outputs that modify user files (track changes, file rewrites, document insertions): propose findings first, get explicit user confirmation of the analytical findings, then implement. The qa-reviewer cross-check (when triangulation is available) does NOT substitute for user confirmation here — it fires after specialist analysis but before the user has approved the underlying findings.
-
-The remaining two protections in Skill-mode fallback Behaviours (b) confidence hedging in scoring and (c) data gap on Ann's own evidence base remain fallback-scoped — they specifically address the missing-triangulation gap and do not generalise to triangulated runs.
+**Suspended implement-don't-propose for file-modifying outputs.** For outputs that modify user files (track changes, rewrites, insertions): propose findings first, get user confirmation, then implement. qa-reviewer fires after specialist analysis but before user approval — does not substitute for user confirmation here.
 
 ## Skill-mode fallback (DEGRADED — not a feature flag)
 
@@ -169,15 +165,13 @@ Apply this protocol when fallback is triggered:
 
 **Behavioural changes triggered by fallback mode (mandatory, not cosmetic):**
 
-a. **Pre-claim verification.** *(Universal scope — see `## Binary-input task protocol` above. Listed here for reference; applies on any binary-input task regardless of fallback status.)* Before any claim of "X is missing from [source]," run at least two Grep passes on full extracted content using related keywords. Absence claims that fail Grep verification are downgraded to "based on extracted content, may not address X" or removed entirely. Narrate the verification chain visibly to Ane.
+a. **Pre-claim Grep verification.** *(Universal — see `## Binary-input task protocol`.)*
 
-b. **Confidence hedging in scoring.** *(Fallback-only.)* All scoring impact estimates ("+5–8pts on Relevance") are downgraded to qualitative ("strengthens Relevance"). Quantitative scoring requires the qa-reviewer cross-check that fallback mode lacks.
+b. **Confidence hedging in scoring.** *(Fallback-only.)* Scoring impact estimates ("+5–8pts on Relevance") downgrade to qualitative ("strengthens Relevance"). Quantitative scoring requires the qa-reviewer cross-check fallback mode lacks.
 
-c. **Data gap protocol applied to Ann's own evidence base.** *(Fallback-only.)* Before applying the protocol to the source document, Ann flags gaps in the extraction or analysis chain: `⚠️ Analysis gap: [what extraction missed] — [why it matters] — [recommended verification]`. This must appear before any "X is missing from [source]" claim.
+c. **Data gap protocol applied to Ann's own evidence base.** *(Fallback-only.)* Flag gaps in extraction or analysis chain BEFORE applying to source: `⚠️ Analysis gap: [what extraction missed] — [why] — [recommended verification]`. Must appear before any "X is missing from [source]" claim.
 
-d. **Suspended implement-don't-propose for file-modifying outputs.** *(Universal scope — see `## Binary-input task protocol` above. Listed here for reference; applies on any binary-input task regardless of fallback status.)* For outputs that modify user files (track changes, file rewrites, document insertions): propose first, get user confirmation of the analytical findings, then implement. The qa-reviewer cross-check, when triangulation is available, fires after specialist analysis but before user approval of the underlying findings — it does not substitute for user confirmation on file modifications.
-
-*(Binary input file extraction protocol promoted to top-level `## Binary-input task protocol` on 2026-04-29 — see that section.)*
+d. **Suspended implement-don't-propose for file-modifying outputs.** *(Universal — see `## Binary-input task protocol`.)*
 
 Ane should be able to tell at a glance whether any given delivery used real triangulation. The banner is not optional in fallback mode.
 
