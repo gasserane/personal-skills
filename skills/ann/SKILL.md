@@ -69,6 +69,19 @@ Pass: plan text (full COMPLEX / brief SIMPLE), original task, Evidence Brief (CO
 
 **Standing instructions** are Ane's validated preferences propagating to every specialist: assemble from CLAUDE.md (writing-style + interaction-approach rules), `ann-overlay.md` entries tagged as standing preferences, and any task-specific preferences Ane stated in this conversation. Format as a bullet list under `## Standing instructions`. Pass the same block to Researcher (COMPLEX) for source-selection / lens-emphasis. Omit the header entirely when no preferences apply.
 
+### PHASE 4.5 — SOURCE PERSISTENCE (ad-hoc capture)
+
+When the deliverable contains 3+ verified sources from in-session WebSearch (i.e., not all sources came from `mel_wiki/wiki/domain-standards.md` or other wiki pages), Ann captures the verified sources to an ad-hoc literature-review folder using Li's INGEST-FROM-RESEARCHER schema:
+
+1. Generate task slug (lowercase-hyphenated, ≤5 words, descriptive of the deliverable).
+2. Create folder `${RESOURCES_ROOT}/CLAUDE MEL new RESOURCES/literature-reviews/[YYYY-MM-DD]_[task-slug]/` with three files: `full-literature-review.md` (synthesised content from the deliverable), `sources-list.md` (verified source list with URLs + tier classification + recency flags), `wiki-insights.md` (insights worth promoting to wiki — flagged Tier 1/2/3 per Researcher protocol).
+3. Append row to `${RESOURCES_ROOT}/CLAUDE MEL new RESOURCES/artifact-log.md` with origin marked as "Ann-direct" (vs. "Researcher-led" for full Researcher runs).
+4. Hand off to Li with `INGEST-AD-HOC` operation. Li determines auto-merge vs. PENDING staging per existing tier rules — Tier-1 sources with verified DOI/PMID auto-merge; institutional-URL-only Tier-1 stages PENDING (more conservative than Researcher path because Ann-direct lacks multi-source triangulation discipline); Tier 2/3 stages PENDING.
+
+**Skip PHASE 4.5 if:** all sources came from existing wiki pages (no new evidence); deliverable is a one-line answer or operational artefact (file edits, hookify, etc.); Ane explicitly says "no capture for this one."
+
+**Why this phase exists:** Without it, Ann-direct verification work (mandatory under the verified-hyperlinks STANDING PREFERENCE) is single-use — verified URLs sit only in the deliverable text and chat log, lost for future sessions. PHASE 4.5 routes them into the same persistent pipeline that Researcher uses.
+
 ### PHASE 5 — FINAL GATE (verification, not re-derivation)
 
 Vi returns the compiled product with a `qa_block` JSON header (schema: `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/qa-block-schema.md`). Verify field-by-field — do NOT re-judge. Vi populated; Ann verifies.
