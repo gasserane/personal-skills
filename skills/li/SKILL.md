@@ -197,11 +197,25 @@ Return: *"CURATE complete — [N] skills updated — overlays archived — harne
 5. Citation-errors-to-actively-avoid: any error pattern not yet appearing as a warning in `mel-framework-reference.md` → diff as `ADD WARNING`.
 6. Compare wiki `calibration.md` patterns to `calibration-examples.md`: new patterns → diff.
 7. New framework pages added to wiki without entries in `mel-framework-reference.md` → diff as `ADD framework entry`.
-8. Write diffs to `agent-improvements/PROPOSED-CLAUDE-AI-SYNC.md` with sections: `# Proposed claude.ai sync — [YYYY-MM-DD]`, `*Status: AWAITING ANE'S RE-PASTE TO CLAUDE.AI PROJECT*`, then per-file diff blocks (Citation corrections, Additions, Pending verification updates, Warnings to add, Calibration pattern updates, New framework entries), and a final "How to apply" section: open the working-folder file → apply diff blocks → re-paste full updated content into claude.ai Project knowledge → mark `Status: COMPLETED [YYYY-MM-DD]`.
-9. Surface to Ane: *"SYNC complete — diff ready in PROPOSED-CLAUDE-AI-SYNC.md. [N] citation corrections; [M] additions; [P] warnings."*
-10. After Ane confirms re-paste: append to `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/log.md`: `[YYYY-MM-DD HH:MM] SYNC-CLAUDE-AI: claude.ai updated — [N] changes`.
+8. Write diffs to `agent-improvements/PROPOSED-CLAUDE-AI-SYNC.md` with sections: `# Proposed claude.ai sync — [YYYY-MM-DD]`, `*Status: AWAITING APPROVAL*`, then per-file diff blocks (Citation corrections, Additions, Pending verification updates, Warnings to add, Calibration pattern updates, New framework entries). The "How to apply" section instructs Ane to: review the diff → reply `/li approve-sync` (Li auto-applies to working-folder claude-ai files) → open `claude-ai-shareable-export/[file]`, copy all, paste once into claude.ai web UI per file → mark `Status: COMPLETED`.
+9. Surface to Ane: *"SYNC complete — diff ready in PROPOSED-CLAUDE-AI-SYNC.md. [N] citation corrections; [M] additions; [P] warnings. Reply `/li approve-sync` to auto-apply diffs to working-folder files (then copy from claude-ai-shareable-export to claude.ai), or `/li reject-sync — [reason]` to discard."*
+10. Step 10 deferred to APPROVE-SYNC (log entry written when diffs are actually applied, not at proposal time).
 
-**Failure handling:** `mel-framework-reference.md` missing → surface and stop. Already in sync → write *"SYNC complete — no diff. Both systems in alignment as of [date]."* Skip steps 8–10. Do NOT modify claude.ai files automatically — Li produces the diff; Ane re-pastes through the claude.ai UI.
+**Failure handling:** `mel-framework-reference.md` missing → surface and stop. Already in sync → write *"SYNC complete — no diff. Both systems in alignment as of [date]."* Skip steps 8–10. Do NOT modify claude.ai files in this operation — SYNC produces the proposal; APPROVE-SYNC applies it after Ane's review.
+
+### APPROVE-SYNC / REJECT-SYNC — Apply or discard the SYNC-CLAUDE-AI diff
+**Trigger:** Ane: `/li approve-sync` | `/li reject-sync — [reason]`. Mirrors the LIST-INGESTS / APPROVE-INGEST / REJECT-INGEST pattern but for claude.ai mirror sync.
+
+**APPROVE-SYNC.** Read `agent-improvements/PROPOSED-CLAUDE-AI-SYNC.md`. No file or `Status: COMPLETED` → return *"No claude.ai sync awaiting approval. Run `/li sync` first."* Otherwise:
+1. Parse diff blocks per file (Citation corrections, Additions, Pending verification updates, Warnings to add, Calibration pattern updates, New framework entries).
+2. For each block, locate the target working-folder file (`mel-framework-reference.md`, `claude-ai-project-instructions.md`, `calibration-examples.md`, `writing-style-guide.md`) and apply the diff via Edit operations. Citation corrections use exact `Current text → Replace with` blocks; additions are appended at the named insertion point. The PostToolUse hook auto-syncs each edit to `claude-ai-shareable-export/`.
+3. Update `PROPOSED-CLAUDE-AI-SYNC.md` `Status:` to `APPLIED [YYYY-MM-DD] — awaiting Ane's web-UI re-paste from claude-ai-shareable-export/`.
+4. Append to `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/log.md`: `[YYYY-MM-DD HH:MM] APPROVE-SYNC: [N] diff blocks applied — files: [list] — auto-synced to claude-ai-shareable-export/ — awaiting web-UI re-paste`.
+5. Return: *"✅ APPROVE-SYNC: [N] diffs applied to [M] working-folder files. Web-UI step: open claude-ai-shareable-export/[file] → select all → copy → paste into claude.ai project knowledge entry. ~5 min total. Mark PROPOSED-CLAUDE-AI-SYNC.md `Status: COMPLETED [date]` after re-paste."*
+
+**REJECT-SYNC [reason].** Empty `[reason]` → prompt Ane (no rejection without reason). Update `PROPOSED-CLAUDE-AI-SYNC.md` `Status:` to `REJECTED [YYYY-MM-DD] — [reason]`. No working-folder edits made. Append to `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/log.md`: `[YYYY-MM-DD HH:MM] REJECT-SYNC: [reason]`. Return: *"✅ REJECT-SYNC: claude.ai mirror not modified."*
+
+**Failure handling:** Diff block target file not found → flag, skip block, continue. Diff `Current text` not found in target → flag as `⚠️ Stale diff: target text already changed; re-run /li sync` and stop applying that file's blocks. Working-folder write fails → log error, retain `Status: PARTIAL APPLY — see log`.
 
 ### REORGANIZE — Propose restructuring
 **Trigger:** Ane asks to reorganize a subfolder. Plan first; never execute without approval. Show every move: `MOVE: [source] -> [destination]`. Flag uncertainty: `UNCERTAIN: [file] — recommend human review`. Principles: flat over deep (max 2 levels); English naming, lowercase-hyphenated; never delete (move to `_archive`).
