@@ -2,6 +2,22 @@
 
 All notable changes to the Ann / Vi / Li / Researcher skill set are documented here.
 
+## [2026-04-29] — Verified hyperlinks + recency check on every cited source
+
+**Skills affected:** mel-framework-citation
+**System-level additions:** `~/.claude/CLAUDE.md` Citation Standards section (user-level, not in this repo); `agent-improvements/{ann,vi,researcher}-overlay.md` STANDING PREFERENCE entries (in work-folder repo, not in this repo)
+
+### mel-framework-citation
+- **New `## Hyperlink and recency protocol` section** — six-step verification protocol covering citation list assembly, recency check against current authoritative editions, URL verification via WebSearch/WebFetch, preference order for hyperlink targets (publisher canonical → direct PDF → institutional repository → PubMed/PMC; aggregators supplementary only), explicit unverified-URL flagging, and recency-exception statements
+- **New `### Citation correction discipline` subsection** — requires in-line correction when WebSearch surfaces inaccurate citations drafted from memory; forbids publishing unverified citations to keep drafts tidy
+- **Updated `## Output` section** — every citation in the `## Sources` section now requires a verified hyperlink to the canonical publisher page; unverified citations must be flagged explicitly
+
+**Why:** On 2026-04-29 paragraph-transformation work, two citation errors (UNFPA 2024 misnamed; migrant-health attribution overconfident) only surfaced because per-source WebSearch verification was run. Ane's standing instruction: from now on, verified hyperlinks + recency check apply system-wide to MEL/SRHR output, not on-request.
+
+**Architectural note:** This rule is anchored in three layers — (1) `~/.claude/CLAUDE.md` Citation Standards as the constitutional source, (2) this skill file as immediate operational guidance, (3) `ann-overlay.md`, `vi-overlay.md`, `researcher-overlay.md` as repo-controlled patches that survive any upstream skill restore. The three-layer architecture prevents skill-restore overwrites from silently dropping the rule.
+
+---
+
 ## [2026-04-26] — Researcher model default
 
 **Skills affected:** researcher

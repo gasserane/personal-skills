@@ -62,9 +62,28 @@ Feminist, decolonial, intersectionality, and participatory lenses must change th
 - **Intersectionality**: disaggregation plus interaction effects, not parallel disaggregation alone.
 - **Participatory**: position on Hart (1992) ladder named, consultation vs co-design distinguished.
 
+## Hyperlink and recency protocol
+
+Per CLAUDE.md Citation Standards, every cited source carries a verified hyperlink to the canonical publisher page, and every source must represent the most recent authoritative evidence available at the time of writing.
+
+### Verification protocol
+
+Before finalising any MEL/SRHR output that includes citations:
+
+1. **Build the citation list** during drafting (author, year, title, section, publisher).
+2. **Recency check** — for every grey-literature source not in `${MEL_WIKI_ROOT}/wiki/domain-standards.md` (Atlases, EIGE Index, FRA reports, EPF/IPPF EN reports, ECHR judgments, EU strategies, UNFPA SWOP), run a WebSearch to confirm the cited edition is current. If a more recent edition exists, swap or flag.
+3. **URL verification** — run WebSearch (or WebFetch) for each source to retrieve the canonical publisher URL. Batch parallel WebSearch calls for efficiency. Do not guess URLs from training data.
+4. **Preference order for hyperlink target**: publisher's canonical page → direct PDF on publisher's domain → institutional repository or DOI → PubMed/PMC for biomedical articles. Aggregators (ResearchGate, academia.edu, Wikipedia) are supplementary, never sole.
+5. **Flag what cannot be verified** — `⚠️ URL unverified — confirm before publication` rather than guess.
+6. **State recency exceptions explicitly** — `(no superseding edition as of [date])` or `(canonical reference; subsequent literature builds on but does not supersede)`.
+
+### Citation correction discipline
+
+If WebSearch reveals that a citation drafted from memory is inaccurate (wrong year, wrong title, superseded edition), correct it in-line in the deliverable and note the correction transparently in the sources section or as an end-of-output verification note. Do not publish unverified citations to keep the draft tidy.
+
 ## Output
 
-Produce the requested MEL/SRHR artefact. Inline citations throughout. At the end, append a short `## Sources` section listing every citation used, full bibliographic form.
+Produce the requested MEL/SRHR artefact. Inline citations throughout. At the end, append a `## Sources` section listing every citation used, full bibliographic form, with a verified hyperlink to the canonical publisher page for each. Where a citation could not be verified in-session, flag it explicitly.
 
 ## Writing rules
 
