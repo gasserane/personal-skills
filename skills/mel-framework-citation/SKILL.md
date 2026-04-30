@@ -1,11 +1,11 @@
 ---
 name: mel-framework-citation
-description: Enforce IPPF/UNFPA/UNAIDS publication-standard citations on MEL/SRHR output. Use whenever Ane produces a theory of change, evaluation design, indicator set, donor report, or SRHR programme analysis. Injects current authoritative framework versions with author and year, flags outdated versions, and applies the data-gap protocol. Do not use for non-MEL work.
+description: Enforce IPPF/UNFPA/UNAIDS evidence-and-rigour citation standard on MEL/SRHR output. Tier-aware on placement — Tier 1 working brief uses an Evidence base line at end of section; Tier 2 publication uses inline citations; Tier 1 / junior-MEL keeps framework names visible in prose AND uses an annotated Evidence base line. Use whenever Ane produces a theory of change, evaluation design, indicator set, donor report, or SRHR programme analysis. Injects current authoritative framework versions with author and year, flags outdated versions, and applies the data-gap protocol. Do not use for non-MEL work.
 ---
 
 # MEL Framework Citation
 
-Applies Ane's non-negotiable MEL/SRHR citation standard from CLAUDE.md. Generic framework references are a quality failure. This skill prevents that.
+Applies Ane's non-negotiable MEL/SRHR citation standard from CLAUDE.md. Generic framework references are a quality failure. This skill prevents that. Citation rigour is constant across audience tiers; placement varies by tier per CLAUDE.md "Audience tiers and register".
 
 ## When to use
 
@@ -15,7 +15,17 @@ Do not trigger for non-MEL documents, general correspondence, or requests unrela
 
 ## Required behaviour
 
-Every MEL/SRHR claim must carry author surname, year, and specific document title. Minimum. Section or page when available.
+Every MEL/SRHR claim must carry author surname, year, and specific document title. Minimum. Section or page when available. The rigour rule is tier-invariant; the placement rule is tier-specific (see below).
+
+### Citation placement by audience tier
+
+Read the audience tier from the prompt's Standing instructions block (passed by Ann via Vi). If the tier is not stated, default to Tier 1 / colleague.
+
+- **Tier 1 working brief (default).** In the running text, name the analytic move, NOT the framework. Write "tested whether the programme caused the outcome by ruling out rival explanations," not "applied Mayne (2019) revisited contribution analysis." At the end of each section, append `**Evidence base:** [author (year) full title, section, hyperlink]; [next source]`. The full source list also appears in the `## Sources` section at end of document.
+- **Tier 1 / junior-MEL learner subgroup.** In the running text, name the framework AND the analytic move. Write "we tested rival explanations using Mayne (2019) revisited contribution analysis, because the programme operated alongside three other interventions." Append an annotated `**Evidence base:**` line: `Mayne (2019) [framework foundation, read first]; Lemire et al. (2020) [practitioner application, worked example]`. The annotation tells the learner what each source is for.
+- **Tier 2 publication.** In the running text, cite inline: `Mayne (2019) "Revisiting the Contribution Question", Evaluation 25(3)`. Use the same inline format throughout. The `## Sources` section appears at end of document.
+
+Hyperlink rules below (canonical publisher pages, openly-accessible preferred) and recency rules apply to all tiers.
 
 ### Current authoritative versions to enforce
 
@@ -83,7 +93,13 @@ If WebSearch reveals that a citation drafted from memory is inaccurate (wrong ye
 
 ## Output
 
-Produce the requested MEL/SRHR artefact. Inline citations throughout. At the end, append a `## Sources` section listing every citation used, full bibliographic form, with a verified hyperlink to the canonical publisher page for each. Where a citation could not be verified in-session, flag it explicitly.
+Produce the requested MEL/SRHR artefact applying the placement rule for the audience tier (see "Citation placement by audience tier" above):
+
+- **Tier 1 working brief:** analytic moves named in prose without framework names; `**Evidence base:**` line at end of each section; full `## Sources` section at end of document.
+- **Tier 1 / junior-MEL:** framework names AND analytic moves named in prose; annotated `**Evidence base:**` line at end of each section; full `## Sources` section at end of document.
+- **Tier 2 publication:** inline citations throughout; full `## Sources` section at end of document.
+
+Every `## Sources` entry lists full bibliographic form with a verified hyperlink to the canonical publisher page. Where a citation could not be verified in-session, flag it explicitly with `⚠️ URL unverified — confirm before publication`.
 
 ## Writing rules
 

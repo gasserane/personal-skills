@@ -45,6 +45,13 @@ Block target size: 3-4k tokens. If your draft exceeds 5k, trim P2 pointers; neve
 ### PHASE 1 — UNDERSTAND
 Extract objective, domain, evidence, success criteria, audience, ethical pre-screen.
 
+**Audience tier classification (mandatory).** Per CLAUDE.md "Audience tiers and register", classify every task on two axes:
+
+- **Tier:** Tier 1 working brief (default, ~90% of outputs) OR Tier 2 publication (rare, opt-in). Tier 2 triggers only when the prompt explicitly names "publication," "journal article," "donor report for external release," "published guide," "peer-reviewed," "external policy paper," or equivalent. When in doubt, classify Tier 1.
+- **Subgroup (Tier 1 only):** *colleague* / *MA-staff* / *partner-NGO* / *management* / *junior-MEL*. Defaults: *colleague* if Ane does not specify; *junior-MEL* if the content type is capacity-building, training, mentoring, methodology walkthrough, or MEL onboarding; *management* if the prompt names a sign-off, decision memo, or executive briefing; *MA-staff* / *partner-NGO* if the prompt names an MA or external partner as recipient.
+
+State the classification explicitly in PHASE 2's Confirmed brief: `Audience tier: [Tier 1 working brief, subgroup MA-staff, collaborative voice]` or equivalent. Pass it to Vi via the Standing instructions block (see PHASE 4).
+
 **Context detection (multiple may apply — apply all that match; mandatory wiki pages are P2):**
 - **Humanitarian / conflict / displacement** ("conflict", "refugee", "IDP", "crisis", "fragile") → COMPLEX; MISP (IAWG 2020) baseline before WHO (2010); load `frameworks/misp-iawg-2020.md`. Ukraine 2022+: distinguish three sub-contexts per ECA wiki page; EU Temporary Protection Directive applies to refugees in receiving countries, NOT to IDPs in Ukraine.
 - **Sub-Saharan Africa** (SSA country/IPPF MA in SSA) → apply ARE (Chilisa, Major, Gaotlhobogwe & Mokgolodi 2017 *CJPE* 30(3)), Ubuntu-grounded outcome framing.
@@ -82,6 +89,10 @@ Present plan to Ane. Wait for approval. Approval is explicit ("proceed", "approv
 Pass: plan text (full COMPLEX / brief SIMPLE), original task, Evidence Brief (COMPLEX), additional PHASE 1 evidence, and a `## Standing instructions` block when any apply.
 
 **Standing instructions** are Ane's validated preferences propagating to every specialist: assemble from CLAUDE.md (writing-style + interaction-approach rules), `ann-overlay.md` entries tagged as standing preferences, and any task-specific preferences Ane stated in this conversation. Format as a bullet list under `## Standing instructions`. Pass the same block to Researcher (COMPLEX) for source-selection / lens-emphasis. Omit the header entirely when no preferences apply.
+
+**Audience tier — mandatory line in Standing instructions.** Always include the PHASE 1 tier classification as a bullet: `- Audience tier: [Tier 1 working brief / Tier 2 publication]; subgroup: [colleague / MA-staff / partner-NGO / management / junior-MEL / peer-review]; voice positioning: [collaborative / directive / collaborative-pedagogical].` Specialists and Vi apply CLAUDE.md "Audience tiers and register" rules per this classification: Tier 1 → BLUF, evidence-base line at end of section, plain English, invisible lens signposting, framework moves named without framework names; Tier 2 → inline citations, visible framework names, visible lens signposting; Tier 1 / junior-MEL → visible signposting and framework names, worked reasoning, annotated evidence base, optional pedagogical callouts. This bullet is mandatory in every spawn — it is not an Ane-stated preference but a system invariant.
+
+**P1 context block — mandatory in every spawn prompt.** Prepend the `## P1 wiki context (already loaded by Ann)` block (constructed per the spec in `## P1 context block` above) to every Vi, Researcher, and bypass-specialist spawn prompt. The block lets the receiver skip cold-load of P1 wiki files. If the block is absent (skill-fallback or partial context), include the explicit line `## P1 wiki context: NOT PROVIDED — load from source.` so the receiver knows to fall back. This is the Tranche-6 P1 triple-load architectural fix; the receiver checks for this block in its session-start step 1.
 
 ### PHASE 4.5 — SOURCE PERSISTENCE (ad-hoc capture)
 
