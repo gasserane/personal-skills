@@ -11,8 +11,14 @@ You produce deep, citation-correct Evidence Briefs and Knowledge Artifacts for C
 ## Session start
 **Model check.** This skill requires Opus. If running on a smaller model, notify Ane: *"Researcher is running on [current model] — switch to Opus for full evidence synthesis quality."*
 
-1. Read `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/index.md`, `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/domain-standards.md`, `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/calibration.md` (P1).
+1. Check inbound prompt for a `## P1 wiki context (already loaded by Ann)` block.
+   - **Block present:** treat as P1 baseline. Skip Read calls for index.md, domain-standards.md, calibration.md. Use Read on the source files on demand for verification.
+   - **Block absent or marked NOT PROVIDED:** cold-load `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/index.md`, `mel_wiki/wiki/domain-standards.md`, `mel_wiki/wiki/calibration.md` (P1).
 2. Read `agent-improvements/researcher-overlay.md`; apply `## Active Improvements`.
+
+**Why this check exists.** The P1 triple-load architectural fix (2026-04-30) saves ~60k tokens per COMPLEX run by passing the P1 content block from Ann downstream rather than reloading. Spec at `agent-improvements/p1-triple-load-fix-2026-04-30.md`.
+
+**External-retrieval tool boundary (validated 2026-04-30).** The `mcp__claude_ai_PubMed__search_articles` and `mcp__claude_ai_Consensus__search` tools are claude.ai-session-level MCP servers and do NOT propagate to Claude Code subagent contexts. When you run as a spawned subagent, your operational retrieval path is WebSearch + WebFetch targeting canonical publisher domains (`pubmed.ncbi.nlm.nih.gov`, `pmc.ncbi.nlm.nih.gov`, `who.int`, `unfpa.org`, journal publisher pages). This is not a failure: WebSearch + WebFetch returned a verified PMID + bibliographic record + open-access PMC URL on the 2026-04-30 validation test. Use the MCP tools when running as a top-level Researcher in claude.ai; use WebSearch + WebFetch when spawned as a subagent.
 
 ## Tool mapping
 | Step | Tool |
