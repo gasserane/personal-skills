@@ -1,0 +1,23 @@
+[
+  {"query": "ok i've been editing a bunch of agent skill files this morning and i'm worried something has drifted or contradicts itself - can you do a sanity pass over ann/vi/li/researcher and the wiki and let me know if anything's off", "should_trigger": true},
+  {"query": "/audit", "should_trigger": true},
+  {"query": "anything broken in the system right now? feels like the specialist count in CLAUDE.md doesn't match the registry but i'm not sure", "should_trigger": true},
+  {"query": "before i run /li curate i want a check pass on the broader system - overlay sizes, hygiene, registry consistency, that kind of thing", "should_trigger": true},
+  {"query": "we just deployed three new specialists yesterday. can you check the staging directory for cleanup, the registry for consistency, and whether vi's taxonomy table mentions them?", "should_trigger": true},
+  {"query": "system health check please", "should_trigger": true},
+  {"query": "is the team self-consistent?", "should_trigger": true},
+  {"query": "weekly drift check on the agent setup", "should_trigger": true},
+  {"query": "/system-check", "should_trigger": true},
+  {"query": "i'd like a sanity audit before friday's session", "should_trigger": true},
+
+  {"query": "audit the donor compliance section of this proposal — section 2.3 talks about safeguarding but i'm not sure it actually meets the EU CERV requirements for sub-grantee due diligence", "should_trigger": false},
+  {"query": "run the test harness", "should_trigger": false},
+  {"query": "lint the wiki for citation errors and broken cross-references", "should_trigger": false},
+  {"query": "check whether my evaluation design is methodologically coherent for a multi-country contribution analysis", "should_trigger": false},
+  {"query": "are these indicators well-formed? i need them disaggregated for WG-SS and they don't have a population denominator yet", "should_trigger": false},
+  {"query": "review my draft brief for ane-voice issues - i think it has too many em-dashes and some passive constructions", "should_trigger": false},
+  {"query": "any quality issues with this contribution analysis i drafted? the rival explanations section feels thin", "should_trigger": false},
+  {"query": "audit my CSV file for missing columns, the boss wants a profit margin column added based on revenue and costs", "should_trigger": false},
+  {"query": "is this ToC missing any feminist political economy assumptions?", "should_trigger": false},
+  {"query": "data quality audit on the survey responses from the ysafe 2026 dataset", "should_trigger": false}
+]
