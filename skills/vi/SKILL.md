@@ -133,16 +133,19 @@ Return compiled product to Ann (or directly to Ane if invoked directly). Blocker
 
 **Codified policy (from CLAUDE.md interpretation, 2026-04-28).** Each specialist's static `~/.claude/agents/<name>.md` declares a default model in its frontmatter. Vi may override at spawn time for task-specific reasons documented below. Codified rules:
 
-1. **Judgement-heavy specialists default to Opus tier** — analytical work where reasoning depth materially changes output quality. Per CLAUDE.md, Ann and Vi themselves stay on Opus 4.6 always; the rule extends to any specialist exercising MEL judgement: `mel-framework-architect`, `qa-reviewer` (COMPLEX), `intersectionality-analyst`, `contribution-plausibility-analyst`, `political-economy-reviewer`, `evaluation-design-specialist`, `humanitarian-srhr-specialist`.
-2. **Retrieval and formatting specialists may drop to Sonnet** — work where output structure is largely determined by input shape. `srhr-indicator-designer`, `srhr-scope-verifier`, `data-quality-auditor`, `oecd-dac-reviewer`, `gender-transformative-assessor`, `participatory-methods-designer`, `mel-report-writer`, `toc-architect`. Sonnet is ~80% cheaper than Opus and adequate for these tasks.
-3. **Domain-specialised MEL specialists default to Sonnet** — task-bounded by a defined framework set with structured output sections. `cse-mel-specialist`, `sbcc-campaign-mel-specialist`, `health-services-mel-specialist`, `organisational-development-mel-specialist`, `ma-priorities-reviewer`. Lift to Opus per the override conditions below if the task involves novel framework integration or contradictory evidence.
-4. **qa-reviewer** is conditional: Sonnet for SIMPLE tasks (single specialist reconciliation); Opus for COMPLEX (multi-specialist reconciliation, multi-framework citation cross-check, lens-application audit across several specialists).
-5. **researcher** defaults to Sonnet (breadth queries); Opus only when Ann passes a "complex synthesis required" flag (3+ frameworks integrating, novel domain).
-6. **Haiku**: reserved for purely mechanical work (formatting, data extraction, simple assembly). Rare in the MEL pipeline.
+1. **Judgement-heavy specialists default to Opus tier** — analytical work where reasoning depth materially changes output quality on every spawn, not only on edge cases. Per CLAUDE.md, Ann and Vi themselves stay on Opus 4.6 always; the rule extends to specialists whose registry default is Opus: `intersectionality-analyst`, `contribution-plausibility-analyst`, `political-economy-reviewer`.
+2. **Retrieval, formatting, and structured-domain specialists default to Sonnet** — output structure is largely determined by input shape, OR the specialist works within a bounded framework set. Default Sonnet per the agent_registry.md `model_default` field for: `srhr-indicator-designer`, `srhr-scope-verifier`, `data-quality-auditor`, `oecd-dac-reviewer`, `gender-transformative-assessor`, `participatory-methods-designer`, `mel-report-writer`, `toc-architect`, `mel-framework-architect`, `evaluation-design-specialist`, `humanitarian-srhr-specialist`, `cse-mel-specialist`, `sbcc-campaign-mel-specialist`, `health-services-mel-specialist`, `organisational-development-mel-specialist`, `ma-priorities-reviewer`. Sonnet is ~80% cheaper than Opus and adequate for the baseline; Vi lifts to Opus per the override conditions below.
+3. **qa-reviewer** is conditional: Sonnet for SIMPLE tasks (single specialist reconciliation); Opus for COMPLEX (multi-specialist reconciliation, multi-framework citation cross-check, lens-application audit across several specialists).
+4. **researcher** defaults to Sonnet (breadth queries); Opus only when Ann passes a "complex synthesis required" flag (3+ frameworks integrating, novel domain).
+5. **Haiku**: reserved for purely mechanical work (formatting, data extraction, simple assembly). Rare in the MEL pipeline.
 
-**Override conditions Vi may apply at spawn:**
+**Override conditions Vi may apply at spawn (these are the triggers that lift default-Sonnet specialists to Opus):**
+- `mel-framework-architect` → Opus when novel framework selection or 3+ framework integration is required.
+- `evaluation-design-specialist` → Opus when multi-method evaluation under constraint or contradictory evidence requires reconciliation.
+- `humanitarian-srhr-specialist` → Opus when the context is multi-country humanitarian crisis or two or more humanitarian sub-contexts overlap (e.g., Ukraine 2022+ refugees in receiving country AND IDPs in Ukraine).
+- `toc-architect` → Opus when feminist political economy analysis is the primary frame or 3+ assumption layers need explicit testing.
+- Any default-Sonnet specialist → Opus on tasks Ann marked "complex synthesis required" or where two of the above specialists run on the same task.
 - Drop default-Opus specialist to Sonnet for SIMPLE tasks where Ann classified the run as Lite path.
-- Lift default-Sonnet specialist to Opus for novel framework integration, multi-method evaluation under constraint, or contradictory evidence requiring reconciliation.
 
 **Dataset size is NOT an Opus trigger. Analytical judgement complexity is.**
 
