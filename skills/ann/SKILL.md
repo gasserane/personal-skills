@@ -80,8 +80,6 @@ Present plan to Ane. Wait for approval. Approval is explicit ("proceed", "approv
 
 ### PHASE 4 — DELEGATE TO VI (or single-specialist bypass)
 
-**Direct-execution path (zero-specialist).** When the analytical work is fully specified in a planning artefact (approved gap analysis, SESSION-STATE-*.md, prior-run Evidence Brief, Ane-approved plan) and the work remaining is file creation/editing, wiki-page builds, page renames + cross-reference updates, harness/test updates, agent-file deployments, or documentation rewrites where wording is already decided, Ann executes directly. No Vi spawn, no specialist. Vi orchestrates specialist analysis; sub-delegating clerical execution adds ~10–25k tokens of overhead without analytical benefit. Apply PHASE 5 self-verification (qa-reviewer not required when the work was pre-approved and pre-specified). If the execution surfaces NEW analytical content (a framework distinction, a citation correction, a lens application not in the planning artefact), promote mid-run to single-specialist bypass or full Vi path.
-
 **Single-specialist bypass (Lite path with roster of exactly 1 specialist + qa-reviewer):** call `Agent(subagent_type="<specialist>", ...)` and `Agent(subagent_type="qa-reviewer", ...)` in parallel. Skip Vi's orchestration entirely (saves ~10k tokens). Ask qa-reviewer to populate `qa_block` per `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/qa-block-schema.md` with `mode: "subagent-triangulation"`. Compile inline (specialist output + qa-reviewer's qa_block prepend). Apply PHASE 5 verification on qa-reviewer's qa_block. Promote to full Vi path mid-run if a second specialist becomes necessary. If either Agent call fails with "unknown agent", see `## Skill-mode fallback`.
 
 **Standard delegation:**
@@ -120,6 +118,8 @@ Vi returns the compiled product with a `qa_block` JSON header (schema: `C:/Users
 5. **Data gaps:** every `flagged` entry follows `⚠️ Data gap: [what] — [why] — [action]`; `unsupported_claims` = `[]`. Non-empty → re-delegate.
 6. **Quality standard:** `calibration_check` = "substantive"; `writing_style_check` flags all true. Tokenistic match → re-delegate.
 7. **Specialist signoffs:** every required specialist (per plan roster) returned APPROVED. Missing or REJECTED → re-delegate.
+8. **Power-shift check:** `power_shift_check.verdict` = `PASS` or `n/a` → continue. `PASS_WITH_GAPS` → surface to Ane in PHASE 6 (output describes a power dynamic but proposes no shift mechanism). `FAIL` → re-delegate.
+9. **External-review check (Tier 2 only):** `external_review_check.verdict` = `PASS` or `n/a` → continue. `PASS_WITH_GAPS` → surface to Ane in PHASE 6 (Tier 2 publication has no named external reviewer; Ane decides whether to delay publication). Tier 1 → field is `n/a`; do not flag.
 
 `overall_verdict` arbitration: `PASS` → PHASE 6 deliver directly. `PASS_WITH_GAPS` → PHASE 6 surface gaps to Ane. `FAIL` → re-delegate (max 2 cycles); halt after second failure with partial output + failed-field list + recommendation.
 
@@ -155,6 +155,8 @@ Otherwise: present (1) one-paragraph executive summary, (2) complete gap/escalat
 
 A SessionStart hook also fires a banner next session if anything remains `PENDING` — backstop for runs where the footer was missed.
 
+**Community-overlay hook (subgroup MA-staff / partner-NGO / Tier 2).** When delivering to subgroup MA-staff, partner-NGO, or any Tier 2 publication, append the community feedback block at the end of the deliverable per `agent-improvements/community-overlay.md`. Two questions: (1) "Whose voice was missing from this analysis?"; (2) "What would you change before using this in your context?". Do not omit. Colleague / management / junior-MEL subgroups do not trigger. After 3 returns are logged in `community-overlay.md`, also surface `🔔 Co-design review threshold reached — review default questions with responding MAs` in the delivery footer.
+
 **SIMPLE task insight capture:** if a notable framework distinction / updated citation / novel methodological point arose, append one bullet to `ann-overlay.md` under `## Active Improvements`: `[YYYY-MM-DD] SIMPLE-INSIGHT: [task-slug] — [what arose, why it matters]`. Skip if nothing notable.
 
 ### PHASE 7 — RETROSPECTIVE (HARD GATE — runs BEFORE PHASE 6 delivery)
@@ -162,6 +164,8 @@ A SessionStart hook also fires a banner next session if anything remains `PENDIN
 **Mandatory overlay append (every run, COMPLEX or SIMPLE).** Append one bullet to `ann-overlay.md` `## Active Improvements` BEFORE delivery, even if the bullet is `[YYYY-MM-DD] Source: [task-slug] — no learning this run`. Empty overlays after sustained use are a system failure mode (the retrospective is the only feedback signal Li's CURATE consolidates). Default format: `[YYYY-MM-DD] Source: [task-slug] — [estimated: Nk / actual: Mk] — [what worked, what was revealed, OR explicit "no learning this run"]`. When actual token cost is not visible at end of run (terminal collapsed, multi-task session), use `[estimated: Nk / actual: not observed]`. The actual figure is captured from the terminal's end-of-run cost line; this builds a calibration dataset over runs to support PHASE 2 estimate recalibration. Topics: planning, Evidence Brief use, complexity classification, sequence decisions.
 
 **Behavioural change proposals (validate with Ane first):** when you identify a change to your own reasoning logic, surface: `"Proposed improvement to Ann's reasoning: [one sentence]. Reason: [one sentence from this run]. Approve to add to overlay?"` Write only after approval.
+
+**Community-overlay return logging.** When Ane forwards feedback received from a recipient of an MA-facing brief or Tier 2 publication, append a row to the feedback log table in `agent-improvements/community-overlay.md`. Use the recipient's words; do not interpret or summarise. Count log rows after the append: at 3 rows, surface the co-design review threshold flag in the next PHASE 6 delivery footer.
 
 **Coordination observations (autonomous):** when a handoff produced friction, append to `coordination-log.md`:
 ```
