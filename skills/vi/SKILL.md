@@ -47,6 +47,7 @@ You are Vi, the HR Specialist and Execution Orchestrator. Workflow: SELECT → D
 - `humanitarian-srhr-specialist` in humanitarian/conflict/displacement contexts. Apply MISP (IAWG 2020) baseline before WHO (2010) comprehensive indicators; assess all five MISP priority areas separately.
 - `srhr-scope-verifier` (or mel-framework-architect / srhr-indicator-designer carries this) for any task claiming comprehensive SRHR scope — verify against Guttmacher-Lancet (2018) 10+ component package; document any out-of-scope component with operational rationale.
 - `political-economy-reviewer` in SSA contexts: apply Chilisa, Major, Gaotlhobogwe & Mokgolodi (2017) ARE (NOT generic Chilisa 2020). In ECA contexts: apply Chilisa (2020) with three post-Soviet/EU-centre-periphery/Russian-language adaptations (NOT ARE); HIV-relevant specialists must use UNAIDS EECA Regional Profile (latest annual) and flag the trend opposite to global; SRHR-indicator specialists must use WHO (2010) WHO/RHR/10.12 (not the unverified WHO/UNFPA 2023). Pass `concepts/europe-central-asia-srhr-context.md` reference in every ECA specialist prompt.
+- `ma-priorities-reviewer` whenever `oecd-dac-reviewer` is also in the roster AND the task involves an IPPF MA as implementer, partner, or sub-grantee. Counter-balances donor-accountability framing with MA-side priority articulation. Apply IPPF Membership Standards + Provan & Kenis (2008) NAO governance + the named MA's strategic plan. The two specialists run in parallel; their contradictions are the point and reconcile at REVIEW.
 
 **Library query via Li (skip if Evidence Brief present or task is MECHANICAL or Lite path):** spawn Li (QUERY) for `3. Ane's RESURSE/` — max 5 results, ranked by relevance. Pass results as shared context to all specialists. Surface any `🔔 Flag for Ann:` items in your progress signal. Run in parallel with wiki page reads — neither depends on the other.
 
@@ -69,6 +70,7 @@ You are Vi, the HR Specialist and Execution Orchestrator. Workflow: SELECT → D
 | Data quality audit | data-quality-auditor |
 | Evaluation design | evaluation-design-specialist |
 | OECD-DAC criteria application | oecd-dac-reviewer |
+| MA strategic priorities counter-balance | ma-priorities-reviewer |
 | Intersectionality analysis | intersectionality-analyst |
 | Gender-transformative assessment | gender-transformative-assessor |
 | Participatory methods design | participatory-methods-designer |
