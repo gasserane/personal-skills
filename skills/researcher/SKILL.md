@@ -53,6 +53,18 @@ Extract an explicit list of research questions. If 0 clear questions: ask Ann or
 
 **Default SRHR additions** (any SRHR domain): one WebSearch for ICPD+30 (2024) accountability framework data; one for UNFPA SoWP 2024 30-year equity audit findings; for humanitarian, one for IAWG MISP (2020) implementation data.
 
+**Multilingual live-retrieval (added 2026-05-06; closes mel-system-bias-audit Item B.7 on the live-retrieval side).** Default WebSearch returns English-dominant results; Consensus and PubMed are English-corpus tools. Li's quarterly catalogue ingestion targets cover the library, not live retrieval. For tasks in non-anglophone regions, issue at least one parallel WebSearch in the relevant working language alongside the English one:
+
+- **ECA tasks** (EECA, post-Soviet, Russian-speaking, Roma in CEE): one Russian-language WebSearch (UNAIDS EECA local-language pages, MZ.gov.ru, regional civil-society publications); one in the relevant national language when a specific country is named (Romanian, Bulgarian, Ukrainian, Polish, etc.).
+- **SSA francophone tasks** (Senegal, Côte d'Ivoire, Mali, DRC, Cameroon, Madagascar, Burkina Faso, Niger, Togo, Benin, Guinea): one French-language WebSearch (AfrEA, ENDA Tiers Monde, OIF, francophone university repositories, national health ministry domains).
+- **MENA tasks**: one Arabic-language WebSearch (ESCWA Centre for Women, AWID Arab regional, Bahithat, Abaad Resource Centre, Arab Family Planning Association). English remains primary because peer-reviewed Arab-region SRHR research often appears in English-language regional journals; the Arabic-language search captures grey literature and civil-society publications the English corpus misses.
+- **Latin America tasks**: one Spanish or Portuguese WebSearch (CEPAL, ReLAC, regional MEL societies, national health ministries; Brazilian Society of Evaluation for lusophone).
+- **Caribbean tasks**: English remains primary (regional academic publishing is anglophone). Flag the field gap explicitly per `calibration.md` regional rules.
+
+Source-tier assessment: non-English sources from established institutional or peer-reviewed publishers count as Tier 1 or Tier 2 by the same rules. Language is not the tier criterion. Translate the relevant finding into the Evidence Brief in English; cite the source in its original language with a one-line English gloss.
+
+If the multilingual search returns nothing materially additional to what the English search already produced, log this in `researcher-overlay.md` so Li's CURATE can identify region-language combinations where the search-target list needs expansion.
+
 **Default ECA additions** — Ane's most frequent context. **Cache-first principle:** the ECA wiki page (`concepts/europe-central-asia-srhr-context.md`) carries cached annual data (UNAIDS EECA epidemic profile, EU GAP III thematic structure, EU Roma Strategic Framework four pillars, Ukraine three sub-contexts framing). Read first; rely on cached data unless cache age > 6 months OR task needs country/programme-specific data not cached.
 - **Mandatory reads:** ECA wiki page; plus `concepts/roma-srhr-mel-context.md` (Roma); `frameworks/eu-roma-strategic-framework-2020-2030.md` (Roma + EU); `frameworks/misp-iawg-2020.md` (Ukraine + humanitarian).
 - **Supplementary WebSearches — cap at 2 per ECA run.** Use only when cache is stale or task needs country-specific data (e.g., a particular MIP, a current GREVIO report, current Istanbul Convention ratification status). Choose the 2 most decision-relevant. If you wanted >2: log to `researcher-overlay.md` what was missing — Li refreshes on next CURATE.
@@ -82,7 +94,7 @@ Structure:
 
 **Artifact B — Knowledge Artifacts.** Stored via Li for future use and wiki integration.
 1. Full literature review — Background, Applicable Frameworks (cited), Evidence by Research Question, Data Gaps, References.
-2. Source list with tier ratings.
+2. Source list with tier ratings AND language tags. Each entry MUST carry a `[lang: <ISO 639-1 code>]` marker (e.g., `[lang: en]`, `[lang: ru]`, `[lang: fr]`, `[lang: ar]`, `[lang: es]`, `[lang: pt]`, `[lang: ro]`). Default to `[lang: en]` only when the source is genuinely English; do not default-tag everything `en`. Li's OVERLAY-DIGEST quarterly counter relies on this field.
 3. MEL Wiki insights — bulleted list of new framework distinctions, new sources, methodological updates worth adding to the wiki. **Each bullet MUST start with a tier tag**: `[TIER 1]` (peer-reviewed source with DOI/PMID), `[TIER 2]` (institutional — WHO/UNFPA/IPPF/UNAIDS/OECD/UN agency), `[TIER 3]` (reputable grey literature — national governments, established INGOs). Tier 1 bullets with verifiable citations auto-merge to wiki via Li (logged to `wiki/log.md`); Tier 2/3 stage to `_pending-ingest.md` for Ane's approval. Untagged bullets default to Tier 3.
 
 ### STEP 5 — RETURN

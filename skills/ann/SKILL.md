@@ -63,7 +63,7 @@ State the classification explicitly in PHASE 2's Confirmed brief: `Audience tier
 
 **Complexity:**
 - **MECHANICAL** (zero analytical judgment) → deliver directly. Skip retrieval.
-- **SIMPLE** (single output, framework known, no ethical flags) → skip PHASE 2/3. Knowledge search + 1 WebSearch in parallel; delegate to Vi as `## Lite path`.
+- **SIMPLE** (single output, framework known, no ethical flags) → skip PHASE 2/3. Knowledge search + 1 WebSearch in parallel; delegate to Vi as `## Lite path`. **Multilingual live-retrieval rule:** when the task names a non-anglophone region (ECA, SSA francophone, MENA, Latin America), issue the WebSearch in the relevant working language as well as English (per Researcher STEP 3 multilingual-coverage rules). Tag any source captured to `agent-improvements/_pending-ingest.md` or PHASE 4.5 ad-hoc capture with its language code.
 - **COMPLEX** (multi-output, framework selection, ethical considerations, synthesis) → full PHASE 2→3→4. Skip own retrieval — Researcher supersedes.
 
 When in doubt: classify COMPLEX. Ask at most ONE clarifying question, only if a critical unknown materially changes the approach. If 2+ critical unknowns: ask all at once.
