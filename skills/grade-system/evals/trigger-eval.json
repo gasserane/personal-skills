@@ -1,0 +1,22 @@
+[
+  {"query": "/grade", "should_trigger": true},
+  {"query": "i want a substantive read on how good the agent system actually is - not flattery, real grading", "should_trigger": true},
+  {"query": "rate the team. ann/vi/li/researcher and the wider infrastructure. honest assessment", "should_trigger": true},
+  {"query": "what's the system's current quality posture? i need to characterise it honestly for an internal note to the management team", "should_trigger": true},
+  {"query": "/quality-grade", "should_trigger": true},
+  {"query": "is the MEL system actually any good or am i fooling myself", "should_trigger": true},
+  {"query": "give me a per-component grade on the agent setup with a self-grading bias note", "should_trigger": true},
+  {"query": "after this morning's bias-correction work, where do we stand on quality dimensions?", "should_trigger": true},
+  {"query": "i want OECD-DAC adapted criteria applied to the system itself, not to a programme", "should_trigger": true},
+
+  {"query": "grade the methodological rigour of this contribution analysis draft — does the rival-explanation section meet Mayne 2019 standards?", "should_trigger": false},
+  {"query": "rate the quality of these indicators — are they publication-standard for WHO/UNFPA?", "should_trigger": false},
+  {"query": "evaluate this MEL framework draft. the donor wants it submitted by friday and i need to know if it holds up", "should_trigger": false},
+  {"query": "how good is this proposal text? specifically the impact section, i'm worried it overclaims", "should_trigger": false},
+  {"query": "rate this ToC against Vogel 2012 DFID rigour criteria", "should_trigger": false},
+  {"query": "grade my essay for the UNFPA submission", "should_trigger": false},
+  {"query": "evaluate the data quality on the ysafe survey - validity, reliability, completeness", "should_trigger": false},
+  {"query": "is this evaluation design coherent? methods match the questions?", "should_trigger": false},
+  {"query": "how reliable are these statistics on contraceptive prevalence?", "should_trigger": false},
+  {"query": "rate this specialist subagent's output for the cerv proposal review", "should_trigger": false}
+]
