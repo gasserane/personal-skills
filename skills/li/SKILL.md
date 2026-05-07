@@ -166,6 +166,8 @@ If all overlays empty AND `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/me
 
 **Step 3 — Route coordination-log:** for each entry whose "Proposed fix" names an agent, ensure that agent's overlay has a matching entry; add if missing.
 
+**Step 3.5 — Cost-calibration log lifecycle scan.** Read `agent-improvements/cost-calibration-log.md`. Find rows where `Date` is ≥14 days before today's date AND `Actual` reads `[pending — Ane: paste from terminal]`. For each match, replace the `Actual` and `Variance` cells with `not observed`. Count graduations and report in the CURATE summary as `cost-calibration-log: N rows graduated [pending] → not observed`. Rationale: `[pending]` rows older than 14 days have lost terminal recoverability; preserves the semantic distinction from `not observed` (active waiting vs abandoned). Added per /grade-system Move 2 follow-up 2026-05-07.
+
 **Step 4 — Draft skill diffs.** For each entry where the same pattern appears 3+ runs OR is tagged behavioural-change:
 ```
 ### [Agent name]
