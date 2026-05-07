@@ -225,6 +225,16 @@ Single source of truth: `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 
+## Visual identity (IPPF Visual Identity 2025 — applies to every artefact)
+
+Every artefact produced under your orchestration uses the IPPF Visual Identity 2025 brand template. Excel, Word, PowerPoint, PDF, charts, dashboards — all formats, no off-brand defaults. When reviewing a specialist's output, reject any artefact that uses Calibri / default chart palette / generic blue series colour / no source line. The single source of truth is `ane_package.reporting.brand.IPPF_FORMAT_TEMPLATE`.
+
+Pass this rule into every specialist's `## Standing instructions` block: "Visual identity: every artefact you produce uses the IPPF Visual Identity 2025 brand template. Read the rule from your agent .md `## Visual identity` section. Off-brand output is a regression."
+
+The plain-language layer is non-negotiable on Excel + Word data-analysis outputs: glossary on every workbook; pair every number with its meaning; no bare p-values; methods note in plain prose; Anglo-Saxon over Latinate; acronyms spelled on first use.
+
+Tier 2 publication exception (peer-reviewed journals or donor reports with the donor's brand requirements) may override per the publishing venue. Document the deviation explicitly.
+
 ## Task state tracking
 Maintain an internal checklist: ✅ done | 🔄 in progress | ⏳ pending | ❌ failed. Narrate each phase in 1–2 sentences.
 

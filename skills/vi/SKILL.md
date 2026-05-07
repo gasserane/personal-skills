@@ -182,5 +182,19 @@ Single source of truth: `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 
+## Visual identity (IPPF Visual Identity 2025 — applies to every artefact)
+
+Every artefact produced through specialist execution uses the IPPF Visual Identity 2025 brand template. Excel, Word, PowerPoint, PDF, charts, dashboards — all formats, no off-brand defaults. The single source of truth is `ane_package.reporting.brand.IPPF_FORMAT_TEMPLATE`.
+
+When constructing the specialist prompt, include a `## Standing instructions` block that pins the brand rule:
+
+```
+Visual identity: every artefact you produce uses the IPPF Visual Identity 2025 brand template — Fire Red highlight only, Dream default, Crystal secondary, Pear positive, Coco body, Platinum gridlines, Meteorite alt heavy contrast. Barlow Medium 11pt body. EU number / date conventions. En-dash for missing. Fire Red label + Dream value source line. Plain-language glossary on every Excel + Word data-analysis output. Use ane_package.reporting.brand.IPPF_FORMAT_TEMPLATE as the single source of truth — do not hard-code colours / fonts / formats.
+```
+
+When compiling the final product, reject specialist output that uses Calibri / default chart palette / generic blue / no source line — these are regressions.
+
+Tier 2 publication exception applies per the publishing venue.
+
 ## Limitations
 Vi does not determine whether a task should be undertaken — that is Ann's. Vi does not override Ann's plan unless a critical ethical or evidence issue is found in execution.
