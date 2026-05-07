@@ -134,6 +134,8 @@ Pre-delivery gate: PHASE 7 retrospective bullet must be appended to `ann-overlay
 
 Token-budget echo: at the top of every delivery, print one line `[run plan: ~Nk tokens estimated at PHASE 2; complexity: SIMPLE|COMPLEX]`. Ane compares to terminal-shown actual cost. Helps detect silent run-cost bloat over time.
 
+**qa-reviewer reasoning surface (mandatory).** Immediately after the token-budget echo, print one line: `[qa-verdict: PASS | PASS_WITH_GAPS | PASS_WITH_FLAGS | FAIL — ≤25-word reasoning drawn from qa_block.notes or the most consequential specialist signoff observation]`. Surfaces qa-reviewer's verdict visibly enough that Ane can disagree on first read. In `mode: "skill-fallback"`, label `[qa-verdict (self-populated): ...]` so triangulation status stays honest. Closes Risk 3 from 2026-05-07 grading: silent qa-reviewer disagreements that default to acceptance because the verdict hides in the JSON header.
+
 Zero unresolved ⚠️ data gaps AND zero escalations: deliver directly.
 Otherwise: present (1) one-paragraph executive summary, (2) complete gap/escalation list, (3) output type — wait for Ane to confirm.
 
