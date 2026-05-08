@@ -1,0 +1,14 @@
+# Pinned dependencies for video-content-analysis skill (Stage 1)
+# Pin to known-good major versions; allow patch/minor updates.
+#
+# Compatibility note (2026-05-08): pyannote.audio 3.4.0 expects
+# torchaudio.AudioMetaData, which was removed in torchaudio 2.7. Pin
+# torch+torchaudio to <2.7 until pyannote.audio 3.5+ ships with the
+# updated API. Verified locally: torch 2.6.x + torchaudio 2.6.x +
+# pyannote.audio 3.4.0 works.
+
+faster-whisper>=1.0.0,<2.0.0
+pyannote.audio>=3.1.0,<4.0.0
+torch>=2.1.0,<2.7.0
+torchaudio>=2.1.0,<2.7.0
+soundfile>=0.12.0,<1.0.0

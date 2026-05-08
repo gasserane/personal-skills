@@ -137,6 +137,50 @@ function New-SkillVenv {
     Write-Step "Venv created. Python: $(& "$script:VenvPath/Scripts/python.exe" --version)" 'OK'
 }
 
+function Install-PipDependencies {
+    param([switch]$SkipDiarization)
+
+    $venvPython = Join-Path $script:VenvPath 'Scripts' 'python.exe'
+    if (-not (Test-Path $venvPython)) {
+        Write-Step "venv Python not found at $venvPython" 'FAIL'
+        throw "venv missing."
+    }
+
+    Write-Step "Upgrading pip in venv..." 'INFO'
+    & $venvPython -m pip install --upgrade pip --quiet
+    if ($LASTEXITCODE -ne 0) {
+        Write-Step "pip upgrade failed (exit $LASTEXITCODE)" 'FAIL'
+        throw "pip upgrade failed."
+    }
+
+    $reqFile = Join-Path $PSScriptRoot 'requirements.txt'
+    if ($SkipDiarization) {
+        Write-Step "Installing faster-whisper only (diarization skipped)..." 'INFO'
+        & $venvPython -m pip install "faster-whisper>=1.0.0,<2.0.0" "soundfile>=0.12.0,<1.0.0"
+    } else {
+        Write-Step "Installing faster-whisper + pyannote.audio from requirements.txt..." 'INFO'
+        & $venvPython -m pip install -r $reqFile
+    }
+    if ($LASTEXITCODE -ne 0) {
+        Write-Step "pip install failed (exit $LASTEXITCODE)" 'FAIL'
+        throw "pip install failed."
+    }
+
+    # Verify imports
+    Write-Step "Verifying imports..." 'INFO'
+    $verifyScript = if ($SkipDiarization) {
+        'import faster_whisper; print("faster_whisper:", faster_whisper.__version__)'
+    } else {
+        'import faster_whisper, pyannote.audio; print("faster_whisper:", faster_whisper.__version__); print("pyannote.audio:", pyannote.audio.__version__)'
+    }
+    & $venvPython -c $verifyScript
+    if ($LASTEXITCODE -ne 0) {
+        Write-Step "Import verification failed" 'FAIL'
+        throw "Imports failed after pip install."
+    }
+    Write-Step "Pip dependencies installed and verified" 'OK'
+}
+
 function Main {
     Write-Step "Starting video-content-analysis installer (PowerShell $($PSVersionTable.PSVersion))" 'INFO'
     Write-Step "Log file: $script:LogFile" 'INFO'
@@ -159,8 +203,11 @@ function Main {
     # Stage 1.6: venv
     New-SkillVenv
 
-    # Subsequent install steps in Tasks 7-8
-    Write-Step "Stage 1.6 complete (venv). Subsequent steps not yet wired." 'INFO'
+    # Stage 1.7: pip dependencies
+    Install-PipDependencies -SkipDiarization:$SkipDiarization
+
+    # Subsequent steps in Task 8+
+    Write-Step "Stage 1.7 complete (pip deps). Subsequent steps not yet wired." 'INFO'
 }
 
 Main
