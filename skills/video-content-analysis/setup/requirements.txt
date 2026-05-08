@@ -7,6 +7,8 @@
 # updated API. Verified locally: torch 2.6.x + torchaudio 2.6.x +
 # pyannote.audio 3.4.0 works.
 
+# numpy<2.0 pin: pyannote.audio 3.4.0 + torch 2.6 stack is unstable on numpy 2.x at time of writing.
+numpy<2.0,>=1.26
 faster-whisper>=1.0.0,<2.0.0
 pyannote.audio>=3.1.0,<4.0.0
 torch>=2.1.0,<2.7.0

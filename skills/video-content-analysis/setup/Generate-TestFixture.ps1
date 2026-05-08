@@ -1,4 +1,7 @@
 #Requires -Version 7.0
+# NOTE: This script is invoked manually when test-fixtures/silence-5sec.wav
+# needs regenerating. setup-video-pipeline.ps1 does NOT call it during
+# normal install; the fixture is committed and travels with the skill.
 <#
 .SYNOPSIS
     Generates the silence-5sec.wav test fixture using ffmpeg.

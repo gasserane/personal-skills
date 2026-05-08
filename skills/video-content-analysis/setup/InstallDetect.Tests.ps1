@@ -48,6 +48,7 @@ Describe 'Test-RealPythonInstalled - version comparison' {
     }
     It 'Returns true when non-Store Python is at or above MinimumVersion' {
         Mock -ModuleName InstallDetect Get-Command { @{Source='C:\Python311\python.exe'} } -ParameterFilter { $Name -eq 'python' }
+        Mock -ModuleName InstallDetect Get-Command { $null } -ParameterFilter { $Name -eq 'py' }
         Mock -ModuleName InstallDetect Get-PythonVersion { [version]'3.11.7' } -ParameterFilter { $PythonPath -eq 'C:\Python311\python.exe' }
         Test-RealPythonInstalled -MinimumVersion '3.11' | Should -Be $true
     }

@@ -16,6 +16,11 @@
     Skip the upfront Whisper large-v3 model download. First transcription run
     will download it instead (~3 GB, 5-10 min on typical broadband).
 
+.PARAMETER NonInteractive
+    Suppress all Read-Host prompts. HuggingFace token entry is skipped
+    (equivalent to passing 's'); model download is deferred; disk-space
+    warning is auto-continued. Enables unattended CI runs.
+
 .EXAMPLE
     ./setup-video-pipeline.ps1
     Full install with prompts.
@@ -23,16 +28,21 @@
 .EXAMPLE
     ./setup-video-pipeline.ps1 -SkipDiarization -DeferModelDownload
     Minimal install, skip diarization and defer model.
+
+.EXAMPLE
+    ./setup-video-pipeline.ps1 -DeferModelDownload -NonInteractive
+    Unattended install; no prompts. Suitable for CI.
 #>
 [CmdletBinding()]
 param(
     [switch]$SkipDiarization,
-    [switch]$DeferModelDownload
+    [switch]$DeferModelDownload,
+    [switch]$NonInteractive
 )
 
 $ErrorActionPreference = 'Stop'
 $script:LogFile = Join-Path $PSScriptRoot 'install.log'
-$script:VenvPath = Join-Path $PSScriptRoot '..' 'venv'
+$script:VenvPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\venv'))
 
 Import-Module (Join-Path $PSScriptRoot 'InstallDetect.psm1') -Force
 
@@ -49,9 +59,13 @@ function Confirm-DiskSpace {
     $drive = (Get-Item $PSScriptRoot).PSDrive
     $freeGB = [math]::Round($drive.Free / 1GB, 1)
     if ($freeGB -lt $RequiredGB) {
-        Write-Step "Insufficient disk space: ${freeGB}GB free, ${RequiredGB}GB required" 'FAIL'
-        $reply = Read-Host "Continue anyway? [y/N]"
-        if ($reply -notmatch '^[Yy]') { exit 1 }
+        Write-Step "Insufficient disk space: ${freeGB}GB free, ${RequiredGB}GB required" 'WARN'
+        if ($NonInteractive) {
+            Write-Step "NonInteractive mode: continuing despite low disk space." 'WARN'
+        } else {
+            $reply = Read-Host "Continue anyway? [y/N]"
+            if ($reply -notmatch '^[Yy]') { exit 1 }
+        }
     } else {
         Write-Step "Disk space check: ${freeGB}GB free (${RequiredGB}GB required)" 'OK'
     }
@@ -63,8 +77,9 @@ function Install-FFmpeg {
         return
     }
     Write-Step "Installing ffmpeg via winget (Gyan.FFmpeg)..." 'INFO'
-    & winget install Gyan.FFmpeg --scope user --accept-source-agreements --accept-package-agreements --silent | Out-Null
+    $output = & winget install Gyan.FFmpeg --scope user --accept-source-agreements --accept-package-agreements --silent 2>&1
     $wingetExit = $LASTEXITCODE
+    Write-Verbose ($output -join "`n")
     # winget exit codes treated as success:
     #   0           = installed
     #   -1978335189 = already installed (APPINSTALLER_CLI_ERROR_PACKAGE_ALREADY_INSTALLED, 0x8A15002B)
@@ -74,12 +89,14 @@ function Install-FFmpeg {
     }
     # Refresh PATH for the current session
     $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
-    $ffmpegCmd = Get-Command ffmpeg -ErrorAction SilentlyContinue
-    if (-not $ffmpegCmd) {
-        Write-Step "ffmpeg installed but not on PATH after refresh. Open a new PowerShell session and re-run this installer to continue." 'WARN'
-    } else {
-        Write-Step "ffmpeg installed at $($ffmpegCmd.Source)" 'OK'
+    # PATH may be stale even after refreshenv. Force a fresh process so subsequent
+    # Get-Command finds the new binary. If still missing, abort with instruction.
+    if (-not (Test-FFmpegInstalled)) {
+        Write-Step "ffmpeg installed but not on PATH after refresh. Open a new PowerShell session and re-run." 'FAIL'
+        exit 1
     }
+    $ffmpegCmd = Get-Command ffmpeg -ErrorAction SilentlyContinue
+    Write-Step "ffmpeg installed at $($ffmpegCmd.Source)" 'OK'
 }
 
 function Install-Python311 {
@@ -111,9 +128,11 @@ function Install-Python311 {
 
     # Refresh PATH (PIM adds shortcut directories to user PATH on first install)
     $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
+    # PATH may be stale even after refreshenv. Force a fresh process so subsequent
+    # Get-Command finds the new binary. If still missing, abort with instruction.
     if (-not (Test-RealPythonInstalled -MinimumVersion '3.11')) {
-        Write-Step "Python 3.11 installed via PIM but not detected after PATH refresh. Open a new PowerShell session and re-run this installer to continue." 'WARN'
-        throw "Python 3.11 install verification failed."
+        Write-Step "Python 3.11 installed but not detected after PATH refresh. Open a new PowerShell session and re-run." 'FAIL'
+        exit 1
     }
     $pyVersionOutput = & py -3.11 --version 2>&1
     Write-Step "Python 3.11 installed: $pyVersionOutput" 'OK'
@@ -125,9 +144,11 @@ function New-SkillVenv {
         return
     }
     Write-Step "Creating skill venv at $script:VenvPath..." 'INFO'
-    & py -3.11 -m venv $script:VenvPath
-    if ($LASTEXITCODE -ne 0) {
-        Write-Step "venv creation failed (exit $LASTEXITCODE)" 'FAIL'
+    $output = & py -3.11 -m venv $script:VenvPath 2>&1
+    $exit = $LASTEXITCODE
+    Write-Verbose ($output -join "`n")
+    if ($exit -ne 0) {
+        Write-Step "venv creation failed (exit $exit)" 'FAIL'
         throw "venv creation failed."
     }
     if (-not (Test-VenvExists -VenvPath $script:VenvPath)) {
@@ -135,6 +156,23 @@ function New-SkillVenv {
         throw "venv post-creation check failed."
     }
     Write-Step "Venv created. Python: $(& "$script:VenvPath/Scripts/python.exe" --version)" 'OK'
+}
+
+function Test-PipDependenciesInstalled {
+    param(
+        [Parameter(Mandatory)] [string] $VenvPath,
+        [Parameter(Mandatory)] [string] $RequirementsFile
+    )
+    $venvPython = Join-Path $VenvPath 'Scripts/python.exe'
+    if (-not (Test-Path $venvPython)) { return $false }
+    $required = Get-Content $RequirementsFile | Where-Object { $_ -and -not $_.StartsWith('#') }
+    foreach ($line in $required) {
+        $name = ($line -split '[<>=!]')[0].Trim()
+        if (-not $name) { continue }
+        $output = & $venvPython -m pip show $name 2>&1
+        if ($LASTEXITCODE -ne 0) { return $false }
+    }
+    return $true
 }
 
 function Install-PipDependencies {
@@ -146,23 +184,34 @@ function Install-PipDependencies {
         throw "venv missing."
     }
 
+    $reqFile = Join-Path $PSScriptRoot 'requirements.txt'
+
+    if (Test-PipDependenciesInstalled -VenvPath $script:VenvPath -RequirementsFile $reqFile) {
+        Write-Step "[SKIP] pip dependencies already satisfied" 'SKIP'
+        return
+    }
+
+    Write-Step "Installing pip dependencies..." 'INFO'
     Write-Step "Upgrading pip in venv..." 'INFO'
-    & $venvPython -m pip install --upgrade pip --quiet
-    if ($LASTEXITCODE -ne 0) {
-        Write-Step "pip upgrade failed (exit $LASTEXITCODE)" 'FAIL'
+    $output = & $venvPython -m pip install --upgrade pip --quiet 2>&1
+    $exit = $LASTEXITCODE
+    Write-Verbose ($output -join "`n")
+    if ($exit -ne 0) {
+        Write-Step "pip upgrade failed (exit $exit)" 'FAIL'
         throw "pip upgrade failed."
     }
 
-    $reqFile = Join-Path $PSScriptRoot 'requirements.txt'
     if ($SkipDiarization) {
         Write-Step "Installing faster-whisper only (diarization skipped)..." 'INFO'
-        & $venvPython -m pip install "faster-whisper>=1.0.0,<2.0.0" "soundfile>=0.12.0,<1.0.0"
+        $output = & $venvPython -m pip install "faster-whisper>=1.0.0,<2.0.0" "soundfile>=0.12.0,<1.0.0" 2>&1
     } else {
         Write-Step "Installing faster-whisper + pyannote.audio from requirements.txt..." 'INFO'
-        & $venvPython -m pip install -r $reqFile
+        $output = & $venvPython -m pip install -r $reqFile 2>&1
     }
-    if ($LASTEXITCODE -ne 0) {
-        Write-Step "pip install failed (exit $LASTEXITCODE)" 'FAIL'
+    $exit = $LASTEXITCODE
+    Write-Verbose ($output -join "`n")
+    if ($exit -ne 0) {
+        Write-Step "pip install failed (exit $exit)" 'FAIL'
         throw "pip install failed."
     }
 
@@ -173,8 +222,10 @@ function Install-PipDependencies {
     } else {
         'import faster_whisper, pyannote.audio; print("faster_whisper:", faster_whisper.__version__); print("pyannote.audio:", pyannote.audio.__version__)'
     }
-    & $venvPython -c $verifyScript
-    if ($LASTEXITCODE -ne 0) {
+    $output = & $venvPython -c $verifyScript 2>&1
+    $exit = $LASTEXITCODE
+    Write-Verbose ($output -join "`n")
+    if ($exit -ne 0) {
         Write-Step "Import verification failed" 'FAIL'
         throw "Imports failed after pip install."
     }
@@ -205,22 +256,30 @@ function Set-HuggingFaceToken {
         return
     }
 
+    if ($NonInteractive) {
+        Write-Step "NonInteractive mode: HuggingFace token entry skipped. Diarization will not work until installer re-run with token." 'WARN'
+        return
+    }
+
     Write-Host ""
     Write-Host "HuggingFace token required for pyannote speaker-diarization-3.1 model."
     Write-Host "Get a token at https://huggingface.co/settings/tokens (free account, 'read' scope sufficient)."
     Write-Host "You also need to accept the gated-model terms at https://huggingface.co/pyannote/speaker-diarization-3.1"
     Write-Host ""
-    $token = Read-Host -Prompt "Paste HuggingFace token (or 'n' to skip)" -AsSecureString
+    $token = Read-Host -Prompt "Paste HuggingFace token (or 's'/'skip'/'n'/'no' to skip)" -AsSecureString
     $tokenPlain = [System.Net.NetworkCredential]::new('', $token).Password
 
-    if ($tokenPlain -eq 'n' -or [string]::IsNullOrWhiteSpace($tokenPlain)) {
+    $skipResponses = @('s', 'skip', 'n', 'no', '')
+    if ($tokenPlain.Trim().ToLower() -in $skipResponses) {
         Write-Step "HuggingFace token entry skipped. Diarization will not work until installer re-run with token." 'WARN'
         return
     }
 
-    & cmdkey /generic:$credentialName /user:hf /pass:$tokenPlain | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        Write-Step "Credential Manager storage failed (exit $LASTEXITCODE)" 'FAIL'
+    $output = & cmdkey /generic:$credentialName /user:hf /pass:$tokenPlain 2>&1
+    $exit = $LASTEXITCODE
+    Write-Verbose ($output -join "`n")
+    if ($exit -ne 0) {
+        Write-Step "Credential Manager storage failed (exit $exit)" 'FAIL'
         throw "Token storage failed."
     }
     Write-Step "HuggingFace token stored in Windows Credential Manager under $credentialName" 'OK'
@@ -234,6 +293,11 @@ function Get-WhisperModel {
         return
     }
 
+    if ($NonInteractive) {
+        Write-Step "NonInteractive mode: Whisper large-v3 model download deferred." 'SKIP'
+        return
+    }
+
     Write-Host ""
     Write-Host "Whisper large-v3 model is ~3GB. Best Romanian/Bulgarian/Polish/Arabic accuracy but a one-time download."
     $reply = Read-Host "Download now (recommended) or defer to first use? [now/defer]"
@@ -244,14 +308,16 @@ function Get-WhisperModel {
 
     Write-Step "Downloading Whisper large-v3 model (this takes 5-10 minutes)..." 'INFO'
     $venvPython = Join-Path $script:VenvPath 'Scripts' 'python.exe'
-    $script = @'
+    $pyScript = @'
 from faster_whisper import WhisperModel
 print("Downloading large-v3...")
 model = WhisperModel("large-v3", device="cpu", compute_type="int8")
 print("Model loaded successfully.")
 '@
-    & $venvPython -c $script
-    if ($LASTEXITCODE -ne 0) {
+    $output = & $venvPython -c $pyScript 2>&1
+    $exit = $LASTEXITCODE
+    Write-Verbose ($output -join "`n")
+    if ($exit -ne 0) {
         Write-Step "Whisper model download failed" 'FAIL'
         throw "Model download failed."
     }
@@ -269,9 +335,19 @@ function Invoke-SmokeTest {
         & (Join-Path $PSScriptRoot 'Generate-TestFixture.ps1')
     }
 
-    & $venvPython $smokeScript --audio $fixturePath --model tiny
-    if ($LASTEXITCODE -ne 0) {
-        Write-Step "Smoke test failed (exit $LASTEXITCODE)" 'FAIL'
+    $output = & $venvPython $smokeScript --audio $fixturePath --model tiny 2>&1
+    $smokeExit = $LASTEXITCODE
+    Write-Verbose ($output -join "`n")
+    if ($smokeExit -ne 0) {
+        # Surface a targeted hint based on the exit code from smoke-test.py
+        $hint = switch ($smokeExit) {
+            2 { "Test fixture WAV missing — re-run installer or run Generate-TestFixture.ps1 manually." }
+            3 { "faster_whisper import failed — check pip install in venv; run: pip show faster-whisper" }
+            4 { "Whisper model load failed — venv may be corrupt; delete venv/ and re-run installer." }
+            5 { "Transcription failed — audio fixture may be corrupt; delete test-fixtures/silence-5sec.wav and re-run." }
+            default { "Smoke test failed with unexpected exit code $smokeExit." }
+        }
+        Write-Step "Smoke test failed (exit $smokeExit): $hint" 'FAIL'
         throw "Smoke test failed."
     }
     Write-Step "Smoke test passed. Skill toolchain ready." 'OK'
