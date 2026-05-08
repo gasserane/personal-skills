@@ -181,6 +181,47 @@ function Install-PipDependencies {
     Write-Step "Pip dependencies installed and verified" 'OK'
 }
 
+function Set-HuggingFaceToken {
+    [CmdletBinding()]
+    param([switch]$Skip)
+
+    # Use hyphens only; cmdkey rejects ':' in target names. /generic: is the
+    # correct form for app-token credentials (vs. /add: which is for NTLM).
+    $credentialName = 'IPPF-MEL-Video-HuggingFace'
+
+    if ($Skip) {
+        Write-Step "Diarization skipped; HuggingFace token not requested" 'SKIP'
+        return
+    }
+
+    # Check if a token already exists
+    $existing = & cmdkey /list:$credentialName 2>&1
+    if ($LASTEXITCODE -eq 0 -and $existing -match [regex]::Escape($credentialName)) {
+        Write-Step "HuggingFace token already stored under $credentialName" 'SKIP'
+        return
+    }
+
+    Write-Host ""
+    Write-Host "HuggingFace token required for pyannote speaker-diarization-3.1 model."
+    Write-Host "Get a token at https://huggingface.co/settings/tokens (free account, 'read' scope sufficient)."
+    Write-Host "You also need to accept the gated-model terms at https://huggingface.co/pyannote/speaker-diarization-3.1"
+    Write-Host ""
+    $token = Read-Host -Prompt "Paste HuggingFace token (or 'n' to skip)" -AsSecureString
+    $tokenPlain = [System.Net.NetworkCredential]::new('', $token).Password
+
+    if ($tokenPlain -eq 'n' -or [string]::IsNullOrWhiteSpace($tokenPlain)) {
+        Write-Step "HuggingFace token entry skipped. Diarization will not work until installer re-run with token." 'WARN'
+        return
+    }
+
+    & cmdkey /generic:$credentialName /user:hf /pass:$tokenPlain | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Step "Credential Manager storage failed (exit $LASTEXITCODE)" 'FAIL'
+        throw "Token storage failed."
+    }
+    Write-Step "HuggingFace token stored in Windows Credential Manager under $credentialName" 'OK'
+}
+
 function Main {
     Write-Step "Starting video-content-analysis installer (PowerShell $($PSVersionTable.PSVersion))" 'INFO'
     Write-Step "Log file: $script:LogFile" 'INFO'
@@ -206,8 +247,11 @@ function Main {
     # Stage 1.7: pip dependencies
     Install-PipDependencies -SkipDiarization:$SkipDiarization
 
-    # Subsequent steps in Task 8+
-    Write-Step "Stage 1.7 complete (pip deps). Subsequent steps not yet wired." 'INFO'
+    # Stage 1.8: HuggingFace token
+    Set-HuggingFaceToken -Skip:$SkipDiarization
+
+    # Subsequent steps in Task 9-11
+    Write-Step "Stage 1.8 complete (HF token). Subsequent steps not yet wired." 'INFO'
 }
 
 Main
