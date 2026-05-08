@@ -57,6 +57,26 @@ function Confirm-DiskSpace {
     }
 }
 
+function Install-FFmpeg {
+    if (Test-FFmpegInstalled) {
+        Write-Step "ffmpeg already installed at $((Get-Command ffmpeg).Source)" 'SKIP'
+        return
+    }
+    Write-Step "Installing ffmpeg via winget (Gyan.FFmpeg)..." 'INFO'
+    & winget install Gyan.FFmpeg --scope user --accept-source-agreements --accept-package-agreements --silent | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Step "ffmpeg install via winget failed (exit $LASTEXITCODE)" 'FAIL'
+        throw "ffmpeg install failed."
+    }
+    # Refresh PATH for the current session
+    $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
+    if (-not (Test-FFmpegInstalled)) {
+        Write-Step "ffmpeg installed but not on PATH after refresh. May require new session." 'WARN'
+    } else {
+        Write-Step "ffmpeg installed at $((Get-Command ffmpeg).Source)" 'OK'
+    }
+}
+
 function Main {
     Write-Step "Starting video-content-analysis installer (PowerShell $($PSVersionTable.PSVersion))" 'INFO'
     Write-Step "Log file: $script:LogFile" 'INFO'
@@ -70,9 +90,11 @@ function Main {
 
     Confirm-DiskSpace -RequiredGB 6
 
-    # Install steps land in Tasks 4-7
-    Write-Step "Installer skeleton complete. Install steps not yet implemented." 'INFO'
-    Write-Step "Run again after subsequent tasks of Stage 1 are complete." 'INFO'
+    # Stage 1.4: ffmpeg
+    Install-FFmpeg
+
+    # Stage 1.5+: subsequent install steps
+    Write-Step "Stage 1.4 complete (ffmpeg). Subsequent steps not yet wired." 'INFO'
 }
 
 Main
