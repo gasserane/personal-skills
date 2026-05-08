@@ -82,6 +82,43 @@ function Install-FFmpeg {
     }
 }
 
+function Install-Python311 {
+    if (Test-RealPythonInstalled -MinimumVersion '3.11') {
+        Write-Step "Python 3.11+ already installed (real Python, not Store stub)" 'SKIP'
+        return
+    }
+
+    # Python Install Manager (PIM) via py launcher 3.13+ installs runtimes to
+    # user scope without admin elevation. winget Python.Python.3.11 requires
+    # admin for the runtime install on most setups, which is unreachable on
+    # IPPF-managed devices where the user has no admin rights.
+    $pyLauncher = Get-Command py -ErrorAction SilentlyContinue
+    if (-not $pyLauncher) {
+        Write-Step "Python launcher 'py' not found. Install it from https://python.org (per-user installer, no admin needed) before re-running this installer." 'FAIL'
+        throw "py launcher missing - required for Python Install Manager."
+    }
+
+    Write-Step "Installing Python 3.11 via Python Install Manager (py install 3.11) - no admin required..." 'INFO'
+    $pimOutput = & py install 3.11 --yes 2>&1
+    $pimExit = $LASTEXITCODE
+    foreach ($line in $pimOutput) {
+        if ($line) { Write-Step "  py install: $line" 'INFO' }
+    }
+    if ($pimExit -ne 0) {
+        Write-Step "py install 3.11 failed (exit $pimExit)" 'FAIL'
+        throw "Python 3.11 install via PIM failed."
+    }
+
+    # Refresh PATH (PIM adds shortcut directories to user PATH on first install)
+    $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
+    if (-not (Test-RealPythonInstalled -MinimumVersion '3.11')) {
+        Write-Step "Python 3.11 installed via PIM but not detected after PATH refresh. Open a new PowerShell session and re-run this installer to continue." 'WARN'
+        throw "Python 3.11 install verification failed."
+    }
+    $pyVersionOutput = & py -3.11 --version 2>&1
+    Write-Step "Python 3.11 installed: $pyVersionOutput" 'OK'
+}
+
 function Main {
     Write-Step "Starting video-content-analysis installer (PowerShell $($PSVersionTable.PSVersion))" 'INFO'
     Write-Step "Log file: $script:LogFile" 'INFO'
@@ -98,8 +135,11 @@ function Main {
     # Stage 1.4: ffmpeg
     Install-FFmpeg
 
-    # Stage 1.5+: subsequent install steps
-    Write-Step "Stage 1.4 complete (ffmpeg). Subsequent steps not yet wired." 'INFO'
+    # Stage 1.5: Python 3.11
+    Install-Python311
+
+    # Subsequent install steps land in Tasks 6-8
+    Write-Step "Stage 1.5 complete (Python 3.11). Subsequent steps not yet wired." 'INFO'
 }
 
 Main
