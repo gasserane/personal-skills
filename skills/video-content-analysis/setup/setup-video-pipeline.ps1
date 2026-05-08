@@ -119,6 +119,24 @@ function Install-Python311 {
     Write-Step "Python 3.11 installed: $pyVersionOutput" 'OK'
 }
 
+function New-SkillVenv {
+    if (Test-VenvExists -VenvPath $script:VenvPath) {
+        Write-Step "Skill venv already exists at $script:VenvPath" 'SKIP'
+        return
+    }
+    Write-Step "Creating skill venv at $script:VenvPath..." 'INFO'
+    & py -3.11 -m venv $script:VenvPath
+    if ($LASTEXITCODE -ne 0) {
+        Write-Step "venv creation failed (exit $LASTEXITCODE)" 'FAIL'
+        throw "venv creation failed."
+    }
+    if (-not (Test-VenvExists -VenvPath $script:VenvPath)) {
+        Write-Step "venv created but pyvenv.cfg missing. Investigate." 'FAIL'
+        throw "venv post-creation check failed."
+    }
+    Write-Step "Venv created. Python: $(& "$script:VenvPath/Scripts/python.exe" --version)" 'OK'
+}
+
 function Main {
     Write-Step "Starting video-content-analysis installer (PowerShell $($PSVersionTable.PSVersion))" 'INFO'
     Write-Step "Log file: $script:LogFile" 'INFO'
@@ -138,8 +156,11 @@ function Main {
     # Stage 1.5: Python 3.11
     Install-Python311
 
-    # Subsequent install steps land in Tasks 6-8
-    Write-Step "Stage 1.5 complete (Python 3.11). Subsequent steps not yet wired." 'INFO'
+    # Stage 1.6: venv
+    New-SkillVenv
+
+    # Subsequent install steps in Tasks 7-8
+    Write-Step "Stage 1.6 complete (venv). Subsequent steps not yet wired." 'INFO'
 }
 
 Main
