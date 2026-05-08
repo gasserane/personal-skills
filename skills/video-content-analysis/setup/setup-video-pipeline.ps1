@@ -194,9 +194,13 @@ function Set-HuggingFaceToken {
         return
     }
 
-    # Check if a token already exists
+    # Check if a token already exists. cmdkey /list:<name> always returns exit 0
+    # AND always echoes the credential name in the "Currently stored credentials for X:"
+    # header — even when the body says "* NONE *". Match the "Target:" line instead;
+    # that line only appears when an actual credential exists.
     $existing = & cmdkey /list:$credentialName 2>&1
-    if ($LASTEXITCODE -eq 0 -and $existing -match [regex]::Escape($credentialName)) {
+    $existingText = ($existing -join "`n")
+    if ($existingText -match "Target:\s*$([regex]::Escape($credentialName))") {
         Write-Step "HuggingFace token already stored under $credentialName" 'SKIP'
         return
     }
