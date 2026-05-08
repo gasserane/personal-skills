@@ -1,0 +1,11 @@
+=== Post-install state (2026-05-08T22:21:51.4963089+02:00) ===
+ffmpeg: C:\Users\AGasser\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.1-full_build\bin\ffmpeg.exe
+ffmpeg version: ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers
+py -3.11: Python 3.11.9
+venv python: Python 3.11.9
+faster_whisper: 1.2.1
+pyannote.audio: 3.4.0
+torch: 2.6.0+cpu
+torchaudio: 2.6.0+cpu
+HF token: stored
+free disk on C: 255.941539764404 GB
