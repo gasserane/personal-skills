@@ -78,7 +78,9 @@ The installer ends with a summary box like:
 # Remove venv (frees ~650 MB plus models if downloaded)
 Remove-Item -Recurse -Force "C:/Users/AGasser/OneDrive/GitHub/personal-skills/skills/video-content-analysis/venv/"
 
-# Remove HuggingFace token from Credential Manager
+# Remove the HuggingFace token from Credential Manager.
+# The credential target is defined in setup/constants.psd1
+# (HuggingFaceCredentialTarget); pass it to cmdkey /delete:<target>.
 cmdkey /delete:IPPF-MEL-Video-HuggingFace
 
 # Optionally remove ffmpeg via winget

@@ -41,6 +41,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$script:Constants = Import-PowerShellDataFile (Join-Path $PSScriptRoot 'constants.psd1')
 $script:LogFile = Join-Path $PSScriptRoot 'install.log'
 $script:VenvPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\venv'))
 
@@ -271,7 +272,7 @@ function Set-HuggingFaceToken {
 
     # Use hyphens only; cmdkey rejects ':' in target names. /generic: is the
     # correct form for app-token credentials (vs. /add: which is for NTLM).
-    $credentialName = 'IPPF-MEL-Video-HuggingFace'
+    $credentialName = $script:Constants.HuggingFaceCredentialTarget
 
     if ($Skip) {
         Write-Step "Diarization skipped; HuggingFace token not requested" 'SKIP'
