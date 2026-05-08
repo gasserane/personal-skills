@@ -64,16 +64,21 @@ function Install-FFmpeg {
     }
     Write-Step "Installing ffmpeg via winget (Gyan.FFmpeg)..." 'INFO'
     & winget install Gyan.FFmpeg --scope user --accept-source-agreements --accept-package-agreements --silent | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        Write-Step "ffmpeg install via winget failed (exit $LASTEXITCODE)" 'FAIL'
+    $wingetExit = $LASTEXITCODE
+    # winget exit codes treated as success:
+    #   0           = installed
+    #   -1978335189 = already installed (APPINSTALLER_CLI_ERROR_PACKAGE_ALREADY_INSTALLED, 0x8A15002B)
+    if ($wingetExit -ne 0 -and $wingetExit -ne -1978335189) {
+        Write-Step "ffmpeg install via winget failed (exit $wingetExit)" 'FAIL'
         throw "ffmpeg install failed."
     }
     # Refresh PATH for the current session
     $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
-    if (-not (Test-FFmpegInstalled)) {
-        Write-Step "ffmpeg installed but not on PATH after refresh. May require new session." 'WARN'
+    $ffmpegCmd = Get-Command ffmpeg -ErrorAction SilentlyContinue
+    if (-not $ffmpegCmd) {
+        Write-Step "ffmpeg installed but not on PATH after refresh. Open a new PowerShell session and re-run this installer to continue." 'WARN'
     } else {
-        Write-Step "ffmpeg installed at $((Get-Command ffmpeg).Source)" 'OK'
+        Write-Step "ffmpeg installed at $($ffmpegCmd.Source)" 'OK'
     }
 }
 

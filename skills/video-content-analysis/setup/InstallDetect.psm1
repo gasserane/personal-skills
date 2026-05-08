@@ -10,20 +10,54 @@ function Test-FFmpegInstalled {
     return [bool](Get-Command ffmpeg -ErrorAction SilentlyContinue)
 }
 
+function Get-PythonVersion {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string]$PythonPath)
+    try {
+        $output = & $PythonPath --version 2>&1
+        if ($output -match 'Python (\d+\.\d+(?:\.\d+)?)') {
+            return [version]$Matches[1]
+        }
+    } catch {}
+    return $null
+}
+
+function Invoke-PyLauncher {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string]$LauncherPath,
+        [Parameter(Mandatory)][string]$Version
+    )
+    try {
+        return (& $LauncherPath "-$Version" --version 2>&1)
+    } catch {
+        return $null
+    }
+}
+
 function Test-RealPythonInstalled {
     [CmdletBinding()]
     param([string]$MinimumVersion = '3.11')
 
+    $minVer = [version]$MinimumVersion
+
+    # Fast-path: real (non-Store) python on PATH at sufficient version
     $pyCmd = Get-Command python -ErrorAction SilentlyContinue
-    if ($pyCmd) {
-        if ($pyCmd.Source -like '*\WindowsApps\*') {
-            # Windows Store stub. Treat as not installed.
-        } else {
-            return $true
+    if ($pyCmd -and $pyCmd.Source -notlike '*\WindowsApps\*') {
+        $detectedVer = Get-PythonVersion -PythonPath $pyCmd.Source
+        if ($detectedVer -and $detectedVer -ge $minVer) { return $true }
+    }
+
+    # Fallback: py launcher reports requested version at or above minimum
+    $pyLauncher = Get-Command py -ErrorAction SilentlyContinue
+    if ($pyLauncher) {
+        $launcherOutput = Invoke-PyLauncher -LauncherPath $pyLauncher.Source -Version $MinimumVersion
+        if ($launcherOutput -match 'Python (\d+\.\d+(?:\.\d+)?)') {
+            $launcherVer = [version]$Matches[1]
+            if ($launcherVer -ge $minVer) { return $true }
         }
     }
-    $output = Invoke-Expression "py -$MinimumVersion --version 2>&1"
-    return ($output -match "^Python $([regex]::Escape($MinimumVersion))")
+    return $false
 }
 
 function Test-VenvExists {
@@ -32,4 +66,4 @@ function Test-VenvExists {
     return (Test-Path (Join-Path $VenvPath 'pyvenv.cfg'))
 }
 
-Export-ModuleMember -Function Test-WingetAvailable, Test-FFmpegInstalled, Test-RealPythonInstalled, Test-VenvExists
+Export-ModuleMember -Function Test-WingetAvailable, Test-FFmpegInstalled, Test-RealPythonInstalled, Test-VenvExists, Get-PythonVersion, Invoke-PyLauncher
