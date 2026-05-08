@@ -222,6 +222,71 @@ function Set-HuggingFaceToken {
     Write-Step "HuggingFace token stored in Windows Credential Manager under $credentialName" 'OK'
 }
 
+function Get-WhisperModel {
+    param([switch]$Defer)
+
+    if ($Defer) {
+        Write-Step "Whisper large-v3 model download deferred. First analyze-video run will download (~3GB)." 'SKIP'
+        return
+    }
+
+    Write-Host ""
+    Write-Host "Whisper large-v3 model is ~3GB. Best Romanian/Bulgarian/Polish/Arabic accuracy but a one-time download."
+    $reply = Read-Host "Download now (recommended) or defer to first use? [now/defer]"
+    if ($reply -eq 'defer') {
+        Write-Step "Whisper large-v3 download deferred." 'SKIP'
+        return
+    }
+
+    Write-Step "Downloading Whisper large-v3 model (this takes 5-10 minutes)..." 'INFO'
+    $venvPython = Join-Path $script:VenvPath 'Scripts' 'python.exe'
+    $script = @'
+from faster_whisper import WhisperModel
+print("Downloading large-v3...")
+model = WhisperModel("large-v3", device="cpu", compute_type="int8")
+print("Model loaded successfully.")
+'@
+    & $venvPython -c $script
+    if ($LASTEXITCODE -ne 0) {
+        Write-Step "Whisper model download failed" 'FAIL'
+        throw "Model download failed."
+    }
+    Write-Step "Whisper large-v3 model ready" 'OK'
+}
+
+function Invoke-SmokeTest {
+    Write-Step "Running post-install smoke test..." 'INFO'
+    $venvPython = Join-Path $script:VenvPath 'Scripts' 'python.exe'
+    $smokeScript = Join-Path $PSScriptRoot 'smoke-test.py'
+    $fixturePath = Join-Path $PSScriptRoot 'test-fixtures' 'silence-5sec.wav'
+
+    if (-not (Test-Path $fixturePath)) {
+        Write-Step "Test fixture missing. Generating..." 'INFO'
+        & (Join-Path $PSScriptRoot 'Generate-TestFixture.ps1')
+    }
+
+    & $venvPython $smokeScript --audio $fixturePath --model tiny
+    if ($LASTEXITCODE -ne 0) {
+        Write-Step "Smoke test failed (exit $LASTEXITCODE)" 'FAIL'
+        throw "Smoke test failed."
+    }
+    Write-Step "Smoke test passed. Skill toolchain ready." 'OK'
+}
+
+function Write-Summary {
+    Write-Host ""
+    Write-Host "==================================================================="
+    Write-Host "  video-content-analysis Stage 1 install complete."
+    Write-Host "==================================================================="
+    Write-Host "  Components:"
+    if (Test-FFmpegInstalled) { Write-Host "    [OK]   ffmpeg ($((Get-Command ffmpeg).Source))" }
+    if (Test-RealPythonInstalled -MinimumVersion '3.11') { Write-Host "    [OK]   Python 3.11 ($(py -3.11 --version))" }
+    if (Test-VenvExists -VenvPath $script:VenvPath) { Write-Host "    [OK]   venv ($script:VenvPath)" }
+    Write-Host "  Log: $script:LogFile"
+    Write-Host "  Re-run safely; the installer is idempotent."
+    Write-Host ""
+}
+
 function Main {
     Write-Step "Starting video-content-analysis installer (PowerShell $($PSVersionTable.PSVersion))" 'INFO'
     Write-Step "Log file: $script:LogFile" 'INFO'
@@ -250,8 +315,15 @@ function Main {
     # Stage 1.8: HuggingFace token
     Set-HuggingFaceToken -Skip:$SkipDiarization
 
-    # Subsequent steps in Task 9-11
-    Write-Step "Stage 1.8 complete (HF token). Subsequent steps not yet wired." 'INFO'
+    # Stage 1.9: test fixture (auto-generated if missing)
+    # Handled inline by Invoke-SmokeTest
+
+    # Stage 1.10-1.11: model preload + smoke test
+    Get-WhisperModel -Defer:$DeferModelDownload
+    Invoke-SmokeTest
+
+    # Stage 1.12: summary
+    Write-Summary
 }
 
 Main
