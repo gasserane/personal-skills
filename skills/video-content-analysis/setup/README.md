@@ -70,6 +70,7 @@ The installer ends with a summary box like:
 | `pyannote.audio` import fails with `AudioMetaData` AttributeError | torchaudio >=2.7 installed | Verify requirements.txt pins torch+torchaudio<2.7; re-run installer |
 | Smoke test fails with `ImportError` | Wrong venv | Delete `<skill>/venv/`, re-run installer |
 | HuggingFace token rejected | Invalid token or terms not accepted | Verify token + accept gated model terms; re-run |
+| `cmdkey /list` shows credential but exit code is 0 even when missing | cmdkey list always exits 0 | Match the literal `Target:` line, not just the credential name |
 
 ## Uninstall
 

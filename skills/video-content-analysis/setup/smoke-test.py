@@ -61,6 +61,13 @@ def run_smoke_test(audio_path: str, model_size: str = "tiny") -> dict[str, Any]:
     return result
 
 
+EXIT_OK = 0
+EXIT_FIXTURE_MISSING = 2
+EXIT_IMPORT_FAILED = 3
+EXIT_MODEL_LOAD_FAILED = 4
+EXIT_TRANSCRIPTION_FAILED = 5
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Smoke test for video-content-analysis install.")
     parser.add_argument("--audio", default=str(Path(__file__).parent / "test-fixtures" / "silence-5sec.wav"))
@@ -70,7 +77,17 @@ def main() -> int:
     print(f"Smoke test starting (audio: {args.audio}, model: {args.model})...")
     result = run_smoke_test(args.audio, args.model)
     print(f"Result: {result}")
-    return 0 if result["ok"] else 1
+    if result["ok"]:
+        return EXIT_OK
+    if any("audio file not found" in e for e in result["errors"]):
+        return EXIT_FIXTURE_MISSING
+    if any("faster_whisper import failed" in e for e in result["errors"]):
+        return EXIT_IMPORT_FAILED
+    if any("model load failed" in e for e in result["errors"]):
+        return EXIT_MODEL_LOAD_FAILED
+    if any("transcription failed" in e for e in result["errors"]):
+        return EXIT_TRANSCRIPTION_FAILED
+    return 1
 
 
 if __name__ == "__main__":
