@@ -28,13 +28,34 @@ Describe 'Test-FFmpegInstalled' {
 Describe 'Test-RealPythonInstalled' {
     It 'Returns false when only the Windows Store stub is installed' {
         Mock -ModuleName InstallDetect Get-Command { @{Source='C:\Users\AGasser\AppData\Local\Microsoft\WindowsApps\python.exe'} } -ParameterFilter { $Name -eq 'python' }
-        Mock -ModuleName InstallDetect Invoke-Expression { '' } -ParameterFilter { $Command -like '*py -3.11 --version*' }
+        Mock -ModuleName InstallDetect Get-Command { $null } -ParameterFilter { $Name -eq 'py' }
         Test-RealPythonInstalled | Should -Be $false
     }
     It 'Returns true when py launcher reports Python 3.11+' {
         Mock -ModuleName InstallDetect Get-Command { $null } -ParameterFilter { $Name -eq 'python' }
-        Mock -ModuleName InstallDetect Invoke-Expression { 'Python 3.11.7' } -ParameterFilter { $Command -like '*py -3.11 --version*' }
+        Mock -ModuleName InstallDetect Get-Command { @{Source='C:\Windows\py.exe'} } -ParameterFilter { $Name -eq 'py' }
+        Mock -ModuleName InstallDetect Invoke-PyLauncher { 'Python 3.11.7' }
         Test-RealPythonInstalled | Should -Be $true
+    }
+}
+
+Describe 'Test-RealPythonInstalled - version comparison' {
+    It 'Returns false when non-Store Python is below MinimumVersion' {
+        Mock -ModuleName InstallDetect Get-Command { @{Source='C:\Python310\python.exe'} } -ParameterFilter { $Name -eq 'python' }
+        Mock -ModuleName InstallDetect Get-PythonVersion { [version]'3.10.5' } -ParameterFilter { $PythonPath -eq 'C:\Python310\python.exe' }
+        Mock -ModuleName InstallDetect Get-Command { $null } -ParameterFilter { $Name -eq 'py' }
+        Test-RealPythonInstalled -MinimumVersion '3.11' | Should -Be $false
+    }
+    It 'Returns true when non-Store Python is at or above MinimumVersion' {
+        Mock -ModuleName InstallDetect Get-Command { @{Source='C:\Python311\python.exe'} } -ParameterFilter { $Name -eq 'python' }
+        Mock -ModuleName InstallDetect Get-PythonVersion { [version]'3.11.7' } -ParameterFilter { $PythonPath -eq 'C:\Python311\python.exe' }
+        Test-RealPythonInstalled -MinimumVersion '3.11' | Should -Be $true
+    }
+    It 'Falls back to py launcher and returns false when launcher reports lower version' {
+        Mock -ModuleName InstallDetect Get-Command { $null } -ParameterFilter { $Name -eq 'python' }
+        Mock -ModuleName InstallDetect Get-Command { @{Source='C:\Windows\py.exe'} } -ParameterFilter { $Name -eq 'py' }
+        Mock -ModuleName InstallDetect Invoke-PyLauncher { 'Python 3.10.5' }
+        Test-RealPythonInstalled -MinimumVersion '3.11' | Should -Be $false
     }
 }
 
