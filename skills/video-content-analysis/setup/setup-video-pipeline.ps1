@@ -186,49 +186,82 @@ function Install-PipDependencies {
 
     $reqFile = Join-Path $PSScriptRoot 'requirements.txt'
 
-    if (Test-PipDependenciesInstalled -VenvPath $script:VenvPath -RequirementsFile $reqFile) {
-        Write-Step "[SKIP] pip dependencies already satisfied" 'SKIP'
-        return
-    }
-
-    Write-Step "Installing pip dependencies..." 'INFO'
-    Write-Step "Upgrading pip in venv..." 'INFO'
-    $output = & $venvPython -m pip install --upgrade pip --quiet 2>&1
-    $exit = $LASTEXITCODE
-    Write-Verbose ($output -join "`n")
-    if ($exit -ne 0) {
-        Write-Step "pip upgrade failed (exit $exit)" 'FAIL'
-        throw "pip upgrade failed."
-    }
-
     if ($SkipDiarization) {
+        # Minimal install: faster-whisper + soundfile only.
+        # Idempotency check mirrors what we actually install — not the full requirements.txt.
+        $needed = @('faster-whisper', 'soundfile')
+        $allPresent = $true
+        foreach ($pkg in $needed) {
+            $null = & $venvPython -m pip show $pkg 2>&1
+            if ($LASTEXITCODE -ne 0) { $allPresent = $false; break }
+        }
+        if ($allPresent) {
+            Write-Step "[SKIP] pip dependencies already satisfied (minimal install)" 'SKIP'
+            return
+        }
+
+        Write-Step "Installing pip dependencies (faster-whisper + soundfile, diarization skipped)..." 'INFO'
+        $output = & $venvPython -m pip install --upgrade pip --quiet 2>&1
+        $exit = $LASTEXITCODE
+        Write-Verbose ($output -join "`n")
+        if ($exit -ne 0) {
+            Write-Step "pip upgrade failed (exit $exit)" 'FAIL'
+            throw "pip upgrade failed."
+        }
+
         Write-Step "Installing faster-whisper only (diarization skipped)..." 'INFO'
         $output = & $venvPython -m pip install "faster-whisper>=1.0.0,<2.0.0" "soundfile>=0.12.0,<1.0.0" 2>&1
+        $exit = $LASTEXITCODE
+        Write-Verbose ($output -join "`n")
+        if ($exit -ne 0) {
+            Write-Step "pip install failed (exit $exit)" 'FAIL'
+            throw "pip install failed."
+        }
+
+        # Verify imports
+        Write-Step "Verifying imports..." 'INFO'
+        $output = & $venvPython -c 'import faster_whisper; print("faster_whisper:", faster_whisper.__version__)' 2>&1
+        $exit = $LASTEXITCODE
+        Write-Verbose ($output -join "`n")
+        if ($exit -ne 0) {
+            Write-Step "Import verification failed" 'FAIL'
+            throw "Imports failed after pip install."
+        }
     } else {
+        if (Test-PipDependenciesInstalled -VenvPath $script:VenvPath -RequirementsFile $reqFile) {
+            Write-Step "[SKIP] pip dependencies already satisfied" 'SKIP'
+            return
+        }
+
+        Write-Step "Installing pip dependencies (upgrading pip + full requirements.txt)..." 'INFO'
+        $output = & $venvPython -m pip install --upgrade pip --quiet 2>&1
+        $exit = $LASTEXITCODE
+        Write-Verbose ($output -join "`n")
+        if ($exit -ne 0) {
+            Write-Step "pip upgrade failed (exit $exit)" 'FAIL'
+            throw "pip upgrade failed."
+        }
+
         Write-Step "Installing faster-whisper + pyannote.audio from requirements.txt..." 'INFO'
         $output = & $venvPython -m pip install -r $reqFile 2>&1
-    }
-    $exit = $LASTEXITCODE
-    Write-Verbose ($output -join "`n")
-    if ($exit -ne 0) {
-        Write-Step "pip install failed (exit $exit)" 'FAIL'
-        throw "pip install failed."
+        $exit = $LASTEXITCODE
+        Write-Verbose ($output -join "`n")
+        if ($exit -ne 0) {
+            Write-Step "pip install failed (exit $exit)" 'FAIL'
+            throw "pip install failed."
+        }
+
+        # Verify imports
+        Write-Step "Verifying imports..." 'INFO'
+        $output = & $venvPython -c 'import faster_whisper, pyannote.audio; print("faster_whisper:", faster_whisper.__version__); print("pyannote.audio:", pyannote.audio.__version__)' 2>&1
+        $exit = $LASTEXITCODE
+        Write-Verbose ($output -join "`n")
+        if ($exit -ne 0) {
+            Write-Step "Import verification failed" 'FAIL'
+            throw "Imports failed after pip install."
+        }
     }
 
-    # Verify imports
-    Write-Step "Verifying imports..." 'INFO'
-    $verifyScript = if ($SkipDiarization) {
-        'import faster_whisper; print("faster_whisper:", faster_whisper.__version__)'
-    } else {
-        'import faster_whisper, pyannote.audio; print("faster_whisper:", faster_whisper.__version__); print("pyannote.audio:", pyannote.audio.__version__)'
-    }
-    $output = & $venvPython -c $verifyScript 2>&1
-    $exit = $LASTEXITCODE
-    Write-Verbose ($output -join "`n")
-    if ($exit -ne 0) {
-        Write-Step "Import verification failed" 'FAIL'
-        throw "Imports failed after pip install."
-    }
     Write-Step "Pip dependencies installed and verified" 'OK'
 }
 
@@ -341,6 +374,7 @@ function Invoke-SmokeTest {
     if ($smokeExit -ne 0) {
         # Surface a targeted hint based on the exit code from smoke-test.py
         $hint = switch ($smokeExit) {
+            1 { "Smoke test failed (unclassified error). Review output above or run smoke-test.py manually for the full traceback." }
             2 { "Test fixture WAV missing — re-run installer or run Generate-TestFixture.ps1 manually." }
             3 { "faster_whisper import failed — check pip install in venv; run: pip show faster-whisper" }
             4 { "Whisper model load failed — venv may be corrupt; delete venv/ and re-run installer." }
