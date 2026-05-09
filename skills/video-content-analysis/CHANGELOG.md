@@ -88,3 +88,39 @@ Versioning: Semantic Versioning (https://semver.org/).
 
 ### Known carry-overs
 - `ane_package/video/__init__.py` still does NOT re-export the four function symbols (`extract_audio`, `extract_frames`, `probe_video`, `transcribe`). Stage 5 wires these back when the skill orchestrator lands. Type re-exports include the new `VideoManifest` and `VideoSummary` dataclasses.
+
+## [0.4.0-stage4] - 2026-05-09
+
+### Added
+- `ane_package/video/privacy.py` — `validate_privacy(tier, engine, *, diarization_used)` enforces "no silent escalation" per spec Section 6 hard guarantee #1. `write_network_log(path, tier, engine, egress)` writes the audit trail per guarantee #2.
+- `ane_package/video/consent.py` — `validate_consent` blocks `consent_unclear` runs; `is_publication_cleared` gates Tier 2 quote use.
+- `ane_package/video/diarization.py` — `diarize(audio_path, *, hf_token, num_speakers)` wraps `pyannote.audio.Pipeline.from_pretrained("pyannote/speaker-diarization-3.1")`. HF token retrieved from Windows Credential Manager via inline PowerShell `CredRead` shim.
+- `ane_package/video/alignment.py` — `align_speakers(transcription, diarization)` returns a new `TranscriptionResult` with `segment.speaker` populated by majority temporal overlap.
+- `ane_package/video/quality.py` — `detect_audio_quality_flags(audio_path)` detects `low_volume` (-20 dBFS / 5s windows), `clipping` (>= 0.99 amplitude), `long_silence` (-50 dBFS / 10s windows).
+- `ane_package/video/telemetry.py` — `record_run(event)` appends JSONL operational metrics. Allowlist-enforced — participant-content keys raise `TelemetryError`.
+- `PrivacyTier`, `PrivacySettings`, `ConsentStatus`, `ConsentMetadata`, `SpeakerTurn`, `DiarizationResult`, `AudioQualityFlag` types in `ane_package/video/types.py`. `TranscriptSegment` extended with optional `speaker: str | None = None`.
+
+### Changed
+- `build_manifest` accepts new optional kwargs: `privacy`, `consent`, `diarization`, `audio_quality_flags`. Backward-compatible: omitting them keeps the Stage 3 placeholder values.
+- When `consent.status == "consent_unclear"` is passed explicitly, `build_manifest` appends a `Data gap: consent_unclear ...` line per CLAUDE.md data-gap protocol.
+
+### Compatibility patches (Stage 4.5 diarization)
+- Three upstream incompatibilities surfaced and were patched inside `diarization.py`:
+  1. PowerShell 7 `Add-Type -UsingNamespace` "duplicate using directive" error → switched to `Add-Type -TypeDefinition` with inline `using` directives.
+  2. `huggingface_hub` 1.14.0 dropped `use_auth_token` parameter → `_patch_hf_hub_compat()` remaps `use_auth_token` -> `token` for pyannote callers.
+  3. `torch` 2.6 changed `weights_only=None` default to True → `_patch_torch_load_compat()` normalises `None` to `False` (pyannote checkpoints are trusted local files).
+- Each patch is idempotent and scoped to the diarization import path. Stage 6 should remove these once upstream libraries align.
+
+### Deferred to later stages
+- M365 Stream/Teams adapter (engine=`m365-stream` is recognised by `validate_privacy` but the actual fetch is Stage 5).
+- Interactive consent capture prompt → Stage 5 (skill orchestrator).
+- `record_run` calls inside the pipeline → Stage 5 (orchestrator wires telemetry calls per stage).
+- Calibration anchors page + retrospective protocol → Stage 6.
+- Real `jsonschema` validation of manifest → Stage 6.
+- `ane_package/video/__init__.py` function-symbol re-exports → Stage 5.
+- Robust `keyring`-based HF token retrieval → Stage 6 alongside the installer dependency upgrade.
+
+### Known carry-overs
+- `__init__.py` re-exports types only (17 symbols after Stage 4).
+- Two non-blocking minor items from the Stage 4.5 review: (a) `_read_hf_token_from_credential_manager` could log PowerShell stderr when CredRead fails for non-missing reasons; (b) `_patch_torch_load_compat` docstring should clarify the patch also fires when `weights_only` is omitted.
+- The diarization smoke test downloads ~500 MB on first run if the user has not already accepted the `pyannote/speaker-diarization-3.1` gated terms.
