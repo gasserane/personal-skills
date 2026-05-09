@@ -92,7 +92,7 @@ If the verdict is `partial` or `failed`, append the verdict and note to `~/.clau
 Return the manifest path, the summary path, and (if any) the brand-summary path to Ane. Suggest the next move:
 
 - "Run `/ann analyse the focus group findings in <manifest>`" — for in-depth coding.
-- "Run `/ann compute speaker time-share by gender across these 3 manifests" — for batch cross-cuts.
+- "Run `/ann compute speaker time-share by gender across these 3 manifests`" — for batch cross-cuts.
 - "Open `summary.docx` for the slide deck" — when `--brand-summary` was passed.
 
 ## Output
