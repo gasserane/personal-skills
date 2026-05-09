@@ -14,3 +14,10 @@ pyannote.audio>=3.1.0,<4.0.0
 torch>=2.1.0,<2.7.0
 torchaudio>=2.1.0,<2.7.0
 soundfile>=0.12.0,<1.0.0
+
+# Stage 5: brand-template Word summary path (orchestrator brand_summary=True).
+# python-docx writes summary.docx; xlsxwriter is a transitive dep of
+# ane_package.reporting.excel_native imported alongside word_export.
+python-docx>=1.2.0,<2.0.0
+lxml>=6.1.0,<7.0.0
+xlsxwriter>=3.2.9,<4.0.0
