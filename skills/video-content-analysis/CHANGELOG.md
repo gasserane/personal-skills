@@ -124,3 +124,38 @@ Versioning: Semantic Versioning (https://semver.org/).
 - `__init__.py` re-exports types only (17 symbols after Stage 4).
 - Two non-blocking minor items from the Stage 4.5 review: (a) `_read_hf_token_from_credential_manager` could log PowerShell stderr when CredRead fails for non-missing reasons; (b) `_patch_torch_load_compat` docstring should clarify the patch also fires when `weights_only` is omitted.
 - The diarization smoke test downloads ~500 MB on first run if the user has not already accepted the `pyannote/speaker-diarization-3.1` gated terms.
+
+## [0.5.0-stage5] - 2026-05-09
+
+### Added
+- `ane_package/video/orchestrator.py` — `analyze_video(input_path, *, privacy_tier, consent, language, diarize, brand_summary, output_dir, m365_caption_path, telemetry_path)`. End-to-end pipeline. Validates privacy + consent before any primitive runs. Wraps every stage in `time.perf_counter`. Calls `record_run` once at the end with operational keys only. Returns `AnalysisResult`.
+- `ane_package/video/m365_stream.py` — `parse_vtt(vtt_path) -> TranscriptionResult` for the M365 Stream/Teams caption path. `fetch_caption_via_graph(file_id, *, access_token, out_path)` for the direct-HTTP path used by Vi-spawned subagents and manual integration. Skill (Claude Code) prefers the connected Microsoft 365 MCP server. UTF-8 BOM stripped automatically.
+- `ane_package/video/routing.py` — `populate_routing_hints(manifest)` returns a per-specialist `{ready, notes}` dict for the four manifest-consuming specialists named in spec Section 10.
+- `ane_package/video/feedback.py` — `prompt_verdict(*, timeout_s=30, stream=None)` returns `(Verdict, str | None)`. Defaults to `Verdict.SKIP` on EOF, blank line, unrecognised letter. Banner reflects the actual EOF/blank-line skip behaviour.
+- `ane_package/video/_brand_summary.py` — manifest -> `WordReport` mapper used when `brand_summary=True`. Routes through `ane_package.reporting.word_export.write_word_report` for IPPF Visual Identity 2025.
+- `AnalysisResult`, `Verdict`, `RoutingHint` types in `ane_package/video/types.py`.
+- `~/.claude/skills/video-content-analysis/SKILL.md` — full Tier 1 skill content. Replaced the Stage 1 scaffolding placeholder. Version `0.5.0-stage5`.
+- `~/.claude/agents/video-content-analyst.md` — Vi-spawnable subagent. Captured into `claude-config` via the `sync-from-local.sh` workflow.
+- `agent-improvements/agent_registry.md` — `### video-content-analyst` entry registered for Vi's SELECT phase.
+- Seven new static harness checks: `video.orchestrator_module_present`, `video.m365_stream_module_present`, `video.routing_module_present`, `video.feedback_module_present`, `video.skill_full`, `video.subagent_present`, `video.analyst_in_registry`.
+- Brand-summary dependencies pinned in `setup/requirements.txt`: python-docx, lxml, xlsxwriter.
+
+### Changed
+- `ane_package/video/__init__.py` — exports the 12 function-style primitives + 20 types (32 symbols total). Submodule-direct imports remain valid.
+- `tests/manual/integration_real_video.py` — switched from bare-primitive composition to a single `analyze_video(...)` call exercising the brand-summary path.
+
+### Deferred to Stage 6
+- Calibration anchors page at `mel_wiki/wiki/calibration/video-content-analysis.md`.
+- Retrospective protocol `/analyze-video --retrospective`.
+- Test fixtures `synthetic-romanian-fgd-30s/` and `sbcc-public-15s/` with expected_manifest.json + expected_summary.md.
+- Specialist `.md` updates (qualitative-coding-specialist, intersectionality-analyst, sbcc-campaign-mel-specialist, gender-transformative-assessor) — the 8-12-line "Reading a video-content-analysis manifest" section.
+- Real `jsonschema` validation.
+- Gated-terms acceptance check in the installer.
+- The two minor non-blocking diarization items.
+- Real polling-based timeout for `prompt_verdict` if Ane wants TTY-side timeout behaviour.
+- Real-video integration timing capture in `tests/manual/README.md` — Stage 5.10 ran the integration partially (network.log + audio.wav written; transcription not completed within the implementer-session timeout).
+
+### Known carry-overs
+- Skill calls `prompt_verdict` after the orchestrator returns; this means telemetry receives one operational line per run plus an optional verdict-update line. Stage 6 collapses these.
+- Brand-summary path uses the existing `WordReport` dataclass with a single mapper; field choices are intentionally minimal in v1 and refactor freely as Ane reviews live output.
+- Subagent's manifest schema validation is structural only (Stage 6 wires real `jsonschema`).
