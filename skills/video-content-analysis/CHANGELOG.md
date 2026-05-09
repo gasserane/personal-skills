@@ -65,3 +65,26 @@ Versioning: Semantic Versioning (https://semver.org/).
 - M365 Stream adapter + skill (`/analyze-video`) + subagent (`video-content-analyst`) → Stage 5.
 - Calibration anchors page + retrospective protocol + remaining test fixtures + specialist `.md` updates → Stage 6.
 - `extract_frames` real-video frame-cap (current I-frame union may emit hundreds of frames on long FGD recordings; Stage 5 callers should pass higher `scene_threshold` or use interval strategy exclusively).
+
+## [0.3.0-stage3] - 2026-05-09
+
+### Added
+- `ane_package/video/manifest.py` — `build_manifest(probe, audio, frames, transcription, output_dir, *, skill_version)` writes manifest.json matching the full Section 7 schema. Privacy / consent / diarization / audio_quality_flags / data_gaps / downstream_routing_hints fields populated as placeholders for Stages 4-5 to fill in.
+- `ane_package/video/summary.py` — `generate_summary(manifest, output_path)` writes Tier 1 BLUF summary.md. Plain markdown; Stage 5 wraps via word_export for the IPPF brand template.
+- `ane_package/video/schemas/manifest_v1.schema.json` — JSON Schema (Draft 2020-12) describing the full Section 7 manifest shape.
+- `tests/manual/integration_real_video.py` — long-running manual script exercising the full pipeline on a real video.
+- 3 new static checks in `tests/run_tests.py` (105/105 total).
+
+### Changed
+- `extract_frames` defaults flipped from `scene_change=True` to `scene_change=False`. Reasoning: 64.5-min IPPF launch recording produced 848 frames with the Stage 2 default; the I-frame clause in the Stage 2.7 deviation matches every encoder keyframe regardless of `scene_threshold`. Interval-only is the safer default for real Teams / webinar content. Callers wanting scene detection pass `scene_change=True` explicitly.
+- `extract_frames` adds `max_frames: int | None = None` parameter with uniform downsampling. Pruned PNGs are deleted from disk.
+
+### Deferred to later stages
+- `jsonschema` package + real schema validation -> Stage 6 (requires installer change).
+- Privacy enforcement, consent metadata population, diarization -> Stage 4.
+- M365 Stream adapter, skill orchestrator, subagent -> Stage 5.
+- IPPF brand-template wrapping of summary.md (Word/PDF) -> Stage 5 via word_export.
+- Calibration anchors page, retrospective protocol -> Stage 6.
+
+### Known carry-overs
+- `ane_package/video/__init__.py` still does NOT re-export the four function symbols (`extract_audio`, `extract_frames`, `probe_video`, `transcribe`). Stage 5 wires these back when the skill orchestrator lands. Type re-exports include the new `VideoManifest` and `VideoSummary` dataclasses.
