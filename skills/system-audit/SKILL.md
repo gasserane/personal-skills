@@ -56,7 +56,7 @@ Check:
 Read:
 - `agent-improvements/qa-disagreement-log.md` — count rows. If 0, the Vi/Li elevation watch-trigger has not fired. Note as "ceiling unmonitored except via watch".
 - `agent-improvements/cost-calibration-log.md` — count rows with observed actuals vs `not observed`. If less than 30% have actuals, observability remains weak.
-- `mel-framework-reference.md` size (claude-ai mirror) — flag if grown >150KB (it was 117KB at 2026-04-28 audit; bigger means drift surface increased).
+- `mel-framework-reference.md` size (claude-ai mirror) — flag if grown >200KB (baseline 117KB at 2026-04-28 audit; 174.7KB at 2026-05-10 with legitimate Tier 2 + Tier 3 expansion; threshold raised 2026-05-10 to accommodate documented wiki growth).
 - Em-dash count across wiki body prose — `grep -c "—"` on `mel_wiki/wiki/**/*.md`. Compare to most recent audit-drift baseline. Trend matters more than absolute count.
 
 ### Step 6 — Recent audit-drift carry-forward
