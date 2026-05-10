@@ -320,18 +320,18 @@ function Set-HuggingFaceToken {
 
     # Stage 6: confirm gated-terms acceptance up-front so the first diarization
     # run does not download 500 MB and then fail with HTTP 403.
-    $plain = [Runtime.InteropServices.Marshal]::PtrToStringUni(
-        [Runtime.InteropServices.Marshal]::SecureStringToBSTR($token)
-    )
+    $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($token)
     try {
+        $plain = [Runtime.InteropServices.Marshal]::PtrToStringUni($bstr)
         $accepted = Confirm-PyannoteGatedTerms -Token $plain
         if (-not $accepted) {
             Write-Step "Diarization will not work until gated terms are accepted." 'WARN'
         }
     } finally {
-        [Runtime.InteropServices.Marshal]::ZeroFreeBSTR(
-            [Runtime.InteropServices.Marshal]::SecureStringToBSTR($token)
-        )
+        if ($bstr -ne [IntPtr]::Zero) {
+            [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+        }
+        Remove-Variable plain -ErrorAction SilentlyContinue
     }
 }
 
