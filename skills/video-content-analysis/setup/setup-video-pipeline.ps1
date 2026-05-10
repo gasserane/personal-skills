@@ -317,6 +317,56 @@ function Set-HuggingFaceToken {
         throw "Token storage failed."
     }
     Write-Step "HuggingFace token stored in Windows Credential Manager under $credentialName" 'OK'
+
+    # Stage 6: confirm gated-terms acceptance up-front so the first diarization
+    # run does not download 500 MB and then fail with HTTP 403.
+    $plain = [Runtime.InteropServices.Marshal]::PtrToStringUni(
+        [Runtime.InteropServices.Marshal]::SecureStringToBSTR($token)
+    )
+    try {
+        $accepted = Confirm-PyannoteGatedTerms -Token $plain
+        if (-not $accepted) {
+            Write-Step "Diarization will not work until gated terms are accepted." 'WARN'
+        }
+    } finally {
+        [Runtime.InteropServices.Marshal]::ZeroFreeBSTR(
+            [Runtime.InteropServices.Marshal]::SecureStringToBSTR($token)
+        )
+    }
+}
+
+function Confirm-PyannoteGatedTerms {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)][string]$Token,
+        [int]$TimeoutSeconds = 10
+    )
+
+    Write-Step "Probing pyannote gated-terms acceptance..." 'INFO'
+    $modelUrl = "https://huggingface.co/api/models/pyannote/speaker-diarization-3.1"
+    $headers = @{ Authorization = "Bearer $Token" }
+    try {
+        $resp = Invoke-WebRequest -Uri $modelUrl -Headers $headers -UseBasicParsing `
+            -TimeoutSec $TimeoutSeconds -ErrorAction Stop
+        if ($resp.StatusCode -eq 200) {
+            Write-Step "Gated-terms acceptance confirmed; pyannote model accessible" 'OK'
+            return $true
+        }
+        Write-Step "Unexpected status $($resp.StatusCode) probing gated terms" 'WARN'
+        return $false
+    } catch {
+        $code = $_.Exception.Response.StatusCode.value__
+        if ($code -eq 403) {
+            Write-Step "Gated-terms NOT accepted (HTTP 403). Visit https://huggingface.co/pyannote/speaker-diarization-3.1, click 'Agree and access repository', then re-run this installer." 'FAIL'
+            return $false
+        }
+        if ($code -eq 401) {
+            Write-Step "Token rejected (HTTP 401). Token may be wrong scope or expired." 'FAIL'
+            return $false
+        }
+        Write-Step "Probe error: $($_.Exception.Message)" 'WARN'
+        return $false
+    }
 }
 
 function Get-WhisperModel {
