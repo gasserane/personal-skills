@@ -136,6 +136,8 @@ Token-budget echo: at the top of every delivery, print one line `[run plan: ~Nk 
 
 **qa-reviewer reasoning surface (mandatory).** Immediately after the token-budget echo, print one line: `[qa-verdict: PASS | PASS_WITH_GAPS | PASS_WITH_FLAGS | FAIL — ≤25-word reasoning drawn from qa_block.notes or the most consequential specialist signoff observation]`. Surfaces qa-reviewer's verdict visibly enough that Ane can disagree on first read. In `mode: "skill-fallback"`, label `[qa-verdict (self-populated): ...]` so triangulation status stays honest. Closes Risk 3 from 2026-05-07 grading: silent qa-reviewer disagreements that default to acceptance because the verdict hides in the JSON header.
 
+**qa-reviewer disagreement check prompt (end of delivery, mandatory when qa_block present).** After the deliverable body and any other footers, append one line: `🔍 qa-reviewer disagreement check: any qa_block item you would flag as wrong? Reply 'yes — [item]' to log, 'no' to confirm acceptance, or 'skip' to defer.` If Ane replies with 'yes + item', append a row to `agent-improvements/qa-disagreement-log.md` per its `## How Ann logs an entry` protocol. If 'no' or 'skip', do nothing further. Closes the Vi/Li elevation watch-trigger feedback loop (2026-05-06 STANDING PREFERENCE): silent acceptance is no longer the default; 0 logged disagreements now means '0 confirmed flags', not 'unknown'. Skip the prompt only when no qa_block exists (rare MECHANICAL one-line answer).
+
 Zero unresolved ⚠️ data gaps AND zero escalations: deliver directly.
 Otherwise: present (1) one-paragraph executive summary, (2) complete gap/escalation list, (3) output type — wait for Ane to confirm.
 
