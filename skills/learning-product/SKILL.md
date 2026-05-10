@@ -81,6 +81,14 @@ Before returning the draft:
 - **Citation placement.** Tier 1 working brief: framework names off the running text; `**Evidence base:**` line at end of section. v2 source slide uses "For further details you can consult:" lead phrase per `feedback_source_slide_framing.md`.
 - **Citation rigour.** Author surname + year + venue + section where applicable. Lifted verbatim from the Evidence Brief. Never invent.
 - **Hyperlink policy.** Reuse only URLs that appear in the Evidence Brief or its `sources.md`. Never fabricate. Any URL not present in the source carries `⚠️ URL unverified — confirm before publication`.
+- **Session-time URL audit step.** Before returning the draft, verify each cited URL against the IPPF/UNFPA hyperlink standard:
+  - Aggregator wrappers (`consensus.app`, ResearchGate, academia.edu, Wikipedia) MUST be replaced with the canonical publisher URL or DOI before publication. Aggregators are tolerated only as supplementary alongside canonical, never as sole source.
+  - DOI links that resolve to a paywall MUST be supplemented with an open-access alternative (PMC, institutional repository, publisher-hosted open PDF, author manuscript) where one exists.
+  - Publisher-migrated URLs (Rowman to Bloomsbury, journal venue changes, etc.) MUST be updated to the current canonical URL.
+  - URLs returning 404 MUST be replaced with the canonical permanent link (typically UNESDOC, DOI, or institutional repository).
+  - When the canonical source has no open-access alternative and the audience is non-academic, the citation MUST flag "paywalled, no open-access alternative found" so MA staff and partner readers know in advance.
+
+  The audit applies WebFetch and WebSearch at session time. Lift the audit cost across the four output types (v1/v2/v3/v4) by running once per Evidence Brief, caching the URL substitutions, and reusing them across all output types generated from the same source brief.
 - **Sentence length.** Under 25 words. Active voice. No em-dashes in body prose. No nominalisations where a verb works.
 - **Plain English.** Anglo-Saxon over Latinate. Acronyms spelled on first use. Translatability test for ECA / SSA / MENA readers.
 - **Disaggregation default.** When the Evidence Brief carries WG-SS, age, gender identity, geography breakdown, the output preserves the disaggregation rather than collapsing.
@@ -180,16 +188,26 @@ For v1, v3, v4: return as markdown body in the assistant turn. Ane converts to W
 **Required structure** (mirror `learning-product-exemplar-v3.md`):
 
 1. **Title block** — title, audience (federation-wide MELers, senior leadership, donor programme officers, policy researchers), length, date, voice, source brief.
-2. **Executive summary** — 5 bullets exact. Bullets carry the regional pattern, not just findings restated.
-3. **Why this brief** — 2–3 paragraphs. Includes the CoP-cultivation framing (the brief is itself a CoP practice artefact).
-4. **The regional landscape** — 3 sub-headers naming the structural shifts that frame the analysis (e.g., for ECA: opposition convergence; EU candidate-status pressure; improved adolescent SRHR data). Each shift cites Evidence Brief sources verbatim.
-5. **Four findings with cross-MA evidence** — pulled from the Evidence Brief RQ1 findings; each finding adds a "Cross-MA evidence" sentence naming the sub-region pattern. Closes with `**Evidence base:**` line.
-6. **Country snapshots — N MA contexts** — fixed sub-structure per snapshot: Context (1 paragraph) → Lever applied (1 line) → What worked (2–3 bullets) → What did not work (1–2 bullets) → Lesson (1 sentence). Skip a row only when the Evidence Brief does not cover it.
-7. **Cross-cutting strategy — what the snapshots share** — the brief's analytical contribution. Names the pattern across snapshots (e.g., lever-fit follows existing relational capital). One paragraph plus a short list. This is the section where the regional brief earns its keep relative to v1.
-8. **Adaptation prompts by MA pattern** — 3 patterns, each leading to a different lever recommendation. Each pattern uses a diagnostic question. Closes with a fallback path for MAs that fit none of the three patterns.
-9. **What this means for the federation** — 3 actions maximum. The only place where federation infrastructure is named.
-10. **Sources** — full Evidence base from the brief's source list.
-11. **How this brief was made** — provenance + redaction candidates + companion artefacts per Step 5.
+2. **How to read this brief** — default v3 section between Title block and Executive summary. Two parts:
+   - A **note on language** sub-paragraph naming the acronyms used in the brief and pointing readers to the glossary near the end.
+   - A **note on confidence levels** sub-paragraph defining each confidence label that appears in the brief, plus a single sentence on the basis for the rating. The basis is the source Researcher Evidence Brief, which applies standard evidence-synthesis discipline. Rating depends on study type, number of independent sources, consistency across studies, and directness to the question. The approach is similar to GRADE in health research, adapted to mixed evidence bases typical of CSE / SRHR evaluation.
+
+   Default content for the confidence-labels list (preserve verbatim across v3 outputs; substitute domain topic where bracketed):
+
+   - **We are confident in this finding.** Multiple peer-reviewed studies, working independently, point to the same answer. The evidence converges.
+   - **We are fairly confident in this finding.** The finding fits how we already know [domain topic] works. Specific evaluation in our region (or for this exact approach) is limited. Practitioner experience indicates the effect. Published comparative data is not yet at the level a donor or external reader would expect.
+   - **Less confident — emerging evidence.** Theoretical or mechanism-based reason exists to think the approach works. Operational evaluation has not yet tested it directly. Treat as promising rather than proven.
+   - **Mixed confidence — varies by approach.** The findings inside this bullet sit at different levels. The body of the brief preserves the differences.
+3. **Executive summary** — 5 bullets exact. Bullets carry the regional pattern, not just findings restated.
+4. **Why this brief** — 2–3 paragraphs. Includes the CoP-cultivation framing (the brief is itself a CoP practice artefact).
+5. **The regional landscape** — 3 sub-headers naming the structural shifts that frame the analysis (e.g., for ECA: opposition convergence; EU candidate-status pressure; improved adolescent SRHR data). Each shift cites Evidence Brief sources verbatim.
+6. **Four findings with cross-MA evidence** — pulled from the Evidence Brief RQ1 findings; each finding adds a "Cross-MA evidence" sentence naming the sub-region pattern. Closes with `**Evidence base:**` line.
+7. **Country snapshots — N MA contexts** — fixed sub-structure per snapshot: Context (1 paragraph) → Lever applied (1 line) → What worked (2–3 bullets) → What did not work (1–2 bullets) → Lesson (1 sentence). Skip a row only when the Evidence Brief does not cover it.
+8. **Cross-cutting strategy — what the snapshots share** — the brief's analytical contribution. Names the pattern across snapshots (e.g., lever-fit follows existing relational capital). One paragraph plus a short list. This is the section where the regional brief earns its keep relative to v1.
+9. **Adaptation prompts by MA pattern** — 3 patterns, each leading to a different lever recommendation. Each pattern uses a diagnostic question. Closes with a fallback path for MAs that fit none of the three patterns.
+10. **What this means for the federation** — 3 actions maximum. The only place where federation infrastructure is named.
+11. **Sources** — full Evidence base from the brief's source list.
+12. **How this brief was made** — provenance + redaction candidates + companion artefacts per Step 5.
 
 **Voice.** Tier 1 working brief, federation-wide collaborative. The regional brief addresses MELers and senior leadership across the federation; voice acknowledges the federation's MA-led architecture rather than asserting Secretariat authority.
 
