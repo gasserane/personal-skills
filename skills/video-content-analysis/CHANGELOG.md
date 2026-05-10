@@ -5,6 +5,50 @@ All notable changes to the video-content-analysis skill.
 Format: Keep a Changelog (https://keepachangelog.com/en/1.1.0/).
 Versioning: Semantic Versioning (https://semver.org/).
 
+## [0.6.0-stage6] — 2026-05-10
+
+### Added
+- Calibration anchors page at `mel_wiki/wiki/calibration/video-content-analysis.md` — seven operational quality anchors per spec Section 8 mechanism 3.
+- `ane_package/video/retrospective.py` — `should_run_retrospective`, `read_telemetry`, `compute_anchor_performance`, `identify_recurring_failures`, `write_retrospective`, `update_state`.
+- `prompt_save_fixture` in `ane_package/video/feedback.py` — tier-gated regression-fixture save offer per spec Section 8 mechanism 5.
+- Tier 2 fixture pipeline runner `tests/video/test_fixture_pipeline.py` invoked via `python tests/run_tests.py --fixtures`.
+- Two committed fixture scaffolds: `synthetic-romanian-fgd-30s/` and `sbcc-public-15s/` (source.mp4 user-supplied per fixture README).
+- `## Reading a video-content-analysis manifest` section added to four specialist files: `qualitative-coding-specialist.md`, `intersectionality-analyst.md`, `sbcc-campaign-mel-specialist.md`, `gender-transformative-assessor.md`.
+- Installer probe step `Confirm-PyannoteGatedTerms` — verifies pyannote gated-terms acceptance via HuggingFace API before first diarization run.
+- Six new static harness checks: `video.calibration_anchors_published`, `video.specialist_manifest_sections`, `video.retrospective_module_present`, `video.fixture_pipeline_runner_present`, `video.first_fixture_dir_present`, `video.second_fixture_dir_present`.
+- `--retrospective` flag in skill (`/analyze-video --retrospective`) reads telemetry, writes recommendation document; never auto-applies.
+- `--fixtures` flag in `tests/run_tests.py` dispatches to Tier 2 fixture runner.
+- `jsonschema>=4.21` added to `setup/requirements.txt`.
+- `source.hash` field on manifest (16-hex SHA-256 of source content) for fixture-save keying and telemetry.
+- `network_egress` field added to telemetry allowlist.
+- Auto-saved fixtures land at `tests/video/fixtures/auto/` (gitignored).
+
+### Changed
+- `check_video_manifest_schema_present` now uses `jsonschema.Draft202012Validator.check_schema` (full schema validation, not shape-only). Smoke test exercises the harness function end-to-end.
+- SKILL.md frontmatter `version: 0.6.0-stage6` (was `0.5.0-stage5`).
+- `update_state` semantics: when both `retrospective_ran` and `increment` are passed, reset happens BEFORE increment so a coincident successful run starts the new cycle at count=1 (not 0).
+- `compute_anchor_performance` Anchor 5 now references `audio_quality_flags[]` (matches schema reality); confidence-based extension explicitly gated on Stage 4.5 alignment.
+- `compute_anchor_performance` Anchor 3 prefers `network_egress` field, falls back to engine-as-proxy, treats engine=None on sensitive rows as DATA_GAP rather than silent PASS.
+
+### Fixed
+- `_read_hf_token_from_credential_manager` distinguishes "credential missing" (CredRead exit 2 → silent None) from genuine PowerShell errors (anything else → log to stderr).
+- `_patch_torch_load_compat` docstring expanded to mention the omitted-`weights_only` case (in addition to explicit None).
+- Installer's gated-terms probe uses single BSTR allocation with proper zero-free in `finally`.
+- Tier 2 fixture runner defers heavy imports past existence checks — clean "source not present" message on missing source.mp4 even when venv lacks pyannote/soundfile.
+- `expected_manifest.json` files no longer assert on `source.duration_seconds` / `source.format_name` (brittle source-echo).
+
+### Closes
+- Stage 5 deferred items: real `jsonschema` validation; calibration anchors page; retrospective protocol; test fixture growth from real failures; specialist `.md` updates × 4; installer gated-terms acceptance check; two non-blocking diarization items.
+
+### Out-of-scope (deferred to v2 / future stages)
+- Live populating `source.mp4` and `transcript.gold.json` for both Tier 2 fixtures (user-contribution step).
+- Wiring a `scene_change` knob through `analyze_video` so the SBCC fixture can exercise scene-change frame extraction (currently interval-only).
+- Wiring a runner CLI flag `--m365-caption` through the Tier 2 fixture runner.
+- Refactor of duplicate `check_video_first_fixture_dir_present` and `check_video_second_fixture_dir_present` into a single list-driven check.
+- Re-probing gated-terms on installer re-runs when token already stored (currently bypassed by idempotent skip-path).
+- Telemetry per-segment `confidence` field (gated on Stage 4.5 alignment work).
+- Pushing `tests/video/fixtures/auto/` redaction to a fixtures.py module.
+
 ## [0.1.0-stage1] - 2026-05-08
 
 ### Added
