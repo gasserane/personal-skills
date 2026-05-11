@@ -77,31 +77,20 @@ From the Evidence Brief, draft: **Confirmed brief** (1 paragraph). **Work breakd
 
 ### PHASE 2.5 — PLAN VULNERABILITIES (COMPLEX only, mandatory)
 
-Before handoff to Vi, identify exactly **3** plausible ways this plan could fail. For each, name the failure mode in one sentence and the mitigation already in the plan, OR mark `mitigation needed — flag to Ane`.
+Before handoff to Vi, identify exactly **3** plausible ways this plan could fail. Per failure: one-sentence mode + mitigation in plan, OR `mitigation needed — flag to Ane`. Sonnet under-checks its own plan; this pass is the structural safeguard against quiet plan failure (over-spawn, wrong tier, missing lens) burning budget before qa-reviewer fires after compile — too late to recover the run if the plan itself was wrong.
 
-This pass is not optional and not free-form. Sonnet-tier classification under-checks its own plan; the explicit vulnerabilities pass is the only structural safeguard against quiet plan failure (specialist over-spawn, wrong tier, missing lens) burning budget before qa-reviewer fires. qa-reviewer runs after Vi compiles — too late to recover the run if the plan itself was wrong.
+Failure modes (pick 3 most plausible): wrong tier (Tier 2 register for junior-MEL audience; collaborative voice where directive needed for compliance); missing lens (decolonial / feminist / intersectional / participatory / political-economy absent from roster); specialist over-spawn (7 when 3 cover the question) or under-spawn (roster lean but question demands triangulation); wrong specialist selection (e.g., toc-architect when evaluation-design-specialist fits; mel-framework-architect when a domain specialist is better); wrong sequencing (downstream depends on upstream not yet produced); recency gap (cited version not current per `domain-standards.md`); scope creep (work Ane did not ask for); context flag mis-detection (humanitarian / ECA / Roma / adolescent / multi-country / EU-funded missed or wrongly applied).
 
-Failure modes to check (not exhaustive — pick the 3 most plausible for this task):
-- **Wrong tier classification** (Tier 2 register scoped for junior-MEL audience; Tier 1 working brief scoped for publication; collaborative voice scoped where directive is needed for compliance content)
-- **Missing lens** (decolonial / feminist / intersectional / participatory / political-economy required by context but absent from roster)
-- **Specialist over-spawn** (more specialists than minimum needed; 7 specialists when 3 cover the question — budget burn)
-- **Specialist under-spawn** (roster looks lean but the question demands triangulation across specialists)
-- **Wrong specialist selection** (e.g., toc-architect when realist-evaluation-specialist fits the question; mel-framework-architect when a domain specialist is the better fit)
-- **Wrong sequencing** (downstream specialist depends on upstream output not yet produced; qa-reviewer runs but upstream specialists produced incompatible outputs)
-- **Recency gap** (cited framework version is not current per `domain-standards.md`; superseding edition exists but not flagged)
-- **Scope creep** (plan does work Ane did not ask for; deliverable type drift)
-- **Context flag mis-detection** (humanitarian / ECA / Roma / adolescent / multi-country / EU-funded flag missed or wrongly applied)
-
-Format the section exactly like this in PHASE 3 output:
+Format in PHASE 3 output:
 
 ```
 **Plan vulnerabilities (3 failure modes I see):**
-1. [Failure mode in one sentence]. Mitigation: [what's in the plan / "mitigation needed — flag to Ane"].
-2. [Failure mode in one sentence]. Mitigation: [...].
-3. [Failure mode in one sentence]. Mitigation: [...].
+1. [Failure mode]. Mitigation: [what's in plan / "mitigation needed — flag to Ane"].
+2. [Failure mode]. Mitigation: [...].
+3. [Failure mode]. Mitigation: [...].
 ```
 
-Three is the cap and the floor. Fewer than 3 reads as complacency; more than 3 dilutes the signal. If genuinely fewer than 3 plausible failure modes exist, the task is probably SIMPLE not COMPLEX — reclassify.
+Three is cap and floor. Fewer reads as complacency; more dilutes signal. Genuinely fewer than 3 → task is probably SIMPLE; reclassify.
 
 ### PHASE 3 — VERIFY (COMPLEX only)
 Present plan to Ane **together with the Plan vulnerabilities block from PHASE 2.5**. Wait for approval. Approval is explicit ("proceed", "approved") or implicit (modification without objection). A question about the plan is not implicit approval — answer, do not proceed. If Ane challenges a vulnerability or proposes a different mitigation, revise the plan and re-present once. Do not ask twice.
@@ -171,11 +160,7 @@ Otherwise: present (1) one-paragraph executive summary, (2) complete gap/escalat
 
 **Run-end wiki handoff:** if synthesised insights / framework distinctions / new sources arose THIS RUN that are not yet in the wiki, spawn Li with `INGEST-FROM-RESEARCHER` (synthesised insights, staged for your approval — auto-merge for Tier-1 with verified DOI). For *new raw documents* placed in `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/raw/`, spawn Li with `INGEST-DOCUMENT` instead. Do not conflate the two operations. Wait for Li's confirmation. Act on any `🔔 Flag for Ann:` items.
 
-**Pending-ingest visibility — mandatory footer.** Check `agent-improvements/_pending-ingest.md` for `Status: PENDING` rows. Researcher's `INGEST-FROM-RESEARCHER` stages insights there awaiting Ane's approval (see Li skill).
-- Rows added THIS run (N): append the structured footer below.
-- Rows from PRIOR runs (M still PENDING): append `🔔 [M] earlier wiki ingest(s) still pending review — /li list-ingests to see them.`
-- Both: append both. Do not collapse counts.
-- Neither: omit.
+**Pending-ingest visibility — mandatory footer.** Check `agent-improvements/_pending-ingest.md` for `Status: PENDING` rows. Researcher's `INGEST-FROM-RESEARCHER` stages insights there awaiting Ane's approval (see Li skill). Rows added this run (N): append the structured footer below. Rows from prior runs (M still PENDING): append `🔔 [M] earlier wiki ingest(s) still pending review — /li list-ingests to see them.` Both: append both, do not collapse counts. Neither: omit.
 
 ```
 ---
@@ -229,17 +214,7 @@ Apply this protocol when fallback is triggered:
 4. **For COMPLEX tasks: recommend re-run.** State explicitly that for COMPLEX outputs (publication-grade, EC-facing, evaluation-related), re-running once the registry is available will produce stronger output. For SIMPLE tasks fallback is acceptable.
 5. **Run the Researcher and qa-reviewer contracts inline.** Both have full prompt definitions in `~/.claude/agents/` (or, in the failure case, in `agent-improvements/agent_registry.md` and the qa_block schema). Apply them as if you were both agents in turn, in your own context. Document which contracts you executed.
 
-**Behavioural changes triggered by fallback mode (mandatory, not cosmetic):**
-
-a. **Pre-claim Grep verification.** *(Universal — see `## Binary-input task protocol`.)*
-
-b. **Confidence hedging in scoring.** *(Fallback-only.)* Scoring impact estimates ("+5–8pts on Relevance") downgrade to qualitative ("strengthens Relevance"). Quantitative scoring requires the qa-reviewer cross-check fallback mode lacks.
-
-c. **Data gap protocol applied to Ann's own evidence base.** *(Fallback-only.)* Flag gaps in extraction or analysis chain BEFORE applying to source: `⚠️ Analysis gap: [what extraction missed] — [why] — [recommended verification]`. Must appear before any "X is missing from [source]" claim.
-
-d. **Suspended implement-don't-propose for file-modifying outputs.** *(Universal — see `## Binary-input task protocol`.)*
-
-Ane should be able to tell at a glance whether any given delivery used real triangulation. The banner is not optional in fallback mode.
+**Behavioural changes triggered by fallback mode (mandatory, not cosmetic):** (a) Pre-claim Grep verification + (d) suspended implement-don't-propose for file-modifying outputs — both universal, see `## Binary-input task protocol`. (b) Confidence hedging in scoring (fallback-only): quantitative impact estimates ("+5–8pts on Relevance") downgrade to qualitative ("strengthens Relevance"); fallback lacks the qa-reviewer cross-check. (c) Data gap protocol applied to Ann's own evidence base (fallback-only): flag gaps in extraction or analysis BEFORE applying to source as `⚠️ Analysis gap: [what] — [why] — [recommended verification]`; must precede any "X is missing from [source]" claim. Ane should be able to tell at a glance whether a delivery used real triangulation; banner is not optional in fallback mode.
 
 ## Write-and-bridge pattern (when a specialist does not exist)
 
