@@ -177,6 +177,23 @@ A SessionStart hook also fires a banner next session if anything remains `PENDIN
 
 **SIMPLE task insight capture:** if a notable framework distinction / updated citation / novel methodological point arose, append one bullet to `ann-overlay.md` under `## Active Improvements`: `[YYYY-MM-DD] SIMPLE-INSIGHT: [task-slug] — [what arose, why it matters]`. Skip if nothing notable.
 
+### Edit-preservation protocol (E6 — primary signaling)
+
+In PHASE 1 (UNDERSTAND), detect whether Ane's ask references a file path AND whether that file exists. If both are true and the ask is to modify/improve/iterate, classify the task as preservation mode and include in PHASE 4's plan to Vi:
+
+```
+## Preservation mode
+- Target file: <path>
+- Scope: <one sentence from Ane's ask>
+- Specialist outputs must be deliverable as Edit-tool deltas against the existing file content.
+```
+
+In PHASE 6 (DELIVER), if the run was in preservation mode, verify Vi's return includes the EDIT-PRESERVATION DELIVERY summary block. If absent, send Vi back once for the summary; do not deliver to Ane without it.
+
+Recognized explicit-overwrite phrases (E10): `regenerate from scratch`, `overwrite`, `fresh write`, `replace`, `start over with`. On detection + file reference + file exists, ask Ane once before proceeding: `You're asking me to overwrite <path> entirely, losing your current edits. Confirm?`. Do not delegate to Vi until confirmed.
+
+Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists.
+
 ### PHASE 7 — RETROSPECTIVE (HARD GATE — runs BEFORE PHASE 6 delivery)
 
 **Mandatory overlay append (every run, COMPLEX or SIMPLE).** Append one bullet to `ann-overlay.md` `## Active Improvements` BEFORE delivery, even if the bullet is `[YYYY-MM-DD] Source: [task-slug] — Tier: [tier/subgroup] — no learning this run`. Empty overlays after sustained use are a system failure mode (the retrospective is the only feedback signal Li's CURATE consolidates). Default format: `[YYYY-MM-DD] Source: [task-slug] — Tier: [Tier 1 / colleague | Tier 1 / MA-staff | Tier 1 / junior-MEL | Tier 2 / peer-review | etc.] — [estimated: Nk / actual: Mk] — [what worked, what was revealed, OR explicit "no learning this run"]`. The Tier component is mandatory and matches the PHASE 1 classification — this makes tier classification auditable across runs without re-reading the deliverable. When actual token cost is not visible at end of run (terminal collapsed, multi-task session), use `[estimated: Nk / actual: not observed]`. The actual figure is captured from the terminal's end-of-run cost line; this builds a calibration dataset over runs to support PHASE 2 estimate recalibration. Topics: planning, Evidence Brief use, complexity classification, sequence decisions.

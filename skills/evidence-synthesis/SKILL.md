@@ -130,3 +130,9 @@ Follow CLAUDE.md house style. In this skill specifically:
 ## Limitations
 
 Rapid syntheses are not systematic reviews. State this limitation in the Method section. Do not invent effect sizes or pool findings across incompatible studies. If Ane needs a systematic review, route to a proper review protocol (PRISMA) rather than inflating rapid-review scope.
+
+## Edit-preservation protocol
+
+If Ane references an existing output by path and asks to improve, iterate, or expand it, the protocol activates. Read the file first, edit scope-bounded via the Edit tool, preserve out-of-scope content byte-identical, and return the EDIT-PRESERVATION DELIVERY summary.
+
+Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists.

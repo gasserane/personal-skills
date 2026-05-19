@@ -295,3 +295,9 @@ This skill does not:
 ## Vi specialist registration
 
 This skill is also registered as a Vi specialist `learning-agenda-designer` at `agent-improvements/agent_registry.md`. Vi spawns the specialist when a task brief asks for a learning agenda alongside other deliverables. The specialist reads the same exemplars and frameworks and produces the same three output types via the same router.
+
+## Edit-preservation protocol
+
+If Ane references an existing output by path and asks to improve, iterate, or expand it, the protocol activates. Read the file first, edit scope-bounded via the Edit tool, preserve out-of-scope content byte-identical, and return the EDIT-PRESERVATION DELIVERY summary.
+
+Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists.
