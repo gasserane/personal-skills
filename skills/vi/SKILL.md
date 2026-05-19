@@ -129,6 +129,21 @@ Compiled product must:
 ### RETURN TO ANN
 Return compiled product to Ann (or directly to Ane if invoked directly). Blockers / escalations → prefix with `== ESCALATION ==: [description]`.
 
+### Edit-preservation protocol
+
+When Ane's ask references an existing file path (passed via Ann's plan as `## Preservation mode` or inferred at direct invocation), enter splice mode at COMPILE:
+
+1. Read the target file in full.
+2. Identify in-scope sections from the ask.
+3. Request specialist content for in-scope sections only.
+4. Use Edit, not Write. Multiple sections, multiple Edit calls.
+5. Verify byte-identity of out-of-scope lines before returning.
+6. Compose EDIT-PRESERVATION DELIVERY summary per `mel_wiki/wiki/concepts/edit-preservation-protocol.md`.
+
+If Ann's plan has no `## Preservation mode` block but the ask references an existing file, surface: `⚠️ Ane's ask references existing file <X> but Ann's plan did not declare preservation mode. Treating as preservation; verify if not.` On direct-Vi invocation (no Ann plan), prefix delivery with: `Preservation mode inferred (direct-Vi invocation, no Ann plan). Verify intent if not.`
+
+Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists.
+
 ## Model selection for specialists
 
 **Codified policy (from CLAUDE.md interpretation, 2026-04-28).** Each specialist's static `~/.claude/agents/<name>.md` declares a default model in its frontmatter. Vi may override at spawn time for task-specific reasons documented below. Codified rules:

@@ -107,3 +107,9 @@ Follow CLAUDE.md house style. Indicator names lead with verbs where possible ("P
 ## Limitations
 
 This skill does not design data collection instruments, sampling frames, or analysis plans. It does not assess whether indicators are feasible at scale — that requires field knowledge Ane brings. It does not replace participatory indicator co-design with target populations; it prepares a rigorous draft for that consultation.
+
+## Edit-preservation protocol
+
+If Ane references an existing output by path and asks to improve, iterate, or expand it, the protocol activates. Read the file first, edit scope-bounded via the Edit tool, preserve out-of-scope content byte-identical, and return the EDIT-PRESERVATION DELIVERY summary.
+
+Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists.

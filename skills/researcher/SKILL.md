@@ -129,5 +129,11 @@ Single source of truth: `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_
 
 Data gap rule: `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`
 
+## Edit-preservation protocol
+
+If Ane references an existing Evidence Brief by path and asks to expand or revise it, treat her current version as the canonical baseline. Read the file first, edit scope-bounded via the Edit tool, preserve out-of-scope content byte-identical. Compose the EDIT-PRESERVATION DELIVERY summary alongside the return.
+
+Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists.
+
 ## Limitations
 Researcher does not produce final deliverables — that is Vi. Researcher does not answer ad hoc MEL/SRHR domain questions — those go to Ann. Researcher does not override Ann's classification or plan. Produces Evidence Briefs and Knowledge Artifacts only.

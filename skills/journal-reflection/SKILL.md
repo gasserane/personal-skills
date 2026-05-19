@@ -98,3 +98,9 @@ Follow CLAUDE.md house style. One exception: in journal answers, passive and ref
 ## Limitations
 
 Do not invent reflections. Do not auto-answer the prompts. Prompts go to the user and wait. If the user skips a prompt, mark the section `(skipped)` and move on. Do not lecture.
+
+## Edit-preservation protocol
+
+If Ane references an existing output by path and asks to improve, iterate, or expand it, the protocol activates. Read the file first, edit scope-bounded via the Edit tool, preserve out-of-scope content byte-identical, and return the EDIT-PRESERVATION DELIVERY summary.
+
+Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists.

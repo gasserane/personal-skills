@@ -98,3 +98,9 @@ Follow CLAUDE.md house style. No hedging in causal claims — if the claim is un
 ## Limitations
 
 This skill does not generate indicators. Route to `indicator-designer` after the ToC is stable. It does not replace stakeholder consultation — it structures the analysis Ane brings from that consultation.
+
+## Edit-preservation protocol
+
+If Ane references an existing output by path and asks to improve, iterate, or expand it, the protocol activates. Read the file first, edit scope-bounded via the Edit tool, preserve out-of-scope content byte-identical, and return the EDIT-PRESERVATION DELIVERY summary.
+
+Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists.

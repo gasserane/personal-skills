@@ -74,3 +74,9 @@ Candid, not deferential. If the recommendation is obvious, say so. If the option
 ## Limitations
 
 Do not invent facts, figures, or prior decisions. If a fact is needed and not provided, flag it with `⚠️ Data gap:`. Do not pad to reach a target length. A 250-word memo is fine if the decision is clean.
+
+## Edit-preservation protocol
+
+If Ane references an existing output by path and asks to improve, iterate, or expand it, the protocol activates. Read the file first, edit scope-bounded via the Edit tool, preserve out-of-scope content byte-identical, and return the EDIT-PRESERVATION DELIVERY summary.
+
+Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists.
