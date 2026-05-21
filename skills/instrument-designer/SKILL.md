@@ -79,7 +79,7 @@ Produce:
 6. **Translation and pretesting note** — back-translation plan and the cognitive-testing-then-pilot sequence.
 7. **Data gaps**.
 
-Export the instrument as an IPPF-branded Word document via `ane_package.reporting.word_export`. Adapt validated items from DHS-8 Model Questionnaires or UNICEF MICS6 tools rather than writing SRHR items from scratch; cite the source item and note the adaptation.
+Export the instrument as an IPPF-branded Word document via `ane_package.reporting.word_export`. For a structured questionnaire intended for field deployment, also emit a KOBO/ODK-deployable XLSForm: assemble the items into the survey-definition dict (schema documented in `ane_package.reporting.xlsform`) and call `xlsform.write_xlsform`. The file uploads straight to KoboToolbox (New project, then Upload an XLSForm) and bridges to the KOBO ingestion adapter (`ane_package.ingest.sources.kobo`). The XLSForm is a machine-read deployment file, so it carries no IPPF brand formatting; the Word document is the human-facing instrument. Adapt validated items from DHS-8 Model Questionnaires or UNICEF MICS6 tools rather than writing SRHR items from scratch; cite the source item and note the adaptation.
 
 ## Citation requirements
 
