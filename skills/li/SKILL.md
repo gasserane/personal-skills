@@ -62,11 +62,11 @@ Cross-references: `mel_wiki/wiki/calibration.md` ingestion priorities for Caribb
 
 **LIST-PROGRAMMES.** Run `python -m ane_package.orchestration.programmes index`. Empty → "No programmes in the store yet — /li add-programme to seed one."
 
-**GET-PROGRAMME [name].** Resolve name to id, print the full dossier. No match → list available names.
+**GET-PROGRAMME [name].** Resolve name→id by running `python -m ane_package.orchestration.programmes list` (prints `id  name  [status]`), or read `programme_context.json` directly with the Read tool. Print the full dossier. No match → list available names.
 
-**EDIT-PROGRAMME / DELETE-PROGRAMME [name].** Confirm-before-write gate (`feedback_confirm_before_overwrite.md`): show the change, get confirmation, then upsert / delete via the CLI. Deletion is irreversible (gitignored store) — say so before deleting.
+**EDIT-PROGRAMME / DELETE-PROGRAMME [name].** Resolve name→id as in GET-PROGRAMME. Confirm-before-write gate (`feedback_confirm_before_overwrite.md`): for EDIT, read the existing dossier, apply the change, write the full dossier (including its `id`) to a temp `.json`, then `upsert`; for DELETE, `delete <id>`. Show the change and get confirmation before any write. Deletion is irreversible (gitignored store) — say so before deleting.
 
-**LINT-PROGRAMMES.** Flag dossiers whose `updated` is >90 days old, or missing a key field (`name`, `status`, `current_phase`, and at least one of `member_associations` / `countries`). Return a prioritised fix list; do not auto-fix.
+**LINT-PROGRAMMES.** Flag dossiers whose `updated` is >90 days old, or missing a key field (`name`, `status`, `current_phase`, and at least one of `member_associations` / `countries`). Return a prioritised fix list; do not auto-fix. Empty store → "No programmes to lint."
 
 **APPROVE-PROGRAMME-UPDATE [task-slug] / REJECT-PROGRAMME-UPDATE [task-slug] — [reason].** Read `agent-improvements/_pending-programme-updates.md`. APPROVE: for each PENDING row matching the slug, show the proposed change, get Ane's confirmation, merge via the CLI, set the row status `APPROVED [YYYY-MM-DD]`. REJECT: set status `REJECTED [YYYY-MM-DD] — [reason]`; store unchanged; empty reason → prompt Ane. Apply `mel_wiki/wiki/concepts/edit-preservation-protocol.md` when editing the staging file.
 
