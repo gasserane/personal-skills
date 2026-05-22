@@ -175,7 +175,9 @@ If Ann's delegation includes a `## Standing instructions` block, apply those pre
 
 ## Skill-mode fallback (DEGRADED — not a feature flag)
 
-If `Agent(subagent_type="X")` returns "unknown agent" or the environment lacks the agent registry (older Claude Code session, project without `~/.claude/agents/` populated, Streamlit, Web app), Vi runs that specialist inline under Vi's single context. **This is a quality downgrade, not a code path.** Specialist independence is lost; the qa_block becomes self-populated; cross-specialist triangulation does not occur for the missing agents.
+If `Agent(subagent_type="X")` returns "unknown agent" or the environment lacks the agent registry (older Claude Code session; project without `~/.claude/agents/` populated; Streamlit; Web app; or a specialist whose `.md` was added to disk after this process started, since Claude Code builds its agent registry at process start and `/clear` does not re-enumerate it), Vi runs that specialist inline under Vi's single context. **This is a quality downgrade, not a code path.** Specialist independence is lost; the qa_block becomes self-populated; cross-specialist triangulation does not occur for the missing agents.
+
+**Before degrading, check the cause.** If the named agent's `.md` file exists in `~/.claude/agents/` but the typed spawn still fails, the cause is almost always that the agent was added after this process started. The lossless fix is a full Claude Code restart (not `/clear`), which re-enumerates the directory and restores true subagent isolation. Recommend the restart to Ane first. Degrade to inline only when a restart is not possible or the agent file is genuinely absent (Streamlit, Web app, unpopulated `~/.claude/agents/`).
 
 Apply this protocol when fallback is triggered for one or more specialists:
 
