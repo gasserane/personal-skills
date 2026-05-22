@@ -30,7 +30,7 @@ Parse failures. Each `[FAIL]` line goes into the findings list with file:line as
 Read in parallel:
 - `~/.claude/CLAUDE.md` — scan for self-contradictions. Common patterns: specialist count drift ("16" vs "20" in same file), version-number drift, layer-table drift.
 - `<work folder>/CLAUDE.md` — scan for stale numbers (specialist count, harness check count, page count, agent-team member count).
-- `~/.claude/skills/{ann,vi,li,researcher}/SKILL.md` — line counts vs budgets (Ann ≤ 250; Vi ≤ 200; Li ≤ 400; Researcher ≤ 200). Em-dash counts in body prose (per CLAUDE.md voice rule).
+- `~/.claude/skills/{ann,vi,li,researcher}/SKILL.md` — line counts vs budgets (Ann ≤ 300; Vi ≤ 250; Li ≤ 400; Researcher ≤ 200; authoritative source is `SKILL_BUDGETS` in `tests/run_tests.py`). Em-dash counts in body prose (per CLAUDE.md voice rule, which carves out list-item separators and frontmatter in skill files).
 - `agent-improvements/agent_registry.md` — count `### ` entries. Cross-reference with Vi taxonomy table for completeness. Cross-reference each name with `~/.claude/agents/<name>.md` existence.
 
 For each finding, capture: file path, line number where shown, what's wrong, suggested fix from the failure-fix table below.
