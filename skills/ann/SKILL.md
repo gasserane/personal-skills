@@ -45,6 +45,8 @@ Block target size: 3-4k tokens. If your draft exceeds 5k, trim P2 pointers; neve
 ### PHASE 1 — UNDERSTAND
 Extract objective, domain, evidence, success criteria, audience, ethical pre-screen.
 
+**Programme context detection (mandatory pre-step).** If the task names or implies a known programme, member association, country, donor, or evaluation — or is portfolio-level ("across my programmes", "my portfolio") — read `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/programme_context.json` (Read tool, absolute path; cwd-independent). Select the matching dossier(s); for portfolio-level tasks select the compact index instead. No match, or a MECHANICAL / generic-methodology task → skip the read and forward nothing. If a selected dossier's `updated` date is more than 90 days old, add to the brief: `⚠️ Programme dossier [name] last updated [date] — confirm still current.` Detail: `mel_wiki/wiki/concepts/programme-portfolio-memory.md`.
+
 **Audience tier classification (mandatory).** Per CLAUDE.md "Audience tiers and register", classify every task on two axes:
 
 - **Tier:** Tier 1 working brief (default, ~90% of outputs) OR Tier 2 publication (rare, opt-in). Tier 2 triggers only when the prompt explicitly names "publication," "journal article," "donor report for external release," "published guide," "peer-reviewed," "external policy paper," or equivalent. When in doubt, classify Tier 1.
@@ -110,6 +112,8 @@ Pass: plan text (full COMPLEX / brief SIMPLE), original task, Evidence Brief (CO
 **Audience tier — mandatory line in Standing instructions.** Always include the PHASE 1 tier classification as a bullet: `- Audience tier: [Tier 1 working brief / Tier 2 publication]; subgroup: [colleague / MA-staff / partner-NGO / management / junior-MEL / peer-review]; voice positioning: [collaborative / directive / collaborative-pedagogical].` Specialists and Vi apply CLAUDE.md "Audience tiers and register" rules per this classification: Tier 1 → BLUF, evidence-base line at end of section, plain English, invisible lens signposting, framework moves named without framework names; Tier 2 → inline citations, visible framework names, visible lens signposting; Tier 1 / junior-MEL → visible signposting and framework names, worked reasoning, annotated evidence base, optional pedagogical callouts. This bullet is mandatory in every spawn — it is not an Ane-stated preference but a system invariant.
 
 **P1 context block — mandatory in every spawn prompt.** Prepend the `## P1 wiki context (already loaded by Ann)` block (constructed per the spec in `## P1 context block` above) to every Vi, Researcher, and bypass-specialist spawn prompt. The block lets the receiver skip cold-load of P1 wiki files. If the block is absent (skill-fallback or partial context), include the explicit line `## P1 wiki context: NOT PROVIDED — load from source.` so the receiver knows to fall back. This is the Tranche-6 P1 triple-load architectural fix; the receiver checks for this block in its session-start step 1.
+
+**Programme context block — when PHASE 1 loaded programme context.** Prepend a `## Programme context` block to every Vi, Researcher, and bypass-specialist spawn prompt, carrying only the selected dossier(s) or the portfolio index. Omit the header entirely when PHASE 1 loaded nothing (never emit an empty block). Vi propagates it to specialists exactly as it propagates the P1 wiki block. Stored stakeholder names are internal context only — apply the summary-anonymisation rule on any deliverable surface.
 
 ### PHASE 4.5 — SOURCE PERSISTENCE (ad-hoc capture)
 
