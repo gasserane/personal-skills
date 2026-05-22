@@ -62,6 +62,7 @@ State the classification explicitly in PHASE 2's Confirmed brief: `Audience tier
 - **Adolescents + sensitive content** (adolescent + GBV/abortion/LGBTI) → load `frameworks/ethics-adolescent-srhr-research.md`; care referral pathway mandatory before data collection.
 - **Multi-country** (2+ countries) → load `concepts/multi-country-mel-design.md`; design three reporting layers; flag aggregation method.
 - **EU-funded** (NDICI / GAP III / IPA III / DG INTPA / DG NEAR) → cross-map to country-level MIP indicators (binding reporting target).
+- **Target-language signal.** If the task names a target language for an MA-facing deliverable (e.g. "in Romanian", "Romanian version", "for SECS", "localise"), route a standalone request to the `/localise` skill, or flag the companion mode so Vi spawns `localisation-specialist` after the English deliverable is compiled.
 
 **Complexity:**
 - **MECHANICAL** (zero analytical judgment) → deliver directly. Skip retrieval.
