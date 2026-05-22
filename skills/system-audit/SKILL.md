@@ -38,7 +38,7 @@ For each finding, capture: file path, line number where shown, what's wrong, sug
 ### Step 3 — Overlay and CURATE state (medium severity)
 
 Read in parallel:
-- `agent-improvements/{ann,vi,li,researcher}-overlay.md` — file sizes (cap 35KB) and Active-entries count (cap 10). If either breaches: flag for compression CURATE, not just archive-only CURATE.
+- `agent-improvements/{ann,vi,li,researcher,community}-overlay.md` — file sizes (cap 35KB) and Active-entries count (cap 10). If either breaches: flag for compression CURATE, not just archive-only CURATE. The `community-overlay.md` (claimed-space feedback log, created 2026-05-06) is monitored for the same caps.
 - `agent-improvements/coordination-log.md` — count entries with `STATUS: OPEN`.
 - `agent-improvements/_pending-ingest.md` — count rows with `Status: PENDING`. Surface to Ane for action.
 - `agent-improvements/PROPOSED-*.md` — `Status:` field on each. Flag any `AWAITING APPROVAL` older than 7 days.
