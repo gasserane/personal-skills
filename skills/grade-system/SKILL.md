@@ -173,7 +173,11 @@ End with: "Want concrete recommendations for moving the grade?" Wait for Ane's r
 If Ane confirms, surface 2-3 concrete one-day moves that would shift specific dimensions. Be honest about which are achievable today vs structural ceilings. Then ask whether to execute.
 
 ## Cost band
-~40-80k tokens for a thorough grading pass. Includes reading multiple overlay files, audit history, and harness state. Within the 200k system-improvement cap.
+Two shapes, calibrated from observed actuals:
+- **Grade-only pass:** ~40-80k (reading overlay files, audit history, harness state).
+- **Grade plus followup execution:** ~200k. All three observed runs (2026-05-10, 2026-05-20, 2026-05-22) blew the grade-only band by 2.5 to 5× once followup edits and commits were bolted on. Classify as COMPLEX-execution despite skill-only tooling, and treat ~200k as the working estimate.
+
+Both stay within the 200k system-improvement cap; the grade-plus-followup shape reaches it. If the run is grading only with no edits, the lower band applies.
 
 ## Cross-references
 - `/system-audit` finds bugs; `/grade-system` characterises overall quality posture. Use both for a complete read: audit first to clear quick fixes, then grade.
