@@ -116,6 +116,34 @@ If any of: search strategy produced poor results / source tier unavailable / Evi
 
 For behavioural generalisations (e.g., "always run PubMed before Consensus for SRHR"), validate with Ane before writing.
 
+### Bibliography write-hook (Phase 1, added 2026-05-23)
+
+After every external-retrieval pass that produces an Evidence Brief, run the
+bibliography write-hook:
+
+1. For every source in the Brief (Tier 1, 2, and 3), call
+   `ane_package.bibliography.store.BibliographyStore.add_or_update(record)` with
+   structured tags via
+   `build_tags_for_researcher_push(tier=N, run_id=<run-id>, grey_lit=..., foundational=...)`.
+   The store is idempotent on DOI then URL; existing records are updated, not
+   duplicated.
+
+2. For every source cited in the Brief, run
+   `ane_package.bibliography.detector.surface_candidates([records])`. Any
+   returned Candidate is staged via
+   `ane_package.bibliography.staging.append_or_merge(path, row)` to
+   `agent-improvements/_pending-biblio-updates.md`.
+
+3. The Brief carries a footer line:
+   `🔔 [N] bibliography candidate(s) staged — /li show-biblio-updates to view`
+   when N ≥ 1.
+
+Credentials: API key from Credential Manager target `IPPF-MEL-Zotero-API`
+(see `ane_package.ingest.credentials.get_zotero_api_key`). User and group IDs
+from `ane_package.bibliography.config` (set up once via the plan's Task 13).
+
+Spec: `docs/superpowers/specs/2026-05-23-bibliography-zotero-design.md`.
+
 ## Specialist taxonomy
 In Artifact A "Recommended specialist roster", list only the specialist names the task requires (Vi owns model selection):
 
