@@ -70,6 +70,35 @@ Cross-references: `mel_wiki/wiki/calibration.md` ingestion priorities for Caribb
 
 **APPROVE-PROGRAMME-UPDATE [task-slug] / REJECT-PROGRAMME-UPDATE [task-slug] — [reason].** Read `agent-improvements/_pending-programme-updates.md`. APPROVE: for each PENDING row matching the slug, show the proposed change, get Ane's confirmation, merge via the CLI, set the row status `APPROVED [YYYY-MM-DD]`. REJECT: set status `REJECTED [YYYY-MM-DD] — [reason]`; store unchanged; empty reason → prompt Ane. Apply `mel_wiki/wiki/concepts/edit-preservation-protocol.md` when editing the staging file.
 
+### FEEDBACK — Operationalise the community-overlay intake
+**Trigger:** Ane: `/li pull-feedback`, `/li show-feedback`, `/li approve-feedback-return [id]`, `/li reject-feedback-return [id] — [reason]`. Also surfaced by Ann's PHASE 6 footer when `agent-improvements/_pending-feedback-returns.md` has new PENDING rows.
+
+Operationalises the community-overlay intake (see `mel_wiki/wiki/concepts/community-feedback-intake.md`). Li owns pull, stage, approve, and reject. The overlay markdown stays the system of record. Build-time `safeguarding-reviewer` APPROVED 2026-05-23; rollout review is Ane-owned at the Stage-3 decision.
+
+**Engine.** All pulls go through `ane_package.feedback` (module API: `FeedbackReturn`, `apply_consent_rule`, `map_ingest_result_to_returns`, `parse_email_return`, `returns_to_staging_rows`, `append_returns_to_staging`, `pull_ms_forms_returns`). The deterministic consent strip rule is the only place a name and contact are dropped on `consent_to_name=no`; never replicate the rule by hand.
+
+**PULL-FEEDBACK [item_id] [--drive me|sites/...].** Run from the work-folder root:
+```
+python -c "from ane_package.feedback import pull_ms_forms_returns; \
+  pull_ms_forms_returns(item_id='[item_id]', drive='[drive]', \
+  staging_path='agent-improvements/_pending-feedback-returns.md')"
+```
+Idempotent: already-staged or approved return IDs are skipped (the writer scans the file before appending). Report: `✅ Pulled [N] return(s); [K] new, [N-K] already staged. /li show-feedback to review.`
+
+**SHOW-FEEDBACK.** Read `agent-improvements/_pending-feedback-returns.md`. No file or zero PENDING → return *"No community-feedback returns pending review."* Otherwise print PENDING rows in full (Return ID, Received, Task slug, Channel, Recipient (consent-applied), Q1, Q2), then summary line `[N] PENDING — to approve: /li approve-feedback-return [id]; to reject: /li reject-feedback-return [id] — [reason]`. Do NOT modify the overlay.
+
+**APPROVE-FEEDBACK-RETURN [id].** Find the PENDING row with that return ID in `_pending-feedback-returns.md`. No match → return *"No PENDING return with id [id] — possibly already approved/rejected, or id typo. /li show-feedback to verify."* For the match: read `agent-improvements/community-overlay.md`, append one row to the `## Feedback log` table — columns Date (use the staged Received), Task slug, Recipient (role + MA / org as staged, consent-applied), Q1 — voice missing, Q2 — what to change, Actioned in (blank until a future run uses it). Apply `mel_wiki/wiki/concepts/edit-preservation-protocol.md`: append one row, change nothing else byte-wise. Set the staging row status `APPROVED [YYYY-MM-DD]`. Recompute the log row count; if it reaches 3, note `🔔 Co-design threshold reached — Ann will surface in the next PHASE 6 footer`. Return: `✅ APPROVE-FEEDBACK-RETURN [id]: overlay row appended; log now [N] rows.`
+
+**REJECT-FEEDBACK-RETURN [id] — [reason].** Find the PENDING row; empty `[reason]` → prompt Ane. Set status to `REJECTED [YYYY-MM-DD] — [reason]`. Overlay not modified. Return: `✅ REJECT-FEEDBACK-RETURN [id]: rejected. Overlay not modified.`
+
+**Hand-staging (ragged email).** When an email-fallback return does not follow the template, the deterministic `parse_email_return` will not pick it up. In that case, hand-extract the fields into `_pending-feedback-returns.md` (one PENDING row): `received_at`, `task_slug` (if known), `ma_org`, `role`, `q1_voice_missing` (verbatim), `q2_what_to_change` (verbatim), `consent_to_name` from the respondent's wording, `name` and `contact` only when consent is yes AND a name is given. Compute a `return_id` of the form `em-[hash]` by mirroring the rule (or call `parse_email_return` after reshaping the body into the template). Then approve through the same gate. Never write the consented name into the overlay when consent was not given.
+
+**Staging-gate safeguards** (build-time `safeguarding-reviewer` 2026-05-23):
+- **Coarsening default-on.** If `role + ma_org` could name one person in a small MA, coarsen to "MA only" or "region only" in the overlay row. Clear this judgement before appending.
+- **Third-party-name rule.** If Q1 or Q2 free text contains a third party's personal name, coarsen or remove the name before approval. Do not propagate identifiable third-party names into the canonical log.
+
+**Failure handling.** Missing staging file → surface message; malformed row → flag and continue; overlay write fails → retain staging row as PENDING, return diagnostic.
+
 ### INGEST-FROM-RESEARCHER — Store research artifacts and stage wiki insights
 **Trigger:** Researcher sends Knowledge Artifacts after a literature review. Receives Artifact B (full literature review + source list + MEL Wiki insights), task slug (lowercase-hyphenated, ≤5 words), date (YYYY-MM-DD).
 
