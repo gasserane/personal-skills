@@ -99,6 +99,46 @@ Idempotent: already-staged or approved return IDs are skipped (the writer scans 
 
 **Failure handling.** Missing staging file → surface message; malformed row → flag and continue; overlay write fails → retain staging row as PENDING, return diagnostic.
 
+### BIBLIO Operation (Phase 1, added 2026-05-23)
+
+The managed-bibliography gate. Mirrors the FEEDBACK pattern: stage in a
+gitignored file, approve into canonical surfaces via a verbatim gate, never
+auto-write.
+
+Sub-commands:
+
+- `/li biblio sync` — one-shot push current wiki citations → Zotero. Walks
+  `domain-standards.md` rows + `frameworks/*.md` citation lines; calls
+  `BibliographyStore.add_or_update` for each; populates the `wiki_pages` field
+  on each Zotero record.
+
+- `/li biblio check` — run the candidate-surfacer (`surface_candidates`)
+  across the full Zotero group library. Stages any returned candidates in
+  `agent-improvements/_pending-biblio-updates.md`.
+
+- `/li show-biblio-updates` — list all pending rows from the staging file
+  with their Row ID, detection sources, old/proposed citation, and Tier-A
+  targets.
+
+- `/li approve-biblio-update [id]` — fire the Tier-A propagator
+  (`propagate_approved_update`) for the named row. The four Tier-A targets
+  (domain-standards.md, domain-standards-domain-specific.md, the matching
+  frameworks/*.md page, the claude.ai mirror) are edited scope-bounded per the
+  edit-preservation protocol. On success, the row's status becomes `approved`.
+  Tier-B `secondary_mentions` are reported but not edited; user fires
+  `propagate-secondary` for those if wanted.
+
+- `/li reject-biblio-update [id] — [reason]` — sets the row's status to
+  `rejected:<reason>`. No edits to canonical surfaces.
+
+- `/li propagate-secondary [id] [path]` — targeted manual follow-up on one
+  Tier-B mention site. Same propagator function, single-file target.
+
+All approval/rejection actions preserve the verbatim row in the staging file
+(status field is the only thing that mutates).
+
+Spec: `docs/superpowers/specs/2026-05-23-bibliography-zotero-design.md`.
+
 ### INGEST-FROM-RESEARCHER — Store research artifacts and stage wiki insights
 **Trigger:** Researcher sends Knowledge Artifacts after a literature review. Receives Artifact B (full literature review + source list + MEL Wiki insights), task slug (lowercase-hyphenated, ≤5 words), date (YYYY-MM-DD).
 
