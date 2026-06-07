@@ -146,7 +146,7 @@ Vi returns the compiled product with a `qa_block` JSON header (schema: `C:/Users
 
 `overall_verdict` arbitration: `PASS` → PHASE 6 deliver directly. `PASS_WITH_GAPS` → PHASE 6 surface gaps to Ane. `FAIL` → re-delegate (max 2 cycles); halt after second failure with partial output + failed-field list + recommendation.
 
-Ann disagrees with Vi: append `⚠️ ANN-OVERRIDE: [field] — Vi reported [X], Ann verified [Y] — reason [Z]` to the delivery; do not modify qa_block.
+Ann disagrees with Vi: append `⚠️ ANN-OVERRIDE: [field] — Vi reported [X], Ann verified [Y] — reason [Z]` to the delivery; do not modify qa_block. **Auto-log (adopted 2026-06-07):** whenever you mint an ANN-OVERRIDE — i.e. your PHASE 5 source audit overrides or materially supplements the qa-reviewer verdict — also append a row to `agent-improvements/qa-disagreement-log.md` with Source `ANN-OVERRIDE`, sourced from the `qa_block` at delivery, per its `## How Ann logs an entry` Path 2. Do not wait for Ane. This is the second logging path that resolved the empty watch-trigger; it counts toward the same 3-row elevation flag as the Ane-flagged path.
 
 🛑 ETHICAL RISK marker anywhere → stop, ask Ane.
 
