@@ -120,13 +120,26 @@ Sub-commands:
   with their Row ID, detection sources, old/proposed citation, and Tier-A
   targets.
 
-- `/li approve-biblio-update [id]` — fire the Tier-A propagator
-  (`propagate_approved_update`) for the named row. The four Tier-A targets
-  (domain-standards.md, domain-standards-domain-specific.md, the matching
-  frameworks/*.md page, the claude.ai mirror) are edited scope-bounded per the
-  edit-preservation protocol. On success, the row's status becomes `approved`.
-  Tier-B `secondary_mentions` are reported but not edited; user fires
-  `propagate-secondary` for those if wanted.
+- `/li approve-biblio-update [id]` — branch on the row's `detection_source`:
+  - **`crossref-correction`** (additive — erratum/corrigendum/correction):
+    build an APPEND-style `PropagationPlan` — `old_citation_substring` = the
+    article DOI link as it appears on the citation line (e.g.
+    `](https://doi.org/<article-doi>).`), `new_citation_text` = the same
+    substring with the companion note inserted before the closing token (e.g.
+    `](https://doi.org/<article-doi>). Erratum (YYYY): [<update-doi>](https://doi.org/<update-doi>).`).
+    The article DOI is NEVER swapped. The companion DOI is the row's
+    `proposed_doi`; label/year come from `proposed_citation`. On success, write
+    the resolved tag `biblio-correction-noted:<update-doi>` to the Zotero record
+    via `BibliographyStore(read_only=False)` so `/li biblio check` does not
+    re-stage it, then set the row's status to `approved`.
+  - **`crossref-retraction` / `crossref-version` / `crossref-edition-candidate`**:
+    the existing DOI-swap propagation — fire `propagate_approved_update` against
+    the four Tier-A targets (domain-standards.md,
+    domain-standards-domain-specific.md, the matching frameworks/*.md page, the
+    claude.ai mirror), scope-bounded per the edit-preservation protocol. On
+    success, the row's status becomes `approved`.
+  - Tier-B `secondary_mentions` are reported but not edited in either branch;
+    user fires `propagate-secondary` for those if wanted.
 
 - `/li reject-biblio-update [id] — [reason]` — sets the row's status to
   `rejected:<reason>`. No edits to canonical surfaces.
