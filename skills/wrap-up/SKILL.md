@@ -38,6 +38,9 @@ Identify anything Ane said she would do or that was left open:
 **4. Uncommitted changes risk**
 If there are uncommitted files, run `git diff --stat` to assess what is at risk of being lost.
 
+**5. Desktop / claude.ai export drift (project-aware)**
+If `scripts/check_desktop_sync.py` exists in the repo root, run `python scripts/check_desktop_sync.py`. This surfaces claude.ai Desktop project files that drifted since the last upload (the claude.ai project has no file API, so this surface is always a manual re-upload). If it reports `[DRIFT]`, list the export files Ane must re-upload to the claude.ai Desktop project, and the `--mark-synced` follow-up. If it reports no drift, or the script does not exist, skip this section silently.
+
 ## Report format
 
 Deliver as a tight checklist. One line per item. No preamble.
@@ -57,6 +60,9 @@ ERRORS
 
 PENDING ACTIONS
   ✅ Nothing open                 OR  ⚠️  [action]: [what Ane committed to]
+
+DESKTOP SYNC (only when scripts/check_desktop_sync.py exists and reports drift)
+  ⚠️  Re-upload to claude.ai Desktop: [export file(s)] — then run check_desktop_sync.py --mark-synced
 
 RECOMMENDATION
   [One sentence: either "Safe to close" or specific action to take first]
