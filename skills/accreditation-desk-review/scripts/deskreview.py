@@ -34,6 +34,12 @@ GREY = RGBColor(0x44, 0x44, 0x44)
 RED = RGBColor(0xB0, 0x1A, 0x2A)
 PURBAR = "7030A0"; LILAC = "EEE6F7"
 HEAD = "REVIEWER CONCLUSIONS"            # match with/without colon
+
+MIN_FONT = 10.0                          # hard floor: no run in a generated companion doc
+def fpt(size):                           # renders below 10pt (Ane's font rule, locked 2026-06-10)
+    """Font size as Pt, floored at MIN_FONT. Use for every font-size assignment in a generated
+    document. Do NOT use for spacing (space_after, indents) — those stay as raw Pt()."""
+    return Pt(max(size, MIN_FONT))
 STD_RE = re.compile(r"Standard\s+(\d+\.\d+)")
 NUM_RE = re.compile(r"^(\d+\.\d+\.\d+)")
 
@@ -63,7 +69,14 @@ def iter_cells(doc):
             c0 = row.cells[0].text
             m = STD_RE.search(c0)
             if m:
-                cur = m.group(1)
+                # Only treat a "Standard X.Y" match as a header if it sits in the
+                # original cell text, not inside an appended reviewer block. A
+                # reviewer conclusion may legitimately name another standard
+                # (e.g. "filed under the strategy-and-policy standard 2.3"); that
+                # must not reset the current-standard tracker. See reliability-playbook.
+                hp = c0.find(HEAD)
+                if hp == -1 or m.start() < hp:
+                    cur = m.group(1)
             if "comply with this Standard" in c0 and cur:
                 yield ("STD", cur, row.cells[0])
             mn = NUM_RE.match(c0.strip())
@@ -224,7 +237,7 @@ def _setw(cell, cm):
     w.set(qn("w:w"), str(int(cm * 567))); w.set(qn("w:type"), "dxa"); tcPr.append(w)
 def _crun(cell, text, size=8.5, bold=False, color=None, italic=False):
     cell.text = ""; p = cell.paragraphs[0]; p.paragraph_format.space_after = Pt(1)
-    r = p.add_run(text); r.bold = bold; r.italic = italic; r.font.size = Pt(size)
+    r = p.add_run(text); r.bold = bold; r.italic = italic; r.font.size = fpt(size)
     if color is not None: r.font.color.rgb = color
 
 def _scan_template(doc):
@@ -234,7 +247,8 @@ def _scan_template(doc):
         for ri, row in enumerate(t.rows):
             c0 = row.cells[0].text
             m = STD_RE.search(c0)
-            if m:
+            hp = c0.find(HEAD)
+            if m and (hp == -1 or m.start() < hp):  # ignore standard ids inside reviewer prose
                 cur = m.group(1)
                 std_meta.setdefault(cur, {})["title"] = c0.split("\t")[-1].strip()[:60]
             if "comply with this Standard" in c0 and cur:
@@ -263,7 +277,7 @@ def cmd_standalone(args):
     sec.left_margin = Cm(1.6); sec.right_margin = Cm(1.6)
     def para(txt, size=10, bold=False, italic=False, color=None, after=4, before=0):
         p = d.add_paragraph(); p.paragraph_format.space_after = Pt(after); p.paragraph_format.space_before = Pt(before)
-        r = p.add_run(txt); r.bold = bold; r.italic = italic; r.font.size = Pt(size)
+        r = p.add_run(txt); r.bold = bold; r.italic = italic; r.font.size = fpt(size)
         if color is not None: r.font.color.rgb = color
     para(args.title or "IPPF MA Accreditation Desk Review — reviewer output", 13, True, color=PURPLE, after=2)
     para(f"Principle(s) {', '.join(principles)} | standard-level conclusion is the primary record for the IPPF reader.",
@@ -272,7 +286,7 @@ def cmd_standalone(args):
         meta = std_meta.get(sid, {}); spec = std[sid]
         tb = d.add_table(rows=1, cols=1); c = tb.rows[0].cells[0]; _shade(c, PURBAR); _setw(c, 17.8); c.text = ""
         p = c.paragraphs[0]; r = p.add_run(f"  Standard {sid} — {meta.get('title','')}")
-        r.bold = True; r.font.size = Pt(11); r.font.color.rgb = WHITE
+        r.bold = True; r.font.size = fpt(11); r.font.color.rgb = WHITE
         if meta.get("desc"): para("Standard (IPPF): " + meta["desc"], 8.5, italic=True, color=GREY, after=1, before=2)
         if meta.get("verdict"): para("MA self-assessment verdict: " + meta["verdict"], 8.5, bold=True, color=GREY, after=4)
         para("REVIEWER CONCLUSION — STANDARD LEVEL", 9.5, True, color=PURPLE, after=1)
@@ -283,7 +297,7 @@ def cmd_standalone(args):
             para("Questions / aspects to explore at the interview:", 9.5, True, color=PURPLE, after=1)
             for q in spec["questions"]:
                 p = d.add_paragraph(); p.paragraph_format.left_indent = Cm(0.5); p.paragraph_format.space_after = Pt(1)
-                rr = p.add_run("• " + q); rr.font.size = Pt(9.5); rr.font.color.rgb = PURPLE
+                rr = p.add_run("• " + q); rr.font.size = fpt(9.5); rr.font.color.rgb = PURPLE
         para("Supporting detail — checks", 8.5, True, color=GREY, after=2, before=4)
         t = d.add_table(rows=1, cols=3); t.style = "Table Grid"; h = t.rows[0].cells
         for i, (txt, w) in enumerate([("Check", 4.6), ("MA", 1.2), ("Reviewer conclusion (with MA self-assessment)", 12.0)]):
@@ -292,16 +306,16 @@ def cmd_standalone(args):
             cs = chk[cid]; cm = chk_meta.get(cid, {})
             row = t.add_row().cells
             row[0].text = ""; pp = row[0].paragraphs[0]
-            rr = pp.add_run(cid + "  "); rr.bold = True; rr.font.size = Pt(8)
-            rr2 = pp.add_run(cm.get("q", "")); rr2.italic = True; rr2.font.size = Pt(7.5); rr2.font.color.rgb = GREY; _setw(row[0], 4.6)
+            rr = pp.add_run(cid + "  "); rr.bold = True; rr.font.size = fpt(8)
+            rr2 = pp.add_run(cm.get("q", "")); rr2.italic = True; rr2.font.size = fpt(7.5); rr2.font.color.rgb = GREY; _setw(row[0], 4.6)
             _crun(row[1], cm.get("verdict", ""), 8, True); _setw(row[1], 1.2)
             row[2].text = ""; pp = row[2].paragraphs[0]
-            rs = pp.add_run(cs["status"] + " — "); rs.bold = True; rs.font.size = Pt(8); rs.font.color.rgb = PURPLE
+            rs = pp.add_run(cs["status"] + " — "); rs.bold = True; rs.font.size = fpt(8); rs.font.color.rgb = PURPLE
             body = cs.get("body", ""); body = " ".join(body) if isinstance(body, list) else body
-            rb = pp.add_run(body); rb.font.size = Pt(8); rb.font.color.rgb = PURPLE
+            rb = pp.add_run(body); rb.font.size = fpt(8); rb.font.color.rgb = PURPLE
             if cs.get("questions"):
                 pq = row[2].add_paragraph(); rq = pq.add_run("Interview: " + " ".join(cs["questions"]))
-                rq.italic = True; rq.font.size = Pt(7.5); rq.font.color.rgb = PURPLE
+                rq.italic = True; rq.font.size = fpt(7.5); rq.font.color.rgb = PURPLE
             _setw(row[2], 12.0)
         d.add_paragraph().paragraph_format.space_after = Pt(4)
     d.save(args.out)
@@ -314,14 +328,14 @@ def cmd_interview(args):
     for a in ("top_margin", "bottom_margin", "left_margin", "right_margin"): setattr(sec, a, Cm(1.3))
     def para(txt, size=10, bold=False, italic=False, color=None, after=4):
         p = d.add_paragraph(); p.paragraph_format.space_after = Pt(after)
-        r = p.add_run(txt); r.bold = bold; r.italic = italic; r.font.size = Pt(size)
+        r = p.add_run(txt); r.bold = bold; r.italic = italic; r.font.size = fpt(size)
         if color is not None: r.font.color.rgb = color
     para(data.get("title", "Pre-interview requests and interview questions"), 13, True, color=PURPLE, after=2)
     para("Type key: NC = non-compliance / gap related; CL = clarification (standard met, evidence/confirmation needed).",
          9, italic=True, color=GREY, after=6)
     def section(title, rows, towhom):
         tb = d.add_table(rows=1, cols=1); c = tb.rows[0].cells[0]; _shade(c, PURBAR); _setw(c, 18.4); c.text = ""
-        rr = c.paragraphs[0].add_run("  " + title); rr.bold = True; rr.font.size = Pt(11); rr.font.color.rgb = WHITE
+        rr = c.paragraphs[0].add_run("  " + title); rr.bold = True; rr.font.size = fpt(11); rr.font.color.rgb = WHITE
         cols = 4 if towhom else 3
         t = d.add_table(rows=1, cols=cols); t.style = "Table Grid"; h = t.rows[0].cells
         hdrs = [("Check(s)", 1.9), ("Type", 1.1), ("Item", 11.0 if towhom else 13.4)] + ([("To whom", 2.0)] if towhom else [])

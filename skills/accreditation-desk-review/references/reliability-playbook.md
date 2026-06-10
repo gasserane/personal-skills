@@ -104,3 +104,20 @@ The highest-value findings cross standards. Watch for:
 Tier 1 working brief: actor-first, active voice, sentences under 25 words, no em-dashes in body
 prose (use hyphens in status labels), plain English, spell out acronyms on first use. Reviewer
 text in purple `RGB(0x70,0x30,0xA0)`; status labels and headings bold.
+
+## 11. A reviewer block that names another standard breaks cell location
+
+**Symptom.** `apply` or `verify` mis-attributes cells: a Standard 4.1 conclusion lands under, or
+is counted against, Standard 2.3. The content scan looks correct but the standard tracker jumped.
+
+**Cause.** Cell location tracks the "current standard" by matching `Standard X.Y` in the first
+cell of each row. A reviewer conclusion legitimately names other standards (for example "filed
+under the strategy-and-policy standard 2.3"). Because the block is appended into the same cell,
+the matcher read that 2.3 as a new header and reset the tracker for every cell after it.
+
+**Fix.** Only honour a `Standard X.Y` match when it sits in the original cell text, before any
+appended `REVIEWER CONCLUSIONS` marker. `deskreview.py` now guards both `iter_cells` (locate) and
+`_scan_template` (verify/standalone) with this rule, so reviewer prose can safely name any
+standard. You do not need to avoid naming standards in your conclusions. If you ever hand-roll a
+locator, replicate the guard: `hp = text.find("REVIEWER CONCLUSIONS"); honour only if the match
+starts before `hp`, or `hp == -1`.
