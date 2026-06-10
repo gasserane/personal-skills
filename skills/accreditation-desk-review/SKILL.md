@@ -1,20 +1,28 @@
 ---
 name: accreditation-desk-review
 description: >-
-  Conduct a rigorous, reliable IPPF Member Association (MA) accreditation desk review
-  against the IPPF EN Internal Guidelines (Cycle 4 ARV). Use whenever Ane is doing an
-  accreditation review, an ARV desk review, assessing an MA's self-assessment and evidence
-  against the accreditation principles / standards / checks, writing reviewer conclusions into
-  the desk-review Word template, enhancing or elaborating those conclusions, or preparing
-  pre-interview document requests and interview questions. Triggers on "accreditation desk
-  review", "ARV", "IPPF accreditation", "review the MA evidence", "desk review for [MA]",
-  "reviewer conclusions for standard/check X", "elaborate the standard-level conclusion",
-  "interview question sheet", "pre-interview requests". Handles the Word desk-review template
-  safely (content-based cell location that survives Word table merges, backup, file-lock check,
-  edit-preservation), extracts multilingual evidence (EN/RO/FR/etc.) and flags scans and
-  unreadable files as data gaps rather than guessing, writes two-level conclusions (check level
-  plus an elaborated standard / DESCRIPTION-cell level for the IPPF reader), and generates
-  per-principle standalone outputs and tagged interview lists.
+  Conduct a rigorous, reliable IPPF Member Association (MA) accreditation desk review against the
+  IPPF EN Internal Guidelines Accreditation Review (Cycle 4, the ARV accreditation cycle, where
+  ARV means Accreditation Review, not antiretroviral). Use whenever Ane is doing an MA
+  accreditation review or accreditation desk review: assessing an MA's self-assessment and
+  submitted compliance evidence against the accreditation principles / standards / checks,
+  writing or enhancing reviewer conclusions in the desk-review Word template, elaborating a
+  standard-level (DESCRIPTION-cell) conclusion, or preparing the accreditation pre-interview
+  document requests and interview-stage questions. Triggers on "accreditation desk review",
+  "ARV accreditation review", "IPPF accreditation", "review the MA's self-assessment and
+  evidence", "desk review for [MA]", "reviewer conclusions for standard/check X", "elaborate the
+  standard-level conclusion", "accreditation interview question sheet", "pre-interview requests".
+  It applies even when the request names only a principle, standard or check number in an
+  accreditation context, for example "do principle 8". It handles the desk-review template safely
+  (content-based cell location that survives Word table merges, backup, file-lock check,
+  edit-preservation), extracts multilingual evidence (EN/RO/FR) and flags scans, unreadable or
+  missing files as data gaps rather than guessing, writes two-level conclusions (check level plus
+  the standard / DESCRIPTION-cell level the IPPF reader reads), and produces per-principle
+  standalone outputs and tagged non-compliance / clarification interview lists. Do NOT use for:
+  evidence assessments or literature reviews (use evidence-synthesis); research interview, KII,
+  FGD or survey guides (use instrument-designer); indicator or results-framework design (use
+  indicator-designer); voice or editing passes (use ane-voice); or any clinical antiretroviral
+  "ARV" SRHR question.
 ---
 
 # IPPF MA Accreditation Desk Review
