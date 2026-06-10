@@ -123,6 +123,9 @@ Questions / aspects for the interview:
 em-dashes in body prose (hyphens in status labels), plain English, Anglo-Saxon over Latinate.
 Spell out acronyms on first use.
 
+**Font floor is automatic.** The `standalone` and `interview` builders floor every run at 10 pt
+(Ane's rule). You do not need to post-process or shrink-to-fit. Headers sit above the floor.
+
 ## Reliability rules (the non-negotiables)
 
 These are why the skill is trustworthy. Full detail and worked fixes in
@@ -131,6 +134,10 @@ These are why the skill is trustworthy. Full detail and worked fixes in
 - **Back up before every edit; never write to a Word-locked file.**
 - **Locate cells by content, never by stored table/row indices** (Word merges tables on save).
 - **Verify by content, not by lxml `id()`** (proxy ids are reused → false dedup).
+- **Naming another standard inside a conclusion is safe.** The locator ignores `Standard X.Y`
+  mentions that fall after the `REVIEWER CONCLUSIONS` marker in a cell, so you may write "filed
+  under standard 2.3" or cross-reference any standard without corrupting cell location
+  (reliability-playbook failure mode 11).
 - **Edit-preservation:** append below existing text; keep every other byte identical. Apply
   `mel_wiki/wiki/concepts/edit-preservation-protocol.md` when the target file exists.
 - **Data-gap protocol:** `⚠️ Data gap: [what] — [why it matters] — [recommended action]`.
