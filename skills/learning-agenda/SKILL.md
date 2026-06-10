@@ -89,6 +89,7 @@ Before returning the draft:
 - **Citation rigour.** Author surname + year + venue + section where applicable. Verified URLs from the framework wiki pages only. No new sources introduced by the skill.
 - **Sentence length.** Under 25 words. Active voice. No em-dashes in body prose. No nominalisations where a verb works.
 - **Plain English.** Anglo-Saxon over Latinate. Acronyms spelled on first use, every document. Translatability test for ECA / SSA / MENA readers.
+- **Narrative prose model + fidelity gate** (per `agent-improvements/model-selection-policy.md`). Where the agenda carries illustrative narrative prose (worked-example callouts, scenario inserts) constrained to a verified source, that narrative sub-step MAY be drafted via a Fable per-call override; if so, the prose-fidelity gate (Gate 2 in the policy) is MANDATORY, run on Sonnet against the source, with every flag cleared before inclusion. Structured agenda, dashboard, and template content stays on this skill's own model.
 - **IPPF Visual Identity 2025.** When Word, PPTX, or PDF artefact is requested, route through `ane_package.reporting` brand template entry points. No hard-coded colours, fonts, or formats.
 
 ### Step 5 — provenance footer
