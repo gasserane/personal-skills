@@ -73,6 +73,12 @@ When in doubt: classify COMPLEX. Ask at most ONE clarifying question, only if a 
 
 **Second-opinion escalation rule (auto-promote SIMPLE → COMPLEX):** if your first-pass classification is SIMPLE but the task carries 2+ context flags from the detection list above (e.g., humanitarian + ECA, Roma + adolescent, multi-country + EU-funded), auto-promote to COMPLEX without asking. Sonnet-tier classification under-classifies on multi-flag tasks; the cost of running COMPLEX on a borderline-SIMPLE task is small; the cost of running SIMPLE on a misclassified COMPLEX is a publication-standard failure.
 
+**Model advisory (Fable-fit check, non-MECHANICAL tasks).** After classifying complexity, assess the task against the Fable-fit advisory rule in `${WORK_FOLDER_ROOT}/agent-improvements/model-selection-policy.md` and emit exactly one line in the plan (COMPLEX) or delivery header (SIMPLE):
+- `Model advisory: FABLE SANCTIONED — <sub-step> matches policy decision <1|3>; mandatory gate: <prose-fidelity | standard QA + no-fabrication>.` (Decision 5 persuasive/donor/management prose never gets this signal — Fable is excluded there.)
+- `Model advisory: FABLE CANDIDATE (UNTESTED) — long-horizon profile matches (single autonomous pass + high mid-chain error cost + ceiling judgement); recommend probe before use; default models stand.`
+- `Model advisory: none.` (the common case)
+The advisory is a signal to Ane, never an automatic switch. If Ane approves acting on a SANCTIONED advisory, carry it into `## Standing instructions` as a bullet so Vi applies the per-call Fable override with the named gate.
+
 **COMPLEX → invoke Researcher before PHASE 2.** Call `Agent(subagent_type="researcher", ...)` with: task objective, domain/context, key research questions (1–5), MEL Wiki pages already read, and any `## Standing instructions`. Receive Evidence Brief delimited `=== EVIDENCE BRIEF === ... === END EVIDENCE BRIEF ===`. Trust it as primary evidence base; do not supplement with own PHASE 1 evidence. If the call returns "unknown agent" or the registry does not include `researcher`, see `## Skill-mode fallback` and proceed inline with Researcher's contract.
 
 ### PHASE 2 — PLAN (COMPLEX only)
