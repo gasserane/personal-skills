@@ -97,6 +97,22 @@ Structure:
 2. Source list with tier ratings AND language tags. Each entry MUST carry a `[lang: <ISO 639-1 code>]` marker (e.g., `[lang: en]`, `[lang: ru]`, `[lang: fr]`, `[lang: ar]`, `[lang: es]`, `[lang: pt]`, `[lang: ro]`). Default to `[lang: en]` only when the source is genuinely English; do not default-tag everything `en`. Li's OVERLAY-DIGEST quarterly counter relies on this field.
 3. MEL Wiki insights — bulleted list of new framework distinctions, new sources, methodological updates worth adding to the wiki. **Each bullet MUST start with a tier tag**: `[TIER 1]` (peer-reviewed source with DOI/PMID), `[TIER 2]` (institutional — WHO/UNFPA/IPPF/UNAIDS/OECD/UN agency), `[TIER 3]` (reputable grey literature — national governments, established INGOs). Tier 1 bullets with verifiable citations auto-merge to wiki via Li (logged to `wiki/log.md`); Tier 2/3 stage to `_pending-ingest.md` for Ane's approval. Untagged bullets default to Tier 3.
 
+### STEP 4B — CITATION VERIFICATION GATE (mandatory, model-independent)
+Before returning, verify every citation in the Artifact A source list. This gate is mandatory regardless of which model drafted the brief: a 2026-06-10 probe found a real-DOI-wrong-authors misattribution that only this step caught. Source of truth: `agent-improvements/model-selection-policy.md` (Gate 1).
+
+Spawn one verifier subagent (Sonnet, web-enabled) with this instruction and the brief's source list:
+
+```
+You are a citation verifier. For EACH citation, use WebSearch/WebFetch to check it against reality. Return one verdict each:
+- REAL+CORRECT: source exists; author(s), year, venue, volume/pages as cited are correct.
+- REAL+MISATTRIBUTED: the source (by DOI/title) exists but cited author(s)/year/venue are WRONG. State the correct attribution.
+- FABRICATED: no such source can be found.
+- UNRESOLVED: could not determine within reasonable search.
+Where two citations share a DOI/title but differ in authors/year, determine the TRUE attribution and mark the other MISATTRIBUTED. Output one verdict line per citation plus a tally (REAL+CORRECT / MISATTRIBUTED / FABRICATED).
+```
+
+Any MISATTRIBUTED or FABRICATED verdict is a FAIL: correct the offending citation (or remove it and re-source) before STEP 5. Never reword an unverifiable citation to look sourced. Record the gate result in Artifact A confidence rationale (e.g. *"All N citations verified REAL+CORRECT"*). If the verifier tool is unavailable, flag each unverified citation `⚠️ URL/attribution unverified — confirm before publication` and note the gate could not run.
+
 ### STEP 5 — RETURN
 Return Artifact A delimited:
 ```
