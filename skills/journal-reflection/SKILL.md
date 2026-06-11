@@ -1,6 +1,6 @@
 ---
 name: journal-reflection
-description: Guide Ane through structured reflection at end of day, end of week, after a decision, or after encountering new learning material. Use when the user says "journal", "reflect on today", "weekly review", "what did I learn", "after-action review", or references writing to the MELdigitalgarden vault. Produces Obsidian-compatible markdown; writes directly to the vault when filesystem MCP is connected, otherwise returns content for manual save.
+description: Guide Ane through structured reflection at end of day, end of week, after a decision, or after encountering new learning material. Use when the user says "journal", "reflect on today", "weekly review", "what did I learn", "after-action review", or references writing to the Obsidian vault. Produces Obsidian-compatible markdown; writes directly to the vault journal (`OBSIDIAN_VAULT_ROOT/5 JURNAL/`) when the vault path is reachable, otherwise returns content for manual save.
 ---
 
 # Journal Reflection
@@ -83,13 +83,14 @@ Body structure: one H2 per prompt, the answer as plain prose under it, no bullet
 
 ## File placement
 
-If filesystem MCP to `MELdigitalgarden` is connected:
-- End-of-day: `src/site/notes/Journal/Daily/YYYY-MM-DD.md`
-- End-of-week: `src/site/notes/Journal/Weekly/YYYY-Www.md`
-- Decision review: `src/site/notes/Journal/Decisions/YYYY-MM-DD-<slug>.md`
-- Learning log: `src/site/notes/Journal/Learning/<slug>.md`
+Vault root: `OBSIDIAN_VAULT_ROOT` (`C:/Users/AGasser/OneDrive/Ane Obsidian Vault` — see the path constants table in `~/.claude/CLAUDE.md`). If the vault path is reachable, write directly with the Write tool:
 
-If MCP is not connected, return the markdown as an artifact and name the target path so the user can save it manually.
+- End-of-day: `5 JURNAL/5a Daily Notes/YYYY-MM-DD.md`
+- End-of-week: `5 JURNAL/5b Weekly Notes/YYYY-Www.md`
+- Decision review: `5 JURNAL/Decisions/YYYY-MM-DD-<slug>.md`
+- Learning log: `5 JURNAL/Learning/<slug>.md`
+
+If the vault path is not reachable (web session, other device), return the markdown in the reply and name the target path so the user can save it manually.
 
 ## Writing rules
 
