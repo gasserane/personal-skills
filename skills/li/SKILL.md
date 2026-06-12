@@ -257,6 +257,7 @@ If all overlays empty AND `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/me
 5. **Overlay hygiene:** check four overlay files for stale entries (same entry across 10+ runs without consolidation), broken format (missing date or task-slug), and `coordination-log.md` entries whose "Proposed fix" names an agent with no matching overlay entry.
 6. **Ad-hoc capture coverage:** Sample three recent multi-source MEL/SRHR deliveries from `coordination-log.md` or session logs; for each, check whether a corresponding `literature-reviews/[date]_[slug]/` folder exists in `3. Ane's RESURSE/CLAUDE MEL new RESOURCES/`. Missing folders for sessions with 3+ verified sources → flag `⚠️ AD-HOC GAP: session [date] delivered [task] with [N] sources but no ad-hoc capture folder — Ann PHASE 4.5 may have skipped`. This catches drift on the ad-hoc capture pattern.
 7. Append summary to `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/log.md`. Return prioritised fix list.
+8. Mark the maintenance cadence: `python ~/.claude/hooks/maintenance_due.py --mark li-lint 2>/dev/null || true` (no-op on machines without the hook, e.g. web containers).
 
 ### CURATE — Consolidate overlays and propose skill updates
 **Trigger:** weekly | any overlay file >10 Active entries | Ane: `/li curate`.
