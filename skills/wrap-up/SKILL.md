@@ -38,6 +38,9 @@ Identify anything Ane said she would do or that was left open:
 **4. Uncommitted changes risk**
 If there are uncommitted files, run `git diff --stat` to assess what is at risk of being lost.
 
+**4b. QA rejection log (project-aware)**
+If this session ran Ann/Vi orchestration (any qa_block was produced) AND `agent-improvements/qa-rejection-log.md` exists in the repo, append one row per orchestrated run to its table: Date, Task slug, overall_verdict, Re-delegations (count), Rejection/flag reasons (≤15 words each, semicolon-separated, `—` if verdict was clean PASS). This log is the improvement loop's metric — `/improve-system` reads it to detect recurring failure patterns and to trend the rejection rate over time. Skip silently if no qa_block was produced this session or the log file is absent.
+
 **5. Desktop / claude.ai export drift (project-aware)**
 If `scripts/check_desktop_sync.py` exists in the repo root, run `python scripts/check_desktop_sync.py`. This surfaces claude.ai Desktop project files that drifted since the last upload (the claude.ai project has no file API, so this surface is always a manual re-upload). If it reports `[DRIFT]`, list the export files Ane must re-upload to the claude.ai Desktop project, and the `--mark-synced` follow-up. If it reports no drift, or the script does not exist, skip this section silently.
 

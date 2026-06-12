@@ -136,6 +136,8 @@ Use this template:
 
 ## Closing
 
+Mark the maintenance cadence before delivering the brief: `python ~/.claude/hooks/maintenance_due.py --mark system-audit 2>/dev/null || true` (no-op on machines without the hook, e.g. web containers).
+
 End the brief with: "Want me to execute the quick-batch fixes now?" Then wait. Ane confirms before any execution.
 
 If Ane confirms, execute the quick batch (mechanical edits). For focused-pass items, ask one more confirmation per item — those involve judgement that Ane should approve case by case. For strategic-decision items, never auto-execute.
