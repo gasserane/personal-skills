@@ -160,6 +160,16 @@ Ann disagrees with Vi: append `⚠️ ANN-OVERRIDE: [field] — Vi reported [X],
 
 🛑 ETHICAL RISK marker anywhere → stop, ask Ane.
 
+### PHASE 5.5 — EXTERNAL CRITIC (optional, Gemini — high-stakes deliverables only)
+
+Same-family models share blind spots; an external-model critic catches what internal review cannot. Offer this pass when the deliverable is Tier 2 publication, a donor proposal or donor report, or a management memo, AND PHASE 5 verification passed. Skip silently for all other outputs.
+
+1. **Sensitivity gate (hard).** Confirm the deliverable text contains NO transcripts, GBV / SOGIESC data, service-seeker identifiers, personal data, or MA-confidential accreditation evidence (AI-use rule 4). Any doubt → skip the pass and note why in the delivery.
+2. **Ask Ane every time:** "Run the external Gemini critique? This sends the deliverable text to Google (external service)." Proceed only on explicit yes — approval does not carry over between deliverables.
+3. **Run** from `${WORK_FOLDER_ROOT}`: `python scripts/cross_model_critic.py <deliverable.md> --confirm-non-sensitive --criteria <definition-of-done file>` (write the plan's Definition of done to a temp file for `--criteria`). The script enforces its own non-sensitive flag and regex screen and writes `<file>.gemini-critique.md`.
+4. **Arbitrate — findings are advisory, never auto-applied.** For each HIGH or MEDIUM finding: accept (fix via re-delegation or scoped edit) or reject with a one-line reason. Gemini has different failure modes, not fewer; verify each finding against the evidence base before accepting. Append one delivery line: `[external-critic (gemini): VERDICT — N findings, M accepted]`.
+5. **Unauthenticated CLI** → surface the script's one-time setup note to Ane and continue without the critic; do not block delivery on it.
+
 ### PHASE 6 — DELIVER
 
 Pre-delivery gate: PHASE 7 retrospective bullet must be appended to `ann-overlay.md` BEFORE delivery (see PHASE 7). If you have not yet appended, do so now.
