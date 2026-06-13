@@ -327,7 +327,9 @@ Return: *"CURATE complete — [N] skills updated — overlays archived — harne
 
 **Purpose:** Keep claude.ai project knowledge in sync with Claude Code canonical (`C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/domain-standards.md`). Direction: Code → claude.ai. Note: the PostToolUse hook auto-syncs root claude-ai files to `claude-ai-shareable-export/` after every Edit/Write — this operation produces a structured diff for Ane to re-paste into the claude.ai Project UI when the canonical content has shifted.
 
-**claude.ai files in scope:** `claude-ai-project-instructions.md`, `mel-framework-reference.md`, `writing-style-guide.md`, `calibration-examples.md`.
+**claude.ai files in scope:** `claude-ai-project-instructions.md`, `mel-framework-reference.md`, `mel-concepts-reference.md`, `writing-style-guide.md`, `calibration-examples.md`.
+
+**Concept pages flow to claude.ai as an aggregate** (decision 2026-06-13: concept pages should reach the Desktop/web project). `mel-concepts-reference.md` is the concept-side analogue of `mel-framework-reference.md` — one pasteable mirror of every `mel_wiki/wiki/concepts/*.md` lead summary, generated, not hand-maintained. It is byte-stable across regens, so it only diffs when a concept page actually changed.
 
 **Steps:**
 1. Read `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/domain-standards.md` — extract Current authoritative versions table, Pending verification list, Citation errors to actively avoid.
@@ -337,6 +339,7 @@ Return: *"CURATE complete — [N] skills updated — overlays archived — harne
 5. Citation-errors-to-actively-avoid: any error pattern not yet appearing as a warning in `mel-framework-reference.md` → diff as `ADD WARNING`.
 6. Compare wiki `calibration.md` patterns to `calibration-examples.md`: new patterns → diff.
 7. New framework pages added to wiki without entries in `mel-framework-reference.md` → diff as `ADD framework entry`.
+7b. Concept pages: if any `mel_wiki/wiki/concepts/*.md` was added or changed, regenerate the aggregate with `python scripts/build_concepts_reference.py`, then `python sync_shareable_export.py`. Flag `mel-concepts-reference.md` for re-paste. Do not hand-edit it — it is generated.
 8. Write diffs to `agent-improvements/PROPOSED-CLAUDE-AI-SYNC.md` with sections: `# Proposed claude.ai sync — [YYYY-MM-DD]`, `*Status: AWAITING ANE'S RE-PASTE TO CLAUDE.AI PROJECT*`, then per-file diff blocks (Citation corrections, Additions, Pending verification updates, Warnings to add, Calibration pattern updates, New framework entries), and a final "How to apply" section: open the working-folder file → apply diff blocks → re-paste full updated content into claude.ai Project knowledge → mark `Status: COMPLETED [YYYY-MM-DD]`.
 9. Surface to Ane: *"SYNC complete — diff ready in PROPOSED-CLAUDE-AI-SYNC.md. [N] citation corrections; [M] additions; [P] warnings."*
 10. After Ane confirms re-paste: append to `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/log.md`: `[YYYY-MM-DD HH:MM] SYNC-CLAUDE-AI: claude.ai updated — [N] changes`.
