@@ -96,6 +96,17 @@ When you re-run on a template Ane has already reviewed, **treat her current text
 authoritative**: re-read the cells first and build on her edits (she may sharpen a verdict or
 flag a missing document). Preserve her wording and judgements; enhance around them.
 
+## Cross-cycle (longitudinal) mode
+
+When a prior-cycle desk review or accreditation record for the same MA is available, the review is no longer a single snapshot — it is a point on a trajectory. Run the longitudinal comparison and read the method first: `mel_wiki/wiki/concepts/longitudinal-trajectory-analysis.md`.
+
+1. **Map prior-cycle standards to current-cycle standards before comparing anything.** Cycle 3 and Cycle 4 standards are not identical; some are new, dropped, or re-worded. A check the MA "fails" now that it "passed" before may be a real regression OR a stricter/new check. Name which it is for each changed verdict — an un-mapped cross-cycle comparison is a data gap, not a finding.
+2. **Surface recurring non-compliances and reversals.** A gap flagged in the prior cycle and still open this cycle is the highest-signal interview item (it survived a full cycle of attention). A standard that was compliant and now is not is a reversal worth a direct question.
+3. **Feed the trajectory to the interview stage**, tagged like any other item (NC = persistent/new non-compliance; CL = clarify whether a change is real or criteria-driven).
+4. Hold contribution, not attribution, across cycles, and keep the equity-of-change lens: which marginalised-group commitments improved, and which slipped, between cycles.
+
+This mode is additive — the per-standard desk review still runs in full; the cross-cycle read sits on top of it.
+
 ## Output format
 
 **Reviewer block** (purple `RGB 7030A0`, appended below existing cell text):
