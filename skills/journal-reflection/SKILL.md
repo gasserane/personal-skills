@@ -19,6 +19,7 @@ Ask once, in one prompt, which mode applies. Default to end-of-day if the user s
 2. **End-of-week** (15 min): week in 5 questions plus a pattern scan
 3. **Decision review**: one past decision in 4 questions
 4. **Learning log**: one new framework or concept, linked to what Ane already knows
+5. **Post-deliverable capture** (2 min): the 3-line "what did I learn" after finishing a deliverable, appended to a running log. Lighter than mode 4 (no framework deep-dive); deliverable-triggered, not concept-triggered. /wrap-up offers this at session end; Ane can also trigger it directly any time.
 
 ## Prompts by mode
 
@@ -64,6 +65,16 @@ Ask:
 3. How does it connect to something Ane already uses?
 4. Where will Ane apply it first?
 
+### Post-deliverable capture
+
+Ask these three, one at a time. Keep each answer to one line; this is a fast capture, not a full reflection.
+
+1. What did this deliverable teach you about the work?
+2. What would you do differently next time?
+3. One thing to carry forward.
+
+If Ane gives the deliverable a name or slug, use it; otherwise ask for a 2–4 word label. This mode appends to a single running log (see File placement) rather than creating one file per entry.
+
 ## Output format
 
 Write Obsidian-compatible markdown with YAML frontmatter:
@@ -89,6 +100,7 @@ Vault root: `OBSIDIAN_VAULT_ROOT` (`C:/Users/AGasser/OneDrive/Ane Obsidian Vault
 - End-of-week: `5 JURNAL/5b Weekly Notes/YYYY-Www.md`
 - Decision review: `5 JURNAL/Decisions/YYYY-MM-DD-<slug>.md`
 - Learning log: `5 JURNAL/Learning/<slug>.md`
+- Post-deliverable capture: append to `5 JURNAL/Learning/deliverable-learning-log.md` (single running log). If the file does not exist, create it with the YAML frontmatter (`type: learning-log`) and an H1, then add the first entry. If it exists, append a new `## YYYY-MM-DD — <deliverable label>` section with the three answers as bullets, preserving all prior entries byte-identical (edit-preservation).
 
 If the vault path is not reachable (web session, other device), return the markdown in the reply and name the target path so the user can save it manually.
 

@@ -118,3 +118,20 @@ COMMIT & PUSH
 ```
 
 If the working tree was already clean and there were no unpushed commits, omit this section entirely.
+
+## Post-deliverable learning capture (project-aware, vault-coupled)
+
+This is the human-learning loop counterpart to check 4b (the system-learning loop). Step 4b feeds the *system*; this step feeds *Ane*. Run it LAST, after commit and push, so a skip or an unreachable vault never blocks the safety-critical commit.
+
+**When to offer.** Only when this session produced a substantive deliverable (an analytic, evaluation, knowledge, SRHR, or structured output Ane will use or send) AND the Obsidian vault is reachable at `OBSIDIAN_VAULT_ROOT` (`C:/Users/AGasser/OneDrive/Ane Obsidian Vault`). Skip silently for pure maintenance, debugging, or system-plumbing sessions, and skip silently on web / off-device where the vault is not provisioned.
+
+**What to do.** Offer once, in one line: `3-line learning capture? (enter to start / skip)`. Wait for Ane.
+- If she skips, write nothing and end.
+- If she starts, run the `journal-reflection` **Post-deliverable capture** mode (the three questions: what it taught you about the work; what you'd do differently; one thing to carry forward) and append the answers to `5 JURNAL/Learning/deliverable-learning-log.md` per that skill's File-placement rule (running log, edit-preservation, create with frontmatter if absent). Do not auto-answer the prompts; her words go in verbatim.
+
+**Confirm.** If a capture was written, append to the report:
+```
+LEARNING CAPTURE
+  ✅ Appended to 5 JURNAL/Learning/deliverable-learning-log.md
+```
+Omit the section entirely when not offered or skipped.
