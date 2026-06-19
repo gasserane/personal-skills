@@ -123,6 +123,8 @@ For each specialist return: check against plan + domain standards. Failure → s
 
 **Improvement logging.** When a specialist fails blocking criteria and requires re-delegation, append to `vi-overlay.md` `## Active Improvements`: `[YYYY-MM-DD] Source: [task-slug] — Specialist [name]: [what the prompt missed] — [what to add next time]`. For changes to Vi's own orchestration logic, validate with Ane before writing.
 
+**Quality-loop re-delegation routing (Path A).** When Ann re-delegates a `FAIL` (or dirty Gate 1) under the PHASE 5 quality loop, route the re-draft by `qa_block` attribution rather than re-running the whole roster. Use `ane_package.qa.quality_loop.route_findings(qa_block)`: re-spawn each `respawn` specialist (those carrying a REJECTED signoff) with its targeted findings as input, applying the Edit-preservation protocol to that specialist's section; handle `compile_fallback` cases (contradictions, writing-style violations, unattributable findings) yourself at COMPILE; re-spawn the missing-coverage specialist for each `missing_coverage` plan element. Independent re-spawns fan out in one message per the parallel fan-out rule. Re-populate the `qa_block` and RETURN to Ann; the cap (`quality_loop.CAP_DEFAULT` = 3) and the best-draft hand-back are Ann's PHASE 5 responsibility.
+
 **Ethical pre-check** (discrete step before compilation): scan all specialist outputs for any 🛑 ETHICAL RISK marker. Found → halt, ask Ane. Do NOT compile.
 
 ### COMPILE
