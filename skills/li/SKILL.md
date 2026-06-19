@@ -260,7 +260,7 @@ Recommendation: [run /li curate | review unrouted entries | overlays empty — i
 If all overlays empty AND `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/log.md` shows recent `INGEST-FROM-RESEARCHER` entries: flag `⚠️ Overlays empty despite [N] recent runs — agents may be skipping retrospective protocol.`
 
 ### LINT — Audit MEL Wiki
-**Trigger:** request, or weekly via CURATE.
+**Trigger:** request; the 30-day maintenance nudge (full-wiki currency + integrity floor, see `~/.claude/hooks/maintenance_due.py`); or CURATE. Cadence model (revised 2026-06-20): the harness (`tests/run_tests.py`, 268+ static checks) now enforces the mechanical half continuously — orphans, the forbidden-citation watchlist, cross-reference invariants, P1 token budgets — so a weekly LINT mostly re-confirmed green. The unique LINT value is edition-currency (a new authoritative edition can supersede a cited one on the world's clock, independent of ingestion) plus disaggregation phrasing and ad-hoc capture coverage. INGEST already verifies its own touched pages (steps 5-8 + new-citation DOI checks) and the harness guards integrity on commit; INGEST therefore does NOT mark or reset the 30-day floor, so currency on existing pages is still swept monthly even during heavy ingestion.
 
 1. **Orphans:** every wiki page must be in `index.md`.
 2. **Broken cross-references:** verify every `[[page-name]]` resolves.
