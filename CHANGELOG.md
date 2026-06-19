@@ -2,6 +2,19 @@
 
 All notable changes to the Ann / Vi / Li / Researcher skill set are documented here.
 
+## [2026-06-19] — New skill: grill-mel (MEL-aware grilling)
+
+**Skills affected:** grill-mel (new)
+
+### grill-mel
+- **New skill.** A relentless one-question-at-a-time interview that stress-tests a MEL/SRHR design (ToC, evaluation, indicator set, results framework, proposal angle, learning question) before drafting. The MEL-aware sibling of Matt Pocock's generic `grilling` skill.
+- Walks ten MEL branches (purpose-and-use, audience-and-tier, outcome altitude, tested-vs-untested assumptions, attribution-vs-contribution, OECD-DAC six-criteria coverage, indicators-and-disaggregation, substantive lens application, data-gaps-and-feasibility, evidence-and-sources).
+- Recommends an answer for every question; applies Tier 1 voice (plain English, translatability, no em-dashes); probes from three perspectives on contested branches; enforces the factual-reliability rule (flag-and-ask, never invent a fact about IPPF/MAs/contacts); hands off to `/toc-builder`, `/indicator-designer`, `/evidence-synthesis`, `/proposal`, or `/ann` rather than drafting itself.
+
+**Why:** On 2026-06-19, five Matt Pocock engineering skills were reviewed and installed. Their grilling/domain skills are code-shaped; Ane's work is ~90% non-code MEL/SRHR. `grill-mel` ports the interview discipline onto the MEL branches that decide whether a design survives scrutiny. Routing between `grill-mel`, `/ann`, `brainstorming`, and the generic `grilling` is laned in the work-folder `CLAUDE.md` § Skill routing.
+
+---
+
 ## [2026-04-29] — Verified hyperlinks + recency check on every cited source
 
 **Skills affected:** mel-framework-citation
