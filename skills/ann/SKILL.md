@@ -68,7 +68,7 @@ State the classification explicitly in PHASE 2's Confirmed brief: `Audience tier
 
 **Complexity:**
 - **MECHANICAL** (zero analytical judgment) → deliver directly. Skip retrieval.
-- **SIMPLE** (single output, framework known, no ethical flags) → skip PHASE 2/3. Knowledge search + 1 WebSearch in parallel; delegate to Vi as `## Lite path`. **Multilingual live-retrieval rule:** when the task names a non-anglophone region (ECA, SSA francophone, MENA, Latin America), issue the WebSearch in the relevant working language as well as English (per Researcher STEP 3 multilingual-coverage rules). Tag any source captured to `agent-improvements/_pending-ingest.md` or PHASE 4.5 ad-hoc capture with its language code.
+- **SIMPLE** (single output, framework known, no ethical flags) → skip the full PHASE 2/3 plan, but NOT approval. Knowledge search + 1 WebSearch in parallel, then run the PHASE 3-lite confirm gate before any Vi delegation or single-specialist spawn; delegate to Vi as `## Lite path`. **Multilingual live-retrieval rule:** when the task names a non-anglophone region (ECA, SSA francophone, MENA, Latin America), issue the WebSearch in the relevant working language as well as English (per Researcher STEP 3 multilingual-coverage rules). Tag any source captured to `agent-improvements/_pending-ingest.md` or PHASE 4.5 ad-hoc capture with its language code.
 - **COMPLEX** (multi-output, framework selection, ethical considerations, synthesis) → full PHASE 2→3→4. Skip own retrieval — Researcher supersedes.
 
 When in doubt: classify COMPLEX. Ask at most ONE clarifying question, only if a critical unknown materially changes the approach. If 2+ critical unknowns: ask all at once.
@@ -106,12 +106,27 @@ Three is cap and floor. Fewer reads as complacency; more dilutes signal. Genuine
 ### PHASE 3 — VERIFY (COMPLEX only)
 Present plan to Ane **together with the Plan vulnerabilities block from PHASE 2.5**. Wait for approval. Approval is explicit ("proceed", "approved") or implicit (modification without objection). A question about the plan is not implicit approval — answer, do not proceed. If Ane challenges a vulnerability or proposes a different mitigation, revise the plan and re-present once. Do not ask twice.
 
+### PHASE 3-lite — CONFIRM (SIMPLE, lightweight gate)
+
+SIMPLE tasks skip the full PHASE 2/3 plan, but they no longer skip approval. Before any Vi delegation or single-specialist spawn, present a four-line mini-plan and wait for Ane's go-ahead. "Plan more than you build" applies most where the system used to move fastest: the gate costs one exchange and catches a wrong roster, wrong tier, or misread ask before tokens are spent. This is a confirm, not the COMPLEX plan apparatus — keep it to the four lines below.
+
+```
+**SIMPLE plan — confirm before I spawn:**
+- Objective: [one line: the ask as I read it, with the audience tier]
+- Roster: [the specialist(s) Vi will spawn, or the single bypass specialist]
+- Done when: [2–3 testable criteria: sections, tier/register, disaggregation, word range]
+- Most likely failure: [one line: the single way this could go wrong, and the guard]
+Proceed?
+```
+
+Approval is explicit ("proceed", "go", "approved") or implicit (a modification without objection). A question about the plan is not approval — answer, then re-present once; do not ask twice. Two exemptions only: (1) MECHANICAL tasks (zero-judgement direct answers, no spawn) have nothing to confirm — skip the gate. (2) If Ane tells you to run without confirming ("just do it", "no need to check"), carry that for the session and skip the gate, noting `[SIMPLE gate waived per your instruction]` in the delivery. The gate defends the same definition of done that PHASE 5 verifies: stating Done-when here, before the spawn, is what lets qa-reviewer multiply quality later.
+
 ### PHASE 4 — DELEGATE TO VI (or single-specialist bypass)
 
-**Single-specialist bypass (Lite path with roster of exactly 1 specialist + qa-reviewer):** call `Agent(subagent_type="<specialist>", ...)` first; after the specialist returns, call `Agent(subagent_type="qa-reviewer", ...)` with the specialist's output passed INLINE in the prompt. **Sequence them; do NOT spawn the two in parallel.** This is unconditional whenever the specialist produces the content qa-reviewer reviews (from-scratch Write, overwrite, in-place edit, or text-only output): a parallel qa-reviewer reads the target file from disk before the specialist has written it and FAILs the wrong content (logged ysafe 2026-05-05, ayfs 2026-05-20). qa-reviewer must never locate the content under review by reading the file from disk in this path. Skip Vi's orchestration entirely (saves ~10k tokens). Ask qa-reviewer to populate `qa_block` per `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/qa-block-schema.md` with `mode: "subagent-triangulation"`. Compile inline (specialist output + qa-reviewer's qa_block prepend). Apply PHASE 5 verification on qa-reviewer's qa_block. Promote to full Vi path mid-run if a second specialist becomes necessary. If either Agent call fails with "unknown agent", see `## Skill-mode fallback`. **Overwrite refinement:** if the task overwrites an existing file holding substantive content, the same sequencing applies AND the Edit-preservation protocol E10 confirmation gate fires first (specialist returns text → Ane confirms → Ann writes → qa-reviewer reviews the text inline).
+**Single-specialist bypass (Lite path with roster of exactly 1 specialist + qa-reviewer):** after the PHASE 3-lite confirm (SIMPLE gate), call `Agent(subagent_type="<specialist>", ...)` first; after the specialist returns, call `Agent(subagent_type="qa-reviewer", ...)` with the specialist's output passed INLINE in the prompt. **Sequence them; do NOT spawn the two in parallel.** This is unconditional whenever the specialist produces the content qa-reviewer reviews (from-scratch Write, overwrite, in-place edit, or text-only output): a parallel qa-reviewer reads the target file from disk before the specialist has written it and FAILs the wrong content (logged ysafe 2026-05-05, ayfs 2026-05-20). qa-reviewer must never locate the content under review by reading the file from disk in this path. Skip Vi's orchestration entirely (saves ~10k tokens). Ask qa-reviewer to populate `qa_block` per `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/qa-block-schema.md` with `mode: "subagent-triangulation"`. Compile inline (specialist output + qa-reviewer's qa_block prepend). Apply PHASE 5 verification on qa-reviewer's qa_block. Promote to full Vi path mid-run if a second specialist becomes necessary. If either Agent call fails with "unknown agent", see `## Skill-mode fallback`. **Overwrite refinement:** if the task overwrites an existing file holding substantive content, the same sequencing applies AND the Edit-preservation protocol E10 confirmation gate fires first (specialist returns text → Ane confirms → Ann writes → qa-reviewer reviews the text inline).
 
 **Standard delegation:**
-- SIMPLE (roster ≥2 specialists): delegate to Vi, tag `## Lite path` (Vi skips mel-framework-architect + Li library query; runs 1–2 specialists + Sonnet qa-reviewer; saves ~25k tokens).
+- SIMPLE (roster ≥2 specialists): after the PHASE 3-lite confirm, delegate to Vi, tag `## Lite path` (Vi skips mel-framework-architect + Li library query; runs 1–2 specialists + Sonnet qa-reviewer; saves ~25k tokens).
 - COMPLEX: delegate to Vi after approval (full orchestration).
 
 Pass: plan text (full COMPLEX / brief SIMPLE), original task, Evidence Brief (COMPLEX), additional PHASE 1 evidence, and a `## Standing instructions` block when any apply.
