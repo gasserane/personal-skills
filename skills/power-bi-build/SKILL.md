@@ -1,7 +1,7 @@
 ---
 name: power-bi-build
 description: Build IPPF-branded Power BI artefacts from analytical input. Use when Ane asks to build, scaffold, or update a Power BI dashboard, semantic model, DAX measures, or .pbip project. Applies IPPF Visual Identity 2025 brand, MEL-standard DAX measures, and three standard page recipes (indicator dashboard, equity disaggregation, methodology card). Requires the pbi CLI (pbi-cli-tool, command name `pbi`) installed and Power BI Desktop running with a .pbip open.
-version: 1.0.1
+version: 1.1.0
 trigger_keywords:
   - power bi
   - powerbi
@@ -26,6 +26,8 @@ The `pbi` CLI (package `pbi-cli-tool`, command name `pbi`) wraps a Power BI MCP 
 - ❌ No `pbi page` or `pbi visual` command. Pages and visuals are created manually in Power BI Desktop using the staging recipe JSONs as a guide.
 
 When the upstream tool adds report-layer commands, this skill will absorb them. v1 ships with the scope above.
+
+**Two routes.** The v1 flow below (`pbi` CLI for measures + theme + staged page recipes) suits an existing model the user keeps building by hand. When the source is an **Excel workbook** and the user wants a **complete, working dashboard handed over** (data loaded, measures, theme, and report pages all built), use the **full `.pbip` authoring route** in the dedicated section below instead. That route was validated end-to-end (CERV Portfolio Dashboard, 2026-06-20).
 
 ## Pre-flight
 
@@ -152,6 +154,38 @@ powerbi-build-output/page_cyp_total-dashboard.json
 
 v2 will automate page creation once the upstream pbi-cli adds report-layer support, or once we wire a direct PBIR writer.
 
+## Full `.pbip` authoring from Excel (full-handover route)
+
+Use when the source is an Excel workbook and the user wants a complete working dashboard, not staged recipes. Author the entire `.pbip` from a **Python generator** (one re-runnable script), because the `pbi` CLI cannot import Excel data (DataSourceOperationsTool is skipped in PowerBI compat mode) and has no report page/visual API. Reference build: `${WORK_FOLDER_ROOT}/scripts/gen_cerv_dashboard_pbip.py`.
+
+**Apply `mel_wiki/wiki/concepts/edit-preservation-protocol.md` when the target `.pbip` already exists.** Author into a NEW project folder if the user has the target open (avoids the file lock); they close-without-saving and reopen.
+
+**Procedure:**
+1. **Mirror the schema.** Read an existing empty `.pbip`'s skeleton and copy its exact versions (compatibilityLevel 1600; report.json 3.3.0; visual 2.9.0; page 2.1.0; pbism 4.2). Require the PBIP + PBIR preview features enabled in Desktop.
+2. **Inspect the Excel** with openpyxl: sheet names, exact header strings (no stripping — trailing spaces break column refs), header row position, and value types per column. Reconcile expected aggregates against any existing in-workbook dashboard tabs.
+3. **Author the SemanticModel TMDL** (TAB-indented): `database.tmdl`, `model.tmdl` (with `ref table X` lines + `relationship` blocks), `cultures/`, and `tables/*.tmdl` (columns + measures + an M `partition`). The M block is indented deeper than `source =`.
+4. **Author the report PBIR**: `definition.pbir` (relative `byPath` to the SemanticModel — this link survives folder moves), `report.json` (register the IPPF custom theme + base theme), `pages/<id>/page.json`, and `pages/<id>/visuals/<id>/visual.json`.
+5. **Reconcile measures** against source aggregates, then have the user open + Refresh. After load, verify via the CLI: `pbi connect`, then `pbi dax execute "EVALUATE <Table>"` and read `RowCount=` (the CLI does NOT print cell values; use a table EVALUATE and read the row count).
+
+**Power Query M gotchas (each cost a refresh-error cycle — apply pre-emptively):**
+- `Excel.Workbook(File.Contents(path), null, true)` **drops leading fully-blank rows**, so a fixed `Table.Skip(n)` misaligns the header. Locate it dynamically: `HeaderRow = List.PositionOf(Sheet[Column1], "<key header>")`, then `Table.Skip(Sheet, HeaderRow)`, then `Table.PromoteHeaders(.., [PromoteAllScalars=true])`.
+- It is `List.PositionOf` (list + value), NOT `Table.PositionOf` (table + record) — the latter throws "cannot convert List to Table".
+- **Only hard-type columns the dashboard needs** (amounts → `type number`, counts → `Int64.Type`). Typing computed / "(auto)" columns throws per-cell "N errors" when they return non-numeric ("" / "Pending") for not-yet-filled rows. Leave those untyped.
+- Multi-row / merged-header sheets: skip PromoteHeaders; use positional `Table.Range` + `Table.SelectColumns({"Column1",...})` + rename.
+- M file paths are literal (no backslash escaping). Put the source path once in a shared expression or inline consistently.
+
+**PBIR visual JSON (authored blind, all rendered correctly):** minimal `visual.query.queryState.<role>.projections[{field:{Measure|Column:{Expression:{SourceRef:{Entity}},Property}}, queryRef:"Entity.Prop", nativeQueryRef:"Prop"}]`. Roles: `card`→`Values`; `clusteredColumnChart`/`clusteredBarChart`→`Category`+`Y` (omit `Category` for a multi-measure chart); `tableEx`→`Values` (list). Omit title objects — let the IPPF theme and auto-titles style everything. Extras: slicer multi-select + Select-all = `objects.selection[{properties:{singleSelect:{Literal false}, selectAllCheckboxEnabled:{Literal true}}}]`; nav bar = visualType `pageNavigator`; logo = visualType `image` with `ResourcePackageItem(RegisteredResources)` + copy the PNG into `StaticResources/RegisteredResources/` + register in report.json; header band = textbox with `visualContainerObjects.background`.
+
+**Layout that reads well (1280×720):** compact full-width slicer strip (slicers render as dropdowns), KPI cards row, then large charts spanning the full width — avoid a part-width slicer row that wastes the band to its right. Set page `displayOption` to `FitToWidth` so it fills the monitor and scrolls vertically.
+
+## Distribution & licensing (advise the user)
+
+- `.pbip` is a **dev/source-control format** — it opens **empty until refreshed**, wrong for novices.
+- For novice viewers, hand out a **`.pbix`** (File → Save As → `.pbix` embeds the data, opens populated, needs no licence). Only Power BI Desktop can write a `.pbix`; no CLI/script can, and embedding data needs a live refresh first.
+- **Power BI Service** publishing lets free-tier colleagues view ONLY if the workspace is on **Premium (P SKU) or Fabric F64+ capacity**; otherwise every viewer also needs **Pro/PPU**. Never use "Publish to web" for sensitive (SRHR / finance / sub-grantee) data — it is public.
+- The page-navigator and buttons navigate on **single-click in Reading view / published**, **Ctrl+click in Editing view** (inherent Power BI behaviour, not a bug).
+- An Excel source referenced by absolute local/OneDrive path **breaks if moved to SharePoint**. Repoint via the SharePoint connector for cloud scheduled refresh; refresh re-reads the source each time.
+
 ## Output (Tier 1 working brief)
 
 ```
@@ -181,3 +215,8 @@ Source: {derived source line}.
 | Theme import fails with `oneOf` validation error referencing the same key after a fix | Power BI Desktop cached the previous failed parse by filename | Rewrite the theme JSON under a `-v2` (or `-v3`) filename and re-browse. See Apply step 2. |
 | `pbi table refresh` fails with `Invalid operation: Refresh` | pbi-cli 0.5.6 sends `Refresh` op-name; MCP server only accepts `REFRESHWITHXMLA` / `REFRESHWITHAPI` | Upstream pbi-cli bug. Workaround: trigger refresh manually in Power BI Desktop (Home → Refresh). |
 | `pbi measure get` or `pbi table export-tmdl` fails with `References is required` | pbi-cli 0.5.6 doesn't pass the References parameter to the MCP server | Upstream pbi-cli bug. Use `pbi measure list --table <name>` to confirm a measure exists; use Power BI Desktop's Tabular Editor view for TMDL inspection. |
+| Refresh: "The column '<key>' of the table wasn't found" (promote-header tables) | `Excel.Workbook` dropped a leading blank row, so a fixed `Table.Skip` misaligned the header | Find the header dynamically: `Table.Skip(Sheet, List.PositionOf(Sheet[Column1], "<key>"))`. See full-authoring route. |
+| Refresh: "We cannot convert a value of type List to type Table" | Used `Table.PositionOf` on a column | Use `List.PositionOf(list, value)`, not `Table.PositionOf(table, record)`. |
+| Refresh: "N rows loaded. M errors" on one table | A typed computed/"(auto)" column returns non-numeric for not-yet-filled rows | Drop the type conversion on that column; type only columns the dashboard needs. |
+| Report opens but every visual is blank after refresh | Import model loaded 0 rows (M failed) — not a binding bug | Connect with `pbi`, run `pbi dax execute "EVALUATE <Table>"`, read `RowCount=`; fix the M, not the visuals. |
+| Recipient opens the `.pbip` to an empty report | `.pbip` stores no data; opens empty until refresh | Distribute a `.pbix` (embeds data) or publish to Service. See Distribution & licensing. |
