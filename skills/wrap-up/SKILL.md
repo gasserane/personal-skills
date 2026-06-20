@@ -119,6 +119,29 @@ COMMIT & PUSH
 
 If the working tree was already clean and there were no unpushed commits, omit this section entirely.
 
+## Skill-improvement capture (session-end, opt-in)
+
+A third learning loop, distinct from the other two. Check 4b feeds `/improve-system` with *recurring, cross-session* QA-failure patterns; the learning capture below feeds *Ane*. This step captures a **single-session, generalizable improvement to a skill that was actually used this session** — a gotcha that will recur, a missing step that caused rework, or a newly-proven capability the skill does not yet document. Run it after commit and push so it never blocks the safety-critical commit.
+
+**When to offer.** Only when BOTH hold: (a) one or more skills were invoked this session, AND (b) a concrete, generalizable change to one of them would have saved time or prevented an error this session. Skip silently otherwise. Do NOT offer for project-specific facts (those go to auto-memory, not the skill), for trivia, or for recurring cross-session patterns (those are `/improve-system`'s job).
+
+**What to do.**
+1. **Propose, concretely.** List each candidate as one line: `skill-name — <the change> — <why, tied to what happened this session>`. No vague "could improve X".
+2. **Ask once, default no.** `Apply these skill improvements? (per skill: y/n, or skip all)`. Wait for Ane. Edit nothing without her explicit yes.
+3. **For each confirmed improvement:**
+   - Edit the skill's **repo clone**, never the live `~/.claude/skills/<name>` junction (the SessionStart `npx skills add` overwrites the junction from the repo). For Ane's skills the clone is `~/OneDrive/GitHub/personal-skills/skills/<name>/SKILL.md`; for a third-party skill, its own repo.
+   - Apply `edit-preservation`: scope-bounded, add rather than rewrite, every line outside the change byte-identical. Bump the skill `version`.
+4. **Commit + push** that repo (single-quoted heredoc message, conventional prefix, `Co-Authored-By` footer per CLAUDE.md).
+5. **Skills-lock.** For **non-core** skills, SKIP the lock-regen — it is the documented exception (the harness `check_skill_repo_chain` validates only clone-clean/synced + the core-agent names, not per-skill hashes; regenerating from the repo root turns `skills/<name>` into symlinks and dirties the clone). For **core agents** (ann/vi/li/researcher), run `npx skills add gasserane/personal-skills --all -y` (NO `--global`) from the repo root, then clean up the symlink churn with `git clean` — NEVER `rm -rf .agents` (it deletes through the symlinks).
+6. The change goes live on the **next session start** (the `--global` install pulls the repo); say so.
+
+**Confirm.** If any skill was updated, append to the report:
+```
+SKILL IMPROVEMENTS
+  ✅ <skill> v<old>→<new> — <one-line change> (committed <sha>, live next session)
+```
+Omit the section entirely when not offered or declined.
+
 ## Post-deliverable learning capture (project-aware, vault-coupled)
 
 This is the human-learning loop counterpart to check 4b (the system-learning loop). Step 4b feeds the *system*; this step feeds *Ane*. Run it LAST, after commit and push, so a skip or an unreachable vault never blocks the safety-critical commit.
