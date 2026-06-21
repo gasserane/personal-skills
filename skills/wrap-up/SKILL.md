@@ -142,6 +142,35 @@ SKILL IMPROVEMENTS
 ```
 Omit the section entirely when not offered or declined.
 
+## Skill-fit scan — should a skill exist for this work? (session-end signal, no writes)
+
+Distinct from the inline loop above. *Skill-improvement capture* fixes a small, scoped gap in a skill that ran THIS session and applies the edit now. This scan looks one level up: did the *type of work* this session deserve a **skill that does not yet exist**, or a **substantial enhancement** to an existing skill that is too big for an inline tweak? It writes and builds nothing — it signals the opportunity and hands Ane a plan plus a copy-paste start prompt for a **separate** build session.
+
+**When to offer.** Only when the session involved a structured, multi-step piece of work that will plausibly **recur** for Ane, AND one of:
+- **NEW** — no existing skill targets that work; Ane did it ad-hoc, by hand, or through general orchestration that a dedicated skill would shortcut.
+- **ENHANCE** — an existing skill applied (or should have) but a *structural* gap made the work harder than it should be, and closing it is bigger than a one-line tweak (a new mode, a new output type, a new branch of logic).
+
+Skip silently when the work was one-off and unlikely to recur; trivial; pure conversation, debugging, or system plumbing; already well-covered by a skill that worked fine; or the gap is a small inline tweak (that belongs to *Skill-improvement capture* above, not here).
+
+**Bias toward no.** Skill proliferation is a real cost — the project CLAUDE.md warns against competing skills and glossaries. Surface the **single** highest-value opportunity only. Allow a second one only when both are clearly distinct and genuinely strong. When in doubt, say nothing.
+
+**Rule out duplication first.** Check the work against the installed skill list and the routing lanes in the project CLAUDE.md (§ Skill routing). If an existing skill already covers it and simply was not used, the signal is "use /<skill> next time", not a new build.
+
+**What to do (no writes).**
+1. **Signal** in one line: `[NEW: <proposed-skill-name> | ENHANCE: <existing-skill>] — <the recurring work> — <why a skill beats doing it ad-hoc>`.
+2. **Plan** in 3 to 6 steps: scope and trigger phrases; which existing skills or agents it composes with or sits beside (name them, to prove it is not a duplicate); the build route (`skill-creator` for a focused skill, or `superpowers:brainstorming` → `writing-plans` → `writing-skills` for a larger build); where it lives (`~/OneDrive/GitHub/personal-skills/skills/<name>/`); and the close-out (run `/test`, commit and push the clone, live next session).
+3. **Start prompt** — a fenced, self-contained prompt Ane can paste into a fresh session. It must name the skill and its one job, state the build skill to invoke first, give the clone path, state explicitly how it differs from the nearest existing skill so the new session does not rebuild something that exists, and end with "run /test, then commit and push".
+4. **Optional stash.** Offer once, default no: `Save this to the skill-ideas backlog? (y/n)`. On yes, append the signal, plan, and start prompt to `agent-improvements/skill-ideas-backlog.md` (apply `edit-preservation`; create the file with an `# Skill ideas backlog` heading if absent). On no, it lives only in this report.
+
+Do not edit or create any skill here. This step ends at the signal, the plan, and the prompt.
+
+**Confirm.** If an opportunity was surfaced, append to the report:
+```
+SKILL OPPORTUNITY
+  💡 [NEW <proposed-name> | ENHANCE <skill>]: <one-line opportunity> — plan + start prompt below
+```
+Then print the plan and the start prompt under the report. Omit the section entirely when no opportunity clears the bar.
+
 ## Post-deliverable learning capture (project-aware, vault-coupled)
 
 This is the human-learning loop counterpart to check 4b (the system-learning loop). Step 4b feeds the *system*; this step feeds *Ane*. Run it LAST, after commit and push, so a skip or an unreachable vault never blocks the safety-critical commit.
