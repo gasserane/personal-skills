@@ -142,34 +142,39 @@ SKILL IMPROVEMENTS
 ```
 Omit the section entirely when not offered or declined.
 
-## Skill-fit scan — should a skill exist for this work? (session-end signal, no writes)
+## Skill-fit scan — should a skill have done this work? (session-end signal, no writes)
 
-Distinct from the inline loop above. *Skill-improvement capture* fixes a small, scoped gap in a skill that ran THIS session and applies the edit now. This scan looks one level up: did the *type of work* this session deserve a **skill that does not yet exist**, or a **substantial enhancement** to an existing skill that is too big for an inline tweak? It writes and builds nothing — it signals the opportunity and hands Ane a plan plus a copy-paste start prompt for a **separate** build session.
+Distinct from the inline loop above. *Skill-improvement capture* fixes a small gap in a skill that ran THIS session and applies the edit now. This scan looks at the *type of work* the session contained, classifies it into one of three outcomes, and hands Ane the matching follow-up. It writes and builds nothing.
 
-**When to offer.** Only when the session involved a structured, multi-step piece of work that will plausibly **recur** for Ane, AND one of:
-- **NEW** — no existing skill targets that work; Ane did it ad-hoc, by hand, or through general orchestration that a dedicated skill would shortcut.
-- **ENHANCE** — an existing skill applied (or should have) but a *structural* gap made the work harder than it should be, and closing it is bigger than a one-line tweak (a new mode, a new output type, a new branch of logic).
+**When to run.** Only when the session involved a structured, multi-step piece of work that will plausibly **recur** for Ane. Skip silently for one-off bespoke work, trivia, pure conversation, debugging, or system plumbing. First, check the work against the installed skill list and the routing lanes in the project CLAUDE.md (§ Skill routing). Then classify into exactly one:
 
-Skip silently when the work was one-off and unlikely to recur; trivial; pure conversation, debugging, or system plumbing; already well-covered by a skill that worked fine; or the gap is a small inline tweak (that belongs to *Skill-improvement capture* above, not here).
+- **ALREADY COVERED** — an existing skill already does this work, and Ane did it **manually without invoking it**. The win is the time she will save next time. This is a first-class signal, not an aside: surface it even when there is nothing to build.
+- **NEW** — no existing skill targets this work; Ane did it ad-hoc, by hand, or through general orchestration a dedicated skill would shortcut.
+- **ENHANCE** — an existing skill fits the work but needed improvement to do it **perfectly** this session: a missing mode, a missing output type, an absent branch of logic, or a gap that forced manual rework.
 
-**Bias toward no.** Skill proliferation is a real cost — the project CLAUDE.md warns against competing skills and glossaries. Surface the **single** highest-value opportunity only. Allow a second one only when both are clearly distinct and genuinely strong. When in doubt, say nothing.
+**Bias toward no.** Skill proliferation is a real cost — the project CLAUDE.md warns against competing skills and glossaries. Surface the **single** highest-value outcome only; a second only when both are clearly distinct and strong. When in doubt, say nothing. An existing skill that fit and was used well needs no signal.
 
-**Rule out duplication first.** Check the work against the installed skill list and the routing lanes in the project CLAUDE.md (§ Skill routing). If an existing skill already covers it and simply was not used, the signal is "use /<skill> next time", not a new build.
+**Relationship to the inline loop.** If the ENHANCE gap is small and Ane already accepted an inline fix in *Skill-improvement capture* above, do not raise it again here. The ENHANCE branch here is for an improvement Ane would rather scope into its own session — describe it, plan it, and prompt it rather than patch it live.
 
-**What to do (no writes).**
-1. **Signal** in one line: `[NEW: <proposed-skill-name> | ENHANCE: <existing-skill>] — <the recurring work> — <why a skill beats doing it ad-hoc>`.
-2. **Plan** in 3 to 6 steps: scope and trigger phrases; which existing skills or agents it composes with or sits beside (name them, to prove it is not a duplicate); the build route (`skill-creator` for a focused skill, or `superpowers:brainstorming` → `writing-plans` → `writing-skills` for a larger build); where it lives (`~/OneDrive/GitHub/personal-skills/skills/<name>/`); and the close-out (run `/test`, commit and push the clone, live next session).
-3. **Start prompt** — a fenced, self-contained prompt Ane can paste into a fresh session. It must name the skill and its one job, state the build skill to invoke first, give the clone path, state explicitly how it differs from the nearest existing skill so the new session does not rebuild something that exists, and end with "run /test, then commit and push".
-4. **Optional stash.** Offer once, default no: `Save this to the skill-ideas backlog? (y/n)`. On yes, append the signal, plan, and start prompt to `agent-improvements/skill-ideas-backlog.md` (apply `edit-preservation`; create the file with an `# Skill ideas backlog` heading if absent). On no, it lives only in this report.
+**What to produce.**
+
+- For **ALREADY COVERED**: the pointer only — name the skill, its trigger phrase, and the one line Ane should type next time. No plan, no prompt. Stop there.
+- For **NEW** and **ENHANCE**, produce all of:
+  1. **Signal** in one line: `[NEW: <proposed-skill-name> | ENHANCE: <existing-skill>] — <the recurring work> — <why a skill or the improvement beats doing it by hand>`. For ENHANCE, also state the precise gap: what the skill does now, what it failed to do this session, and what "perfect fit" would look like.
+  2. **Plan** in 3 to 6 steps: scope and trigger phrases (NEW) or the exact change and where it lands in the skill file (ENHANCE); which existing skills or agents it composes with or sits beside, named, to prove it is not a duplicate; the build route (`skill-creator` for a focused skill or change, or `superpowers:brainstorming` → `writing-plans` → `writing-skills` for a larger build); the clone path `~/OneDrive/GitHub/personal-skills/skills/<name>/`; and the close-out (run `/test`, commit and push the clone, sync the work-folder mirror at `.claude/skills/<name>/`, live next session).
+  3. **Start prompt** — a fenced, self-contained prompt Ane can paste into a fresh session. It names the skill and its one job (NEW) or its one improvement (ENHANCE), states the build skill to invoke first, gives the clone path, states explicitly how it differs from the nearest existing skill so the new session does not rebuild or duplicate, and ends with "run /test, then commit and push both surfaces".
+  - **Optional stash.** Offer once, default no: `Save this to the skill-ideas backlog? (y/n)`. On yes, append the signal, plan, and start prompt to `agent-improvements/skill-ideas-backlog.md` (apply `edit-preservation`; create with an `# Skill ideas backlog` heading if absent). On no, it lives only in this report.
 
 Do not edit or create any skill here. This step ends at the signal, the plan, and the prompt.
 
-**Confirm.** If an opportunity was surfaced, append to the report:
+**Confirm.** Append only the line(s) that apply to the report:
 ```
 SKILL OPPORTUNITY
-  💡 [NEW <proposed-name> | ENHANCE <skill>]: <one-line opportunity> — plan + start prompt below
+  💡 ALREADY COVERED: /<skill> does this — trigger "<phrase>"; use it next time
+  💡 NEW <proposed-name>: <one-line opportunity> — plan + start prompt below
+  💡 ENHANCE <skill>: <gap in one line> — improvement + plan + start prompt below
 ```
-Then print the plan and the start prompt under the report. Omit the section entirely when no opportunity clears the bar.
+For NEW and ENHANCE, print the plan and start prompt under the report. Omit the whole section when nothing clears the bar.
 
 ## Post-deliverable learning capture (project-aware, vault-coupled)
 
