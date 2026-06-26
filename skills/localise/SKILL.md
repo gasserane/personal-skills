@@ -17,6 +17,8 @@ Trigger for: localising a finished English brief; producing a target-language co
 2. **English plus companion** then Vi or you provide the finished English deliverable and get a target-language companion alongside it.
 3. **Review my draft** then you provide your target-language draft (plus the English source if available) and corrections are walked one by one, never a silent rewrite.
 
+**Image-based deck exports (Storyline / PowerPoint exported to Word).** When a mode-3 review target is a slide-deck or e-learning export (e.g. Articulate Storyline `.docx`/PPT export), the translatable text is rasterized inside the slide images, not live in the document body. The only live text is slide titles and layer labels. Three consequences: (a) read the slide images to review the translation, not the body text; (b) a Word comment cannot sit on text inside an image, so anchor each comment to that slide's title paragraph and have the comment name the slide and give the EN→FR correction; (c) corrections are made in the source deck and re-exported, so also deliver a slide-keyed branded corrections sheet (Slide · EN page · Type · EN source · Current FR · Proposed FR · Why · Severity) as the actionable worklist. `python-docx` 1.2.0 `add_comment(runs, …)` preserves the export's unusual package; verify no parts are dropped on save and write to a copy, never the original.
+
 ## Required inputs
 1. The English source (or, for mode 3, the target-language draft plus the English source). Required.
 2. Target language: Romanian, French, Spanish, or Russian (Romanian is the most curated; the others are working drafts).
