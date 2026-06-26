@@ -87,8 +87,16 @@ After the report, if there are uncommitted files or unpushed commits, finish the
 **Gate 1 — Harness must pass (if it ran).**
 If check 2 ran and reported any `⚠️ HARNESS:` line, STOP. Do not commit. Tell Ane the harness is red and recommend `/test` for detail. The wrap-up ends here.
 
-**Gate 2 — Branch guard.**
-Compare the current `git branch --show-current` to the expected branch captured in Phase 1. If they differ, a background process may have checked out another branch mid-session and hijacked the working tree (the documented ralph-loop hazard). STOP and ask Ane before committing. If they match, state the branch you are about to commit to and continue.
+**Gate 2 — Branch guard (checkout + content).**
+First, compare the current `git branch --show-current` to the expected branch captured in Phase 1. If they differ, a background process may have checked out another branch mid-session and hijacked the working tree (the documented ralph-loop hazard). STOP and ask Ane before committing.
+
+Then guard against the *content* hijack the branch-name check misses (a loop committing its own commits onto the matching branch). If `scripts/check-branch-integrity.sh` exists in the repo root, run it. It exits non-zero (SUSPICIOUS) on loop-authored commits or commits sitting directly on `main`. On SUSPICIOUS, STOP: surface its findings and ask Ane whether every commit ahead of `origin/main` is hers before committing or pushing. If the script is absent (most repos), skip this part silently. Report:
+```
+BRANCH INTEGRITY
+  ✅ Branch matches + commits ahead of origin/main verified
+  OR  ⚠️  SUSPICIOUS — [findings]; commit/push held pending Ane's confirmation
+```
+If both checks pass, state the branch you are about to commit to and continue.
 
 **Gate 3 — Sensitive-file scan.**
 Before staging, scan the uncommitted file list **case-insensitively** against these patterns: `.env`, `.env.*`, `*credentials*`, `*secret*`, `*token*`, `*.key`, `*.pem`, `*.pfx`, `*api_key*`. This is a filename scan, not a content scan: it will not catch a secret hardcoded inside a normally-named file, and it may flag innocent names (e.g. `token_utils.py`). If any file matches, list the matches and ask Ane explicitly which (if any) to include. Otherwise continue silently.
