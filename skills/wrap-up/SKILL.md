@@ -143,17 +143,18 @@ If the working tree was already clean and there were no unpushed commits, omit t
 
 ## Phase 5 — Optional follow-ups (opt-in)
 
-Three independent loops can run after the commit. None of them blocks the commit. Evaluate each loop's trigger below; for every loop that genuinely triggers, **batch them into ONE prompt** so Ane answers once:
+Four independent loops can run after the commit. None of them blocks the commit. Evaluate each loop's trigger below; for every loop that genuinely triggers, **batch them into ONE prompt** so Ane answers once:
 
 ```
 Optional follow-ups (enter to skip all):
   [1] Skill improvement — <skill>: <one-line change>
   [2] Save skill idea to backlog — <NEW|ENHANCE> <skill>
   [3] 3-line learning capture → journal
+  [4] Log token cost actual → cost-calibration-log
 Reply with the numbers to run, or enter to skip.
 ```
 
-If only one loop triggers, ask its own one-line prompt directly. If none trigger, say nothing and end the wrap-up. Run accepted loops in the order 1, 2, 3. Loop 3 runs last by design (the vault may be unreachable and it is the least critical).
+If only one loop triggers, ask its own one-line prompt directly. If none trigger, say nothing and end the wrap-up. Run accepted loops in the order 1, 2, 4, 3. Loop 3 runs last by design (the vault may be unreachable and it is the least critical); Loop 4 writes only to the work-folder repo, so it is safe to run before Loop 3.
 
 ### Loop 1 — Skill-improvement capture (inline fix, this session)
 
@@ -217,4 +218,25 @@ Feeds *Ane*, not the system. Runs last because the vault may be unreachable and 
 ```
 LEARNING CAPTURE
   ✅ Appended to 5 JURNAL/Learning/deliverable-learning-log.md
+```
+
+### Loop 4 — Token-cost actual capture (closes the calibration gap)
+
+Graduates this session's `cost-calibration-log.md` row from an estimate to a firm actual. The agent cannot read its own token count (Claude Code does not expose per-run counts to the agent), so an Ane paste is the only capture path, and it must run before the terminal closes or the row graduates to `not observed` after 14 days.
+
+**Trigger.** The session appended, or should have appended, a row to `agent-improvements/cost-calibration-log.md`: a COMPLEX `/ann` run, or a system-improvement session (`/grade-system`, `/system-audit`, wiki expansion, specialist deployment, harness or P1/P2 budget work). Skip for conversation, trivia, light edits, and any session with no calibration row.
+
+**On accept.** Ask Ane to paste the `/cost` block (context tokens used, `$` cost, cache %, duration). Then:
+1. Identify the cost-calibration row(s) this session opened, matched by task slug and today's date.
+2. **One row:** write the pasted figure to that row's `Actual`, then compute `Variance` against its `Estimated band` (flag `⚠️ over-band` at actual ≥ 1.5× the upper bound). Update the row in place with Edit (apply `edit-preservation`; touch only that row).
+3. **More than one row:** the `/cost` total is the session sum, not per-task. Ask Ane for the rough split. If she gives one, write each row. If not, record the total against the largest-scope row, annotate the others `[shared session total — see <slug>]`, and never write a fabricated per-row figure (factual-reliability rule).
+4. Refresh the log's variance-summary counts if the file maintains them (total rows, firm-observed count, over-band count).
+5. Stage, commit, and push this one file in the work-folder repo. It lands after the Phase 4 commit, so it commits itself (single-quoted heredoc message, conventional prefix, `Co-Authored-By` footer per CLAUDE.md).
+
+**On skip.** Leave the row(s) as `[pending — Ane: paste from terminal]`; the 14-day rule graduates them to `not observed` at the next Li CURATE.
+
+**Confirm.** If an actual was written, append to the report:
+```
+COST ACTUAL
+  ✅ <task-slug> — actual <Nk> vs est <band> (<variance>); committed <sha>
 ```
