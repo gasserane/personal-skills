@@ -21,9 +21,12 @@ Mine the system's own correction history for recurring failure patterns, trend t
    - `agent-improvements/cost-calibration-log.md` — estimate-vs-actual drift.
    - `## Active Improvements` sections of `agent-improvements/{ann,vi,li,researcher}-overlay.md`.
    - `.remember/recent.md` and `.remember/today-*.md` — session-history proxy for corrections Ane made in conversation.
+   - `agent-improvements/pre-flight/*-lessons-learned.md` — the **direct-mode** correction signal. Most work is now solo/direct (no Ann/Vi orchestration), so the qa-rejection-log is starved by design; these logs are where direct deliverable corrections land. Read every `*-lessons-learned.md` under `agent-improvements/pre-flight/`.
    - `agent-improvements/improve-system-runs.md` — prior runs (avoid re-proposing rejected items).
 
-2. **Trend the metric.** Report: total orchestrated runs logged, share with re-delegations or non-PASS verdicts, top 3 recurring reasons, direction vs the previous run's figures. If the rejection log is empty after sessions that clearly ran orchestration, the finding is "the wrap-up 4b logging step is failing" — a logging gap, never "no learning".
+2. **Trend the metric (two signals).**
+   - **Orchestrated runs (qa-rejection-log).** Report: total orchestrated runs logged, share with re-delegations or non-PASS verdicts, top 3 recurring reasons, direction vs the previous run's figures. This log fuels ONLY on Ann/Vi orchestration. If it is empty after sessions that *clearly ran orchestration*, the finding is "the wrap-up 4b logging step is failing" — a logging gap. But if the window was direct-mode work, an empty log is **expected, not broken** — verify which before concluding (check the session history and cost-calibration-log for orchestrated runs in the window; confirm the log's creation date predates the runs you expected).
+   - **Direct-mode corrections (pre-flight lessons-learned logs).** For each `*-lessons-learned.md`, report the count of entries in the window and the recurring correction themes. This is the live signal when orchestration is a minority of the work. Trend it the same way: rising repeat-corrections of the same theme = a rule not being applied.
 
 3. **Cluster patterns.** A pattern needs **2+ independent occurrences** across runs or logs. One occurrence is a watch item, listed but not actioned. Name each pattern in one sentence with its occurrences cited.
 
@@ -44,4 +47,4 @@ Mine the system's own correction history for recurring failure patterns, trend t
 |---|---|
 | "The fix is trivial, just apply it" | Trivial edits to standing rules compound; approval is the gate. |
 | "Sparse data, but the pattern is obvious" | One data point is an anecdote. Log it as a watch item. |
-| "Empty log = clean record" | Empty log = broken logging. Verify wrap-up 4b ran. |
+| "Empty log = clean record" | Empty qa-log = either broken logging OR a direct-mode window with no orchestration. Verify which (did orchestration run? does the log predate the expected runs?) before concluding, and read the lessons-learned logs for the direct-mode signal. |
