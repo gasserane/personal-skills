@@ -77,14 +77,23 @@ For each finding or theme, grade using a GRADE-adjacent scheme:
 
 Explain the grade in one clause. No inflation.
 
-### Step 7 — apply the relevant lenses
+### Step 7 — map where the evidence conflicts
+
+Consensus is rarely the whole story, and smoothing it hides the most useful signal. After grading, map the disagreements:
+- Where two or more sources reach opposite conclusions on the same question, name both with citations.
+- Where a finding holds in one setting or population but reverses in another, treat that contrast as a finding, not noise.
+- Where the strongest-evidence source disagrees with the most-cited or most-recent one, say so.
+
+Do not resolve a live disagreement by picking the convenient side or averaging the two. State the conflict, say which reading the evidence currently favours and why, and flag any conflict the evidence cannot yet settle with `⚠️ Unresolved:`.
+
+### Step 8 — apply the relevant lenses
 
 For SRHR or gender-related questions, apply:
 - **Feminist lens**: whose voices shaped the research questions? Are women and girls subjects of the research or objects? Cornwall & Rivas (2015) framing.
 - **Decolonial lens**: where was the research conducted, who funded it, whose knowledge is centred? Chilisa (2020).
 - **Intersectionality**: does the evidence disaggregate to current standard (age, gender identity, disability, geography)? Flag when it does not.
 
-### Step 8 — identify gaps
+### Step 9 — identify gaps
 
 Name what the evidence does not answer. Use `⚠️ Evidence gap:` format. Distinguish:
 - Gaps in research (the study has not been done)
@@ -102,10 +111,11 @@ Produce an evidence brief with these sections:
    - One-sentence statement
    - Confidence grade
    - Supporting sources (author year)
-4. **Lens observations** — feminist, decolonial, intersectional notes
-5. **Implications** — what this means for the stated purpose (programme design, evaluation, etc.). Be concrete.
-6. **Evidence gaps** — `⚠️ Evidence gap:` entries
-7. **Sources** — full citations, alphabetical by first author
+4. **Where the evidence conflicts** — disagreements surfaced in Step 7, not smoothed. For each: the opposing findings with citations, which reading the evidence currently favours and why, or `⚠️ Unresolved:` where it cannot yet be settled
+5. **Lens observations** — feminist, decolonial, intersectional notes
+6. **Implications** — what this means for the stated purpose (programme design, evaluation, etc.). Be concrete.
+7. **Evidence gaps** — `⚠️ Evidence gap:` entries
+8. **Sources** — full citations, alphabetical by first author
 
 ## Citation requirements
 
