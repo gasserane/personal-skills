@@ -68,6 +68,18 @@ If `agent-improvements/audit-drift-*.md` exists:
 
 This prevents the same issue from getting re-flagged as new each audit and from being silently dropped between audits.
 
+### Step 7 — Skill trigger and steering integrity (skill-quality)
+
+Apply the four-part skill rubric: trigger, structure, steering, pruning. Three of the four are already covered elsewhere. Trigger quality is checked by skill-creator evals; structure by superpowers:writing-skills; pruning by Steps 3 to 4 and the harness budgets. This step adds the axis those miss: **steering**, whether a skill that fires actually constrains what the agent does.
+
+Read the first-party skills under the personal-skills `skills/` tree plus the `{ann,vi,li,researcher}` team skills. For each, check three things:
+
+- **Trigger collision.** Two model-invocable skills whose `description` trigger phrases overlap without either naming the other as a deferral. Grep the `description:` frontmatter lines for shared trigger verbs (grill, review, plan, debate, design) and inspect the overlapping pairs by eye. A skill with `disable-model-invocation: true` is user-invoked only and cannot collide, so exclude it. A collision is resolved when the more specific skill names its lane and routes the neighbours away in its description (see grill-mel as the worked example).
+- **Steering strength.** Does the body give the agent concrete, ordered actions, a numbered workflow, decision rules, an output template, or a "what NOT to do" list? Or does it only name a topic and leave the agent to improvise? A skill that fires but does not constrain behaviour is a steering failure. Flag any skill whose body has no imperative workflow, no decision rule, and no output section.
+- **Steering leakage.** Does the body let the agent do something the description forbids? Example: a "does not write files" or "no-write" skill whose body carries no guard against writing, or a "does not decide" skill whose body drifts into deciding. Flag description-body contradictions.
+
+Record each as a finding with the skill path and the failing axis (trigger-collision, steering-weak, or steering-leak). This rubric is adapted from Pocock (2026) *Building Great Agent Skills: The Missing Manual*; the steering axis is the contribution this step adds to the audit.
+
 ## Failure-fix mapping (your quick reference)
 
 | Issue category | Most likely fix |
@@ -81,6 +93,9 @@ This prevents the same issue from getting re-flagged as new each audit and from 
 | Deployed agent in `proposed-agents/` | `git rm` the staged copy; live in `~/.claude/agents/` is canonical |
 | Overlay over 35KB cap | Run substantive CURATE (compress entries, not just archive); Li's archive-only pass is insufficient at this size |
 | qa_block schema-vs-skill mismatch | Schema is authoritative; align skill text to schema field names |
+| Trigger collision between two model-invocable skills | Name the lane in the more specific skill's description and route the neighbour away; or set `disable-model-invocation: true` on the one Ane always calls by name |
+| Steering-weak skill (fires but does not constrain) | Add a numbered workflow, decision rules, or an output template to the body; a description alone does not steer |
+| Steering leak (body allows what description forbids) | Add an explicit guard in the body matching the description's constraint (e.g. a no-write skill states it must not use Write/Edit) |
 
 ## Output format
 
@@ -101,6 +116,11 @@ Use this template:
 ## Documentation drift (medium severity)
 
 | # | Issue | File | Fix |
+|---|---|---|---|
+
+## Skill trigger and steering (medium severity)
+
+| # | Skill | Axis (trigger-collision / steering-weak / steering-leak) | Fix |
 |---|---|---|---|
 
 ## Hygiene (low severity)
