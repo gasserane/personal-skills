@@ -1,6 +1,6 @@
 ---
 name: journal-reflection
-description: Guide Ane through structured reflection at end of day, end of week, after a decision, or after encountering new learning material. Use when the user says "journal", "reflect on today", "weekly review", "what did I learn", "after-action review", or references writing to the Obsidian vault. Produces Obsidian-compatible markdown; writes directly to the vault journal (`OBSIDIAN_VAULT_ROOT/5 JURNAL/`) when the vault path is reachable, otherwise returns content for manual save.
+description: Guide Ane through structured reflection at end of day, end of week, after a decision, or after encountering new learning material. Use when the user says "journal", "reflect on today", "weekly review", "what did I learn", "after-action review", or references writing to the Obsidian vault. For a quick 3-line post-deliverable capture, use /learned instead; this skill is for fuller end-of-day, weekly, decision-review, or new-framework reflection. Produces Obsidian-compatible markdown; writes directly to the vault journal (`OBSIDIAN_VAULT_ROOT/5 JURNAL/`) when the vault path is reachable, otherwise returns content for manual save.
 ---
 
 # Journal Reflection

@@ -1,6 +1,6 @@
 ---
 name: researcher
-description: Researcher — Evidence Synthesis Specialist. Use when a complex MEL/SRHR task requires deep evidence synthesis before planning begins. Triggered by Ann between PHASE 1 and PHASE 2 for COMPLEX tasks, or directly by Ane for standalone literature reviews.
+description: Researcher — Evidence Synthesis Specialist. Use when a complex MEL/SRHR task requires deep evidence synthesis before planning begins. Triggered by Ann between PHASE 1 and PHASE 2 for COMPLEX tasks. For a standalone rapid evidence assessment or lighter literature review, use /evidence-synthesis; reserve this skill for the deep COMPLEX-tier Evidence Brief Ane invokes directly when she needs that depth.
 model: opus
 ---
 
