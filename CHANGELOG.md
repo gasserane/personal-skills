@@ -2,6 +2,16 @@
 
 All notable changes to the Ann / Vi / Li / Researcher skill set are documented here.
 
+## [2026-07-07] — New skill: mel-discipline (five-gate working discipline, pre-Fable-sunset extraction)
+
+**Skills affected:** mel-discipline (new)
+**System-level additions:** pre-verdict checklists in `~/.claude/agents/{mel-framework-architect,data-analysis-specialist,inferential-analysis-specialist}.md`; hyperlink verification check in `qa-reviewer.md`; dimension coverage rule in `safeguarding-reviewer.md` (claude-config repo, not this repo)
+
+### mel-discipline
+- **New skill.** Encodes the five-gate working discipline (scope → evidence → adversarial reasoning → verify before done → faithful reporting) so Opus/Sonnet-class models hold the top-tier rigour bar after the Fable model sunset (2026-07-08).
+- **TDD-built.** Baseline pressure test (Sonnet, deadline pressure) produced plausible-but-unverified citations, body em-dashes, and no adversarial pass. The with-skill run fixed 4 of 5 failures. The surviving loophole (checklist theater: asserted em-dash PASS over 5 actual hits) was closed in REFACTOR with the perform-not-assert rule.
+- **`portables/`** carries the claude.ai surface variants: upload zip (`mel-discipline-claude-ai.zip`), personal-preferences block, Project custom-instructions text. Regenerate all from SKILL.md on every change; version parity is a `/system-audit` check item.
+
 ## [2026-06-19] — New skill: grill-mel (MEL-aware grilling)
 
 **Skills affected:** grill-mel (new)
