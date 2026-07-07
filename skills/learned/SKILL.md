@@ -1,6 +1,6 @@
 ---
 name: learned
-description: Fast post-deliverable learning capture. Use when Ane types "/learned", or says "capture what I learned", "log a learning", "what did I learn from this", or wants a quick 3-line note after finishing a piece of work. Appends a dated entry to the running learning log in the Obsidian vault. The explicit-command sibling of journal-reflection's Post-deliverable capture mode; for end-of-day, weekly, decision-review, or new-framework reflection, use journal-reflection instead.
+description: Fast post-deliverable learning capture. Use when Ane types "/learned", or says "capture what I learned", "log a learning", "what did I learn from this", or wants a quick 4-line note after finishing a piece of work. Appends a dated entry to the running learning log in the Obsidian vault. The explicit-command sibling of journal-reflection's Post-deliverable capture mode; for end-of-day, weekly, decision-review, or new-framework reflection, use journal-reflection instead.
 ---
 
 # /learned — post-deliverable learning capture
@@ -15,20 +15,23 @@ After finishing any substantive deliverable, when you want to bank the lesson. F
 
 ## What to do
 
-Ask these three, one at a time. Keep each answer to one line. Do not auto-answer; Ane's words go in verbatim.
+Ask these four, one at a time. Keep each answer to one line. Do not auto-answer; Ane's words go in verbatim.
 
 1. What did this deliverable teach you about the work?
 2. What would you do differently next time?
 3. One thing to carry forward.
+4. What worked that you want repeated? (success extraction)
 
 If Ane does not name the deliverable, ask for a 2–4 word label.
+
+**Success routing.** If answer 4 names a repeatable system behaviour (a prompt pattern, a workflow, a specialist or model choice), offer to also bank it as a `feedback` memory with **Why:** and **How to apply:** lines — one yes/no, no push. This gives `/improve-system` confirmed successes to trend, not only corrections. The vault entry records all four answers either way.
 
 ## File placement
 
 Append to the single running log `5 JURNAL/Learning/deliverable-learning-log.md` in the Obsidian vault (`OBSIDIAN_VAULT_ROOT` = `C:/Users/AGasser/OneDrive/Ane Obsidian Vault`), exactly as the `journal-reflection` Post-deliverable capture mode specifies:
 
 - If the file does not exist, create it with YAML frontmatter (`type: learning-log`) and an H1, then add the first entry.
-- If it exists, append a new `## YYYY-MM-DD — <deliverable label>` section with the three answers as bullets, preserving all prior entries byte-identical (edit-preservation; apply `mel_wiki/wiki/concepts/edit-preservation-protocol.md`).
+- If it exists, append a new `## YYYY-MM-DD — <deliverable label>` section with the four answers as bullets, preserving all prior entries byte-identical (edit-preservation; apply `mel_wiki/wiki/concepts/edit-preservation-protocol.md`).
 
 Local-only: if the vault path is not reachable (web session, other device), return the markdown in the reply and name the target path so Ane can save it manually.
 

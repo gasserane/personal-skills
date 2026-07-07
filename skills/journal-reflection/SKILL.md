@@ -1,6 +1,6 @@
 ---
 name: journal-reflection
-description: Guide Ane through structured reflection at end of day, end of week, after a decision, or after encountering new learning material. Use when the user says "journal", "reflect on today", "weekly review", "what did I learn", "after-action review", or references writing to the Obsidian vault. For a quick 3-line post-deliverable capture, use /learned instead; this skill is for fuller end-of-day, weekly, decision-review, or new-framework reflection. Produces Obsidian-compatible markdown; writes directly to the vault journal (`OBSIDIAN_VAULT_ROOT/5 JURNAL/`) when the vault path is reachable, otherwise returns content for manual save.
+description: Guide Ane through structured reflection at end of day, end of week, after a decision, or after encountering new learning material. Use when the user says "journal", "reflect on today", "weekly review", "what did I learn", "after-action review", or references writing to the Obsidian vault. For a quick 4-line post-deliverable capture, use /learned instead; this skill is for fuller end-of-day, weekly, decision-review, or new-framework reflection. Produces Obsidian-compatible markdown; writes directly to the vault journal (`OBSIDIAN_VAULT_ROOT/5 JURNAL/`) when the vault path is reachable, otherwise returns content for manual save.
 ---
 
 # Journal Reflection
@@ -19,7 +19,7 @@ Ask once, in one prompt, which mode applies. Default to end-of-day if the user s
 2. **End-of-week** (15 min): week in 5 questions plus a pattern scan
 3. **Decision review**: one past decision in 4 questions
 4. **Learning log**: one new framework or concept, linked to what Ane already knows
-5. **Post-deliverable capture** (2 min): the 3-line "what did I learn" after finishing a deliverable, appended to a running log. Lighter than mode 4 (no framework deep-dive); deliverable-triggered, not concept-triggered. /wrap-up offers this at session end; Ane can also trigger it directly any time.
+5. **Post-deliverable capture** (2 min): the 4-line "what did I learn" after finishing a deliverable, appended to a running log. Lighter than mode 4 (no framework deep-dive); deliverable-triggered, not concept-triggered. /wrap-up offers this at session end; Ane can also trigger it directly any time.
 
 ## Prompts by mode
 
@@ -67,11 +67,14 @@ Ask:
 
 ### Post-deliverable capture
 
-Ask these three, one at a time. Keep each answer to one line; this is a fast capture, not a full reflection.
+Ask these four, one at a time. Keep each answer to one line; this is a fast capture, not a full reflection.
 
 1. What did this deliverable teach you about the work?
 2. What would you do differently next time?
 3. One thing to carry forward.
+4. What worked that you want repeated? (success extraction)
+
+If answer 4 names a repeatable system behaviour (a prompt pattern, a workflow, a specialist or model choice), offer to also bank it as a `feedback` memory with **Why:** and **How to apply:** lines — one yes/no, no push. This gives `/improve-system` confirmed successes to trend, not only corrections.
 
 If Ane gives the deliverable a name or slug, use it; otherwise ask for a 2–4 word label. This mode appends to a single running log (see File placement) rather than creating one file per entry.
 
@@ -100,7 +103,7 @@ Vault root: `OBSIDIAN_VAULT_ROOT` (`C:/Users/AGasser/OneDrive/Ane Obsidian Vault
 - End-of-week: `5 JURNAL/5b Weekly Notes/YYYY-Www.md`
 - Decision review: `5 JURNAL/Decisions/YYYY-MM-DD-<slug>.md`
 - Learning log: `5 JURNAL/Learning/<slug>.md`
-- Post-deliverable capture: append to `5 JURNAL/Learning/deliverable-learning-log.md` (single running log). If the file does not exist, create it with the YAML frontmatter (`type: learning-log`) and an H1, then add the first entry. If it exists, append a new `## YYYY-MM-DD — <deliverable label>` section with the three answers as bullets, preserving all prior entries byte-identical (edit-preservation).
+- Post-deliverable capture: append to `5 JURNAL/Learning/deliverable-learning-log.md` (single running log). If the file does not exist, create it with the YAML frontmatter (`type: learning-log`) and an H1, then add the first entry. If it exists, append a new `## YYYY-MM-DD — <deliverable label>` section with the four answers as bullets, preserving all prior entries byte-identical (edit-preservation).
 
 If the vault path is not reachable (web session, other device), return the markdown in the reply and name the target path so the user can save it manually.
 

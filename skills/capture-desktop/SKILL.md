@@ -36,7 +36,11 @@ Read the staged transcript. Sort its substantive content into four buckets:
 
 1. **Deliverables** — documents, analyses, tables, drafts Ane produced.
 2. **Decisions / rules / lessons** — locked decisions, framework calls, guidance
-   on how the system should work, feedback on your behaviour.
+   on how the system should work, feedback on your behaviour. Capture successes
+   as well as corrections: an approach the transcript shows Ane praised, reused,
+   or locked is a success worth banking as a `feedback` memory (with **Why:**
+   and **How to apply:**) so `/improve-system` trends confirmed successes, not
+   only corrections.
 3. **Project-knowledge changes** — edits that belong in canonical sources
    (`mel_wiki/` pages, `~/.claude/CLAUDE.md`).
 4. **Full log** — already staged in Step 2. No action.
