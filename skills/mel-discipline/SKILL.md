@@ -39,7 +39,7 @@ Run this checklist on the finished draft. **Perform each check physically; never
 
 | # | Check | How |
 |---|---|---|
-| 1 | Every citation opened this session or flagged unverified | Trace each source to the fetch/read that opened it |
+| 1 | Every citation opened this session or flagged unverified — walked source by source through the Evidence base line, including frameworks, tools, and commissions named as design anchors; "well-known" grants no exemption | Trace each named source to the fetch/read that opened it, or attach the ⚠️ flag to that specific source. Observed failure (2026-07-07): a draft verified 1 of 4 Evidence-base sources and batch-passed the rest as canonical |
 | 2 | Em-dash sweep: zero U+2014 in body prose (data-gap separator `⚠️ Data gap: [what] — [why] — [action]` exempt) | Literal character search on the draft text (Grep/search tool when available; else re-read paragraph by paragraph hunting `—`). Rewrite each hit as a comma, colon, or two sentences |
 | 3 | BLUF: sentence 1 is the verdict or answer | Read sentence 1 |
 | 4 | Data gaps flagged in the standard format, never papered over | Scan for asserted-but-unsourced claims |
