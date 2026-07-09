@@ -174,7 +174,7 @@ Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exis
 3. **qa-reviewer** is conditional: Sonnet for SIMPLE tasks (single specialist reconciliation); Opus for COMPLEX (multi-specialist reconciliation, multi-framework citation cross-check, lens-application audit across several specialists).
 4. **researcher** defaults to Sonnet (breadth queries); Opus only when Ann passes a "complex synthesis required" flag (3+ frameworks integrating, novel domain).
 5. **Haiku**: reserved for purely mechanical work (formatting, data extraction, simple assembly). Rare in the MEL pipeline.
-6. **Fable** (`model: "fable"`, per-call override only — never a frontmatter default): spawn a specialist on Fable only when BOTH hold: (a) Ann's `## Standing instructions` carry an Ane-approved `Model advisory: FABLE SANCTIONED` line citing decision 1 or 3 of `agent-improvements/model-selection-policy.md`, and (b) the decision's mandatory gate is in the run plan (prose-fidelity gate on Sonnet for decision 1 narrative; standard specialist QA + no-fabrication instruction for decision 3 data analysis). A `FABLE CANDIDATE (UNTESTED)` advisory never triggers a Fable spawn — default models stand until a probe sanctions the slot. Fable is a quality permission, not a cost optimisation (policy telemetry: token footprint ≈ Opus, often slower than Sonnet and Opus in wall-clock).
+6. **Fable — DORMANT (2026-07-08, Fable access ended).** Do not spawn any specialist on Fable; Ann no longer emits a `Model advisory:` line (advisory suspended per `agent-improvements/model-selection-policy.md` status addendum). The gates the sanctions carried (prose-fidelity gate on Sonnet; specialist QA + no-fabrication instruction) are model-independent and remain mandatory where the policy names them. Routing follows `agent-improvements/agent_registry.md` § Routing tiers. If Fable-class access returns, restore this rule from the policy (decisions 1 and 3 reactivate as written: per-call override only, never a frontmatter default; a CANDIDATE advisory never triggers a spawn; quality permission, not cost optimisation).
 
 **Override conditions Vi may apply at spawn (these are the triggers that lift default-Sonnet specialists to Opus):**
 - `mel-framework-architect` → Opus when novel framework selection or 3+ framework integration is required.
@@ -186,7 +186,7 @@ Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exis
 
 **Dataset size is NOT an Opus trigger. Analytical judgement complexity is.**
 
-Document any spawn-time override in the spawn brief: `Model override: <opus|sonnet|fable>; reason: <one sentence>` (for fable: cite the policy decision number and the attached gate).
+Document any spawn-time override in the spawn brief: `Model override: <opus|sonnet>; reason: <one sentence>`.
 
 ## Standing instructions
 If Ann's delegation includes a `## Standing instructions` block, apply those preferences to all specialist prompt design for this run. Do not override without explicit instruction from Ann or Ane.
