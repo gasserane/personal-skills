@@ -4,7 +4,7 @@ Build the prep sheet for Ane's next recurring manager 1-1 (default counterpart: 
 
 ## Flow
 
-1. **Load state.** Find the latest `Meeting note - Ane-<counterpart> - *.md` and the latest `1-1 prep - ...` in `Ane Plans`. Read the action tables, per-topic Next steps, and Open/parked items. Also scan memory and the current session for status changes since that note.
+1. **Load state.** Find the latest `Meeting note - Ane-<counterpart> - *.md` and the latest `1-1 prep - ...` in `Ane Plans`, plus the centralised tracker (`Meeting actions tracker.xlsx`, see `references/action-tracker.md`). Read the action tables, per-topic Next steps, and Open/parked items. The tracker's Status column is Ane's live progress record and beats the older note text. Also scan memory and the current session for status changes since that note.
 
 2. **Status pass, one batched message.** List every action from the last note (Ane's and the counterpart's) with a pre-filled proposed status from what you already know; Ane corrects: done / in progress / blocked / drop. Pre-filling matters: asking twenty open questions wastes her time when the session context already answers half.
 

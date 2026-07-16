@@ -41,4 +41,6 @@ Read only the reference file for the selected mode. If the mode is ambiguous, as
 
 **Privacy.** Meeting notes are personal working records: names may appear in them. Anything shareable (the learning document, or a note Ane says she will send) follows summary-anonymisation: roles and organisation types, not names, and internal analysis sections dropped. Never quote `5 JURNAL` vault content.
 
+**Centralised action tracker.** Every confirmed note also feeds one Excel workbook (`Ane Plans/Meeting actions tracker.xlsx`): one tab per person for actions with deadline and status, a Decisions log, and a Pending tab for parked items. Run `scripts/update_tracker.py` as the last step of any note-producing mode; it only appends (stable IDs, idempotent), so Ane's manual Status and Progress edits are never touched. Details: `references/action-tracker.md`. Prep mode reads this tracker for its status pass; the tracker's Status column beats the older note text.
+
 **Memory close-out.** After a note is confirmed, offer to persist durable project facts (confirmed decisions, changed budgets, new deadlines) to auto-memory, updating existing project memories rather than duplicating. The note captures the meeting; memory carries what future sessions must know.

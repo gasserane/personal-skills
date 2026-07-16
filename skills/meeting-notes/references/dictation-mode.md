@@ -21,7 +21,7 @@ Turn Ane's spoken per-topic debrief of a meeting into a confirmed, structured no
 
 5. **One write at the end**, after all topics are confirmed: the `.md` then the branded `.docx`, per the shared rules in SKILL.md. Build the deadline-sorted action tables across all topics at this point, not incrementally.
 
-6. **Close out.** Offer to persist durable facts (confirmed decisions, changed budgets, new deadlines) to memory. In the final message, surface any action due today or tomorrow explicitly: a deadline that only lives inside the file gets missed.
+6. **Close out.** Update the centralised tracker (`scripts/update_tracker.py`, see `references/action-tracker.md`). Offer to persist durable facts (confirmed decisions, changed budgets, new deadlines) to memory. In the final message, surface any action due today or tomorrow explicitly: a deadline that only lives inside the file gets missed.
 
 ## Why interview-first
 
