@@ -1,6 +1,6 @@
-# Photo notes mode
+# Handwritten notes mode (photo or scan)
 
-Turn photographed handwritten meeting notes into verified, structured meeting notes. Inputs: one or more image paths, plus a project-context folder when Ane names one.
+Turn photographed or scanned handwritten meeting notes into verified, structured meeting notes. Inputs: one or more image paths or scanned PDFs, plus a project-context folder when Ane names one.
 
 ## Flow
 
