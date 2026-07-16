@@ -28,7 +28,7 @@ Read only the reference file for the selected mode. If the mode is ambiguous, as
 
 **Note structure** (the proven template, settled 2026-07-16):
 1. Header: date, participants, type line, topic list with stable tags (T1, T2, ...). Keep tags stable across notes so T1 always means the same workstream for a given counterpart.
-2. `## Next actions at a glance`: two deadline-sorted tables (Deadline | Topic | Action), one for Ane, one for the counterpart ("to chase"). Deadline-sorted because "what do I owe today" is the question the note gets reopened for.
+2. `## Next actions at a glance`: two deadline-sorted tables (Deadline | Topic | Action), one for Ane, one for the counterpart ("to chase"). Deadline-sorted because "what do I owe today" is the question the note gets reopened for. Actions owned by third parties go into the table of whoever chases them (Ane or the counterpart), with the actual owner named in the Action cell.
 3. Per topic `## T<n> - <name>`, each with `### Key takeaways` (max 5 synthetic bullets), `### Decisions` (confirmed only), `### Next steps` (Ane / counterpart, with deadlines), `### Open / parked` (each item with the trigger date or event that should resurface it).
 4. Footer: preparation provenance with AI-support disclosure.
 
