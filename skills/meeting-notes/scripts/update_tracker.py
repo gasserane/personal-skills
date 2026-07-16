@@ -40,10 +40,30 @@ ACTION_HEADERS = ["ID", "Added", "Meeting date", "Counterpart", "Topic", "Action
 DECISION_HEADERS = ["ID", "Meeting date", "Counterpart", "Topic", "Decision", "Notes"]
 PENDING_HEADERS = ["ID", "Meeting date", "Counterpart", "Topic", "Item",
                    "Trigger / review by", "Status", "Notes"]
+TOPIC_HEADERS = ["Topic", "Counterpart", "Name", "What it is",
+                 "My role", "In annual plan", "Strategic importance (IPPF EN)",
+                 "Effort for me", "Status", "Recurrence", "Delegation potential",
+                 "Energy", "Funding / project", "First seen", "Last discussed",
+                 "Times discussed", "Notes"]
+# Topics judgement-column drop-downs: column letter -> options
+TOPIC_DROPDOWNS = {
+    "E": '"Lead,Co-lead,Co-worker,Advisor"',
+    "G": '"High,Medium,Low"',
+    "H": '"High,Medium,Low"',
+    "I": '"Active,Dormant,Closed"',
+    "J": '"Recurring,One-off"',
+    "K": '"High,Medium,Low"',
+    "L": '"Gives,Neutral,Drains"',
+}
 COL_WIDTHS = {"ID": 20, "Added": 11, "Meeting date": 12, "Counterpart": 12,
               "Topic": 8, "Action": 70, "Decision": 80, "Item": 70,
               "Deadline": 24, "Trigger / review by": 30, "Status": 12,
-              "Progress notes": 40, "Notes": 40, "Last updated": 12}
+              "Progress notes": 40, "Notes": 40, "Last updated": 12,
+              "Name": 38, "What it is": 55, "My role": 11, "In annual plan": 26,
+              "Strategic importance (IPPF EN)": 14, "Effort for me": 12,
+              "Recurrence": 11, "Delegation potential": 12, "Energy": 9,
+              "Funding / project": 16, "First seen": 11, "Last discussed": 12,
+              "Times discussed": 10}
 
 MONTHS = {m.lower(): i for i, m in enumerate(
     ["January", "February", "March", "April", "May", "June", "July",
@@ -84,6 +104,7 @@ def parse_note(path: Path):
         counterpart = others[0].split()[0] if others else ""
 
     actions, decisions, pending = [], [], []
+    topics = {}  # tag -> full name
     current_h2, current_h3, current_topic = "", "", ""
 
     for raw in text.splitlines():
@@ -94,6 +115,9 @@ def parse_note(path: Path):
             current_h3 = ""
             tm = re.match(r"(T\d+)\b", current_h2)
             current_topic = tm.group(1) if tm else ""
+            if current_topic:
+                name = re.sub(r"^T\d+\s*[-:]\s*", "", current_h2).strip()
+                topics[current_topic] = name
             continue
         if s.startswith("### "):
             current_h3 = clean(s[4:])
@@ -124,7 +148,7 @@ def parse_note(path: Path):
                 pending.append((current_topic, item, trig))
             continue
 
-    return meeting_date, counterpart, actions, decisions, pending
+    return meeting_date, counterpart, actions, decisions, pending, topics
 
 
 def style_header(ws, headers):
@@ -149,6 +173,48 @@ def ensure_sheet(wb, name, headers, status_col=None, status_options=STATUS_OPTIO
     return ws
 
 
+def ensure_topics_sheet(wb):
+    if "Topics" in wb.sheetnames:
+        return wb["Topics"]
+    ws = wb.create_sheet("Topics", 1)  # right after Guide
+    style_header(ws, TOPIC_HEADERS)
+    for col, options in TOPIC_DROPDOWNS.items():
+        dv = DataValidation(type="list", formula1=options, allow_blank=True)
+        ws.add_data_validation(dv)
+        dv.add(f"{col}2:{col}500")
+    return ws
+
+
+def upsert_topics(ws, topics, meeting_date, counterpart):
+    """Script-owned cells only: Topic, Counterpart, Name, First seen, Last discussed,
+    Times discussed. Judgement columns (role, plan link, importance, effort, status,
+    recurrence, delegation, energy, funding, notes) belong to Ane and are never
+    written for existing rows. Idempotent: same meeting date never double-counts."""
+    added = updated = 0
+    index = {}
+    for r in range(2, ws.max_row + 1):
+        tag, cp = ws.cell(row=r, column=1).value, ws.cell(row=r, column=2).value
+        if tag:
+            index[(tag, cp or "")] = r
+    for tag, name in sorted(topics.items()):
+        key = (tag, counterpart or "")
+        if key in index:
+            r = index[key]
+            last = str(ws.cell(row=r, column=15).value or "")
+            if meeting_date > last:
+                ws.cell(row=r, column=15, value=meeting_date)
+                ws.cell(row=r, column=16,
+                        value=int(ws.cell(row=r, column=16).value or 0) + 1)
+                updated += 1
+            if not ws.cell(row=r, column=3).value:
+                ws.cell(row=r, column=3, value=name)
+        else:
+            append_row(ws, [tag, counterpart, name, "", "", "", "", "", "Active",
+                            "", "", "", "", meeting_date, meeting_date, 1, ""])
+            added += 1
+    return added, updated
+
+
 def existing_ids(ws):
     return {ws.cell(row=r, column=1).value
             for r in range(2, ws.max_row + 1) if ws.cell(row=r, column=1).value}
@@ -168,14 +234,26 @@ GUIDE_LINES = [
     ("What this is: one central place for every action, decision and pending item "
      "from your meeting notes, added automatically when a note is confirmed.", False),
     ("", False),
-    ("Tabs: one tab per person holds that person's actions (your tab is what you owe; "
-     "another person's tab is what you chase with them). 'Decisions' is the decision "
-     "log. 'Pending' holds open and parked items with their resurface trigger.", False),
+    ("Tabs: 'Topics' is the registry of what each topic tag means, with your own "
+     "metadata per topic. One tab per person holds that person's actions (your tab is "
+     "what you owe; another person's tab is what you chase with them). 'Decisions' is "
+     "the decision log. 'Pending' holds open and parked items with their resurface "
+     "trigger.", False),
     ("", False),
-    ("Yours to edit: Status, Progress notes, and Notes columns. The updater never "
-     "changes rows that are already in the workbook, so your edits are safe.", False),
-    ("Added automatically: everything else, one row per item, with a stable ID so "
-     "re-running the updater never duplicates a row.", False),
+    ("Yours to edit: Status, Progress notes and Notes columns on the action tabs, and "
+     "on Topics all the judgement columns: My role (Lead / Co-lead / Co-worker / "
+     "Advisor), In annual plan (point to the subgoal, e.g. 'Yes - 1.2' or 'New item'), "
+     "Strategic importance for IPPF EN, Effort for me, Status, Recurrence, Delegation "
+     "potential, Energy (does the topic give or drain energy), Funding / project. The "
+     "updater never changes cells you own, so your edits are safe.", False),
+    ("Added automatically: everything else. Action, decision and pending rows carry a "
+     "stable ID so re-running the updater never duplicates. On Topics the updater "
+     "maintains First seen, Last discussed and Times discussed per topic.", False),
+    ("", False),
+    ("Why the Topics metadata: at year end, filter high Effort + low Strategic "
+     "importance (delegate or drop candidates), compare In annual plan vs New item "
+     "(how much of your agenda was planned work), and read Energy against Times "
+     "discussed. This is the dataset for optimising next year's planning.", False),
     ("", False),
     ("Status meanings: Open = not started. In progress = started. Blocked = waiting "
      "on someone or something. Done = finished. Dropped = agreed not to do.", False),
@@ -204,13 +282,15 @@ def main():
 
     note = Path(args.note)
     book = Path(args.workbook)
-    meeting_date, counterpart, actions, decisions, pending = parse_note(note)
+    meeting_date, counterpart, actions, decisions, pending, topics = parse_note(note)
     today = date.today().isoformat()
 
     wb = load_workbook(book) if book.exists() else Workbook()
     if "Sheet" in wb.sheetnames and wb["Sheet"].max_row == 1 and wb["Sheet"].max_column == 1:
         del wb["Sheet"]
     ensure_guide(wb)
+    t_added, t_updated = upsert_topics(ensure_topics_sheet(wb), topics,
+                                       meeting_date, counterpart)
 
     added = {"actions": 0, "decisions": 0, "pending": 0}
 
@@ -248,6 +328,8 @@ def main():
     print(f"  note: {note.name} (meeting {meeting_date}, counterpart {counterpart or '?'})")
     print(f"  added {added['actions']} actions, {added['decisions']} decisions, "
           f"{added['pending']} pending items (existing rows untouched)")
+    print(f"  topics: {t_added} new, {t_updated} last-discussed updated "
+          f"(your judgement columns untouched)")
 
 
 if __name__ == "__main__":
