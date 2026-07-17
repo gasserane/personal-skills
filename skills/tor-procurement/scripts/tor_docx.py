@@ -18,6 +18,7 @@ ane_package.reporting.brand.IPPF_FORMAT_TEMPLATE — if the IPPF template
 changes, update both.
 """
 
+import os
 from pathlib import Path
 
 from docx import Document
@@ -174,7 +175,13 @@ class TorBuilder:
 
     def save(self, out_path: Path | None = None) -> Path:
         out = out_path or Path(__file__).resolve().parent.parent / OUT_NAME
-        self.doc.save(out)
+        target = str(out)
+        # Windows MAX_PATH: docx saves fail past ~260 chars unless the path
+        # carries the \\?\ extended-length prefix. Applied only when needed so
+        # normal project paths stay untouched.
+        if os.name == "nt" and len(target) > 255 and not target.startswith("\\\\?\\"):
+            target = "\\\\?\\" + target
+        self.doc.save(target)
         return out
 
 
