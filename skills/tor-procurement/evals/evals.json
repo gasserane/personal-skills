@@ -1,0 +1,23 @@
+{
+  "skill_name": "tor-procurement",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need a ToR for a consultancy to redesign our MA data-quality training package. Budget ceiling around EUR 9,000 incl VAT from two funding sources, contract needs to be signed by mid-October, final products end of February. Build me a draft ToR.",
+      "expected_output": "Intake questions batched first (missing critical facts), then a branded docx ToR emitted via a python-docx generator saved alongside it, with every open-market checklist item either applied or flagged as a decision for Ane.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Review this ToR before I send it to procurement — projects/tor-drafts/service-contract-tor-v0.2.md. Give me strong and weak points and a grade.",
+      "expected_output": "Read-only two-lens review (senior acquisition + topic expert), strong/weak points against the open-market checklist, a 1-10 grade with a self-grading bias note and a recommendation for an external read.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "We agreed revisions on the ToR yesterday: bulk budget figure instead of the split, add a Q&A window, page cap of 10 on proposals. Apply them to the v0.3 generator and re-emit the docx.",
+      "expected_output": "Scope-bounded edits to the generator source via Edit (edit-preservation protocol), docx regenerated, out-of-scope observations reported separately, nothing else changed.",
+      "files": []
+    }
+  ]
+}
