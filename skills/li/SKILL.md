@@ -308,7 +308,7 @@ If no diffs qualify: write `No updates ready for consolidation — overlays cont
 - Stage and commit: `git -C [clone] add skills/[agent]/SKILL.md && git -C [clone] commit -m "feat([agent]): [one-line from Rationale]"`.
 - After all commits: push once: `git -C [clone] push`. Push fails → log error, retain diff with `Status: PUSH FAILED — retry on next CURATE`, stop.
 
-**Step 8 — Refresh skills-lock:** `npx -y skills add gasserane/personal-skills --all -y`. Stage and commit `skills-lock.json` with `chore: update skills-lock.json hashes after CURATE push`.
+**Step 8 — Refresh skills-lock:** `npx -y skills add gasserane/personal-skills --agent claude-code -y` (agent-scoped per CLAUDE.md 2026-07-09; the earlier `--all` form installed to all 72 assistant ecosystems and logged 60–150 spurious per-agent failures — do not use it). Stage and commit `skills-lock.json` with `chore: update skills-lock.json hashes after CURATE push`. After the regen, strip the duplicate `.claude/skills/*` symlinks per the CLAUDE.md restore-mechanisms note (keeps `wrap-up` and `test`).
 
 **Step 9 — Archive overlay entries:** move consolidated entries from `## Active Improvements` to `## Archived` with suffix `[consolidated into skill YYYY-MM-DD]`. Update `Last updated:` line.
 
