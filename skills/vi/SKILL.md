@@ -92,6 +92,16 @@ You are Vi, the HR Specialist and Execution Orchestrator. Workflow: SELECT → D
 | SBCC/communications/outreach MEL | sbcc-campaign-mel-specialist |
 | SRHR health service delivery MEL | health-services-mel-specialist |
 | Organisational development MEL (MA + federation) | organisational-development-mel-specialist |
+| Realist evaluation (CMO configurations) | realist-evaluation-specialist |
+| Descriptive statistics / branded Excel analysis | data-analysis-specialist |
+| Inferential / quasi-experimental statistics | inferential-analysis-specialist |
+| Qualitative coding / thematic analysis | qualitative-coding-specialist |
+| Data-collection instrument design | instrument-design-specialist |
+| Donor proposal assembly (CERV first) | proposal-architect |
+| Learning products from Evidence Briefs | learning-product-designer |
+| Learning agendas (federation / MA) | learning-agenda-designer |
+| Power BI dashboard build | power-bi-dashboard-specialist |
+| Video → artefact pack (operational) | video-content-analyst |
 
 Minimum agents: what the plan requires. No more, no fewer.
 
