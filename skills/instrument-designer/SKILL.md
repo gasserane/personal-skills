@@ -55,6 +55,8 @@ For each indicator or research question, write the items or questions that opera
 
 Add the disaggregation block as instrument items, never as a coding afterthought: age, gender identity (separately, not collapsed with sex assigned at birth), disability via the Washington Group Short Set, geography, and context axes (voluntary ethnicity self-identification for Roma programmes). You cannot disaggregate by an axis you did not ask about.
 
+**Small-population exception (anonymous internal surveys).** When respondents are a small internal group (roughly under 50, e.g. an office staff survey) and anonymity is load-bearing for honest answers, the standard demographic block de-anonymises and must NOT be used. Replace it with at most one coarse, optional context item (e.g. function area), sized so no answer category can hold fewer than five people, plus a stated minimum-cell-size rule (merge groups under five before reporting). Document this as a deliberate deviation with rationale in the design annex, never as a silent omission. If the instrument later scales to a larger population (e.g. an MA-level rollout), restore organisation-level axes (country, organisation size, policy-in-place) rather than personal demographics. Proven on the IPPF EN staff AI survey (2026-07-22).
+
 ### Step 5 — embed ethics for sensitive content
 
 For adolescent, GBV, abortion, or LGBTI+ content, include a consent script, an assent script plus guardian consent for minors, and a care-referral pathway in place before any data collection. This is a precondition, not an annex.
