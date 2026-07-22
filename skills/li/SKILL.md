@@ -118,6 +118,16 @@ The managed-bibliography gate. Mirrors the FEEDBACK pattern: stage in a
 gitignored file, approve into canonical surfaces via a verbatim gate, never
 auto-write.
 
+**Harness gate on new DOIs (added 2026-07-22).** Any operation that adds a
+new DOI-bearing citation to `domain-standards*.md` or `frameworks/*.md`
+(INGEST-FROM-RESEARCHER, INGEST-DOCUMENT, INGEST-AD-HOC, APPROVE-INGEST, or
+manual framework-page creation) must run
+`python -m ane_package.bibliography.sync` from the work-folder root before
+commit. The harness check `biblio:framework-page DOIs covered in Zotero`
+FAILs on any framework-page DOI absent from the Zotero cache (proven
+2026-07-22, pleasure-based-srhr INGEST: 293/294 until the sync ran). The
+sync is idempotent; it needs the Zotero write key.
+
 Sub-commands:
 
 - `/li biblio sync` — one-shot push current wiki citations → Zotero. Walks
