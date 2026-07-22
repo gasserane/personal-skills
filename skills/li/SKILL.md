@@ -131,9 +131,16 @@ sync is idempotent; it needs the Zotero write key.
 Sub-commands:
 
 - `/li biblio sync` — one-shot push current wiki citations → Zotero. Walks
-  `domain-standards.md` rows + `frameworks/*.md` citation lines; calls
-  `BibliographyStore.add_or_update` for each; populates the `wiki_pages` field
-  on each Zotero record.
+  every wiki citation surface (scope extended 2026-07-22): both
+  `domain-standards*.md` files at the wiki root plus `frameworks/`,
+  `concepts/`, `indicators/`, `sources/`, `lenses/`, and `glossaries/`
+  (`log.md` excluded — append-only history may carry since-corrected
+  citations); calls `BibliographyStore.add_or_update` for each DOI; populates
+  the `wiki_pages` field on each Zotero record. The harness gate
+  `biblio:framework-page DOIs covered in Zotero` enforces the same scope, so
+  any new DOI on these surfaces fails the harness until this sync runs.
+  Known limitation: DOIs absent from CrossRef (e.g. some UTP book DOIs) are
+  skipped for metadata refresh; the Zotero record itself is unaffected.
 
 - `/li biblio check` — run the candidate-surfacer (`surface_candidates`)
   across the full Zotero group library. Stages any returned candidates in
