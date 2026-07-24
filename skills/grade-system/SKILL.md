@@ -179,6 +179,8 @@ Two shapes, calibrated from observed actuals:
 
 Both stay within the 200k system-improvement cap; the grade-plus-followup shape reaches it. If the run is grading only with no edits, the lower band applies.
 
+**Gathering method drives the cost more than the grade does.** Pass 7 (2026-06-20) fanned Step 1 out across four subagents and spent roughly 340k subagent-side. Pass 8 (2026-07-24) gathered the same evidence with direct Read and Bash calls and reached the same A− with the whole session, including two followup moves and a cross-repo sync, at ~208k. Default to direct gathering. Two honest caveats: this is n=1 against n=1, and pass 8 may have benefited from pass 7 having already mapped where the evidence lives. Treat it as "direct gathering sufficed once", not as proof that fan-out is wasteful. Reach for subagents when the evidence surface is genuinely unfamiliar or when a parallel scan (for example an em-dash sweep across many pages) is the actual work.
+
 ## Cross-references
 - `/system-audit` finds bugs; `/grade-system` characterises overall quality posture. Use both for a complete read: audit first to clear quick fixes, then grade.
 - `agent-improvements/system-audit-2026-04-28.md` is the original architecture audit; carries through to grade dimensions.
