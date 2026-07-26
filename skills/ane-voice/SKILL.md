@@ -30,6 +30,18 @@ This skill does NOT do what most public humanizers do. Specifically, do NOT:
 
 If a public humanizer pattern would add any of the above, do the opposite.
 
+## Ane's signature — protect, never strip
+
+Distilled 2026-07-26 from Ane's own writing (2016 Romanian LinkedIn article on learning project management; 2020 IPPF EN COVID survey overview). Three signature traits: **personal story, self-irony, and radical practical generosity**. The passes strip AI slop; they must never strip these. The formula: structure from the 2026 standards, soul from the 2016 article.
+
+- **Story opening (engagement register only).** In reader-facing engagement outputs (LinkedIn posts, learning products, workshop packs, MA-facing guides, capacity-building content), a two-sentence concrete story or moment may open the piece, provided the finding or promise lands by sentence three. Do not flag it as a BLUF violation or an abstract opening. In management briefs, donor and compliance content, and analytical briefs, BLUF stays absolute: no story opening.
+- **Direct address.** "You" spoken to the reader in MA-facing, learner-facing, and LinkedIn content is Ane's voice, not slop. Keep it. Genuine reflective questions in learning content are pedagogy, not rhetorical flourish; the no-rhetorical-questions rule targets analytical documents.
+- **Candour about limitations.** Sentences that plainly admit what did not work, what the data cannot show, or the weakness of a recommended resource are a trademark. Never soften, never delete. They build trust and complement the ⚠️ data-gap protocol.
+- **Radical practical generosity.** Concrete resources, prices, durations, named tools, worked examples that equip the reader to act. Never cut these for length; cut context and throat-clearing instead.
+- **Self-irony.** Allowed in personal thought-leadership pieces (LinkedIn, blog), sparing, at most one moment per piece. Not in institutional deliverables.
+
+When a pass conflicts with this section, this section wins for engagement-register outputs.
+
 ## Required inputs
 
 1. The text to edit (required)
@@ -111,7 +123,7 @@ Scan for paragraph openers like:
 - "There is growing recognition"
 - "Stakeholders must"
 
-Replace with a direct claim or a concrete actor + action. The opening states the point; context follows.
+Replace with a direct claim or a concrete actor + action. The opening states the point; context follows. A two-sentence concrete story in an engagement-register piece is NOT an abstract opening; see "Ane's signature".
 
 ### Pass 8 — Verify citations (rigour and placement)
 
@@ -131,7 +143,7 @@ Scan for claims invoking a framework, statistic, guideline, or evidence without 
 Confirm the prose matches the target audience tier.
 
 **For Tier 1 working brief, flag and fix:**
-- **BLUF violation.** Recommendation buried after method or context. Rewrite so sentence 1 = the verdict; sentence 2 = the load-bearing reason.
+- **BLUF violation.** Recommendation buried after method or context. Rewrite so sentence 1 = the verdict; sentence 2 = the load-bearing reason. *Exception: engagement-register outputs may open with a two-sentence story that lands the point by sentence three; see "Ane's signature".*
 - **Framework name-dropping.** "Applying Mayne (2019)…" / "Using Crenshaw's intersectionality framework…" in the running prose. Strip the name; keep the substantive move. *Exception: subgroup = junior-MEL — keep the framework name AND the analytic move; the signposting is the pedagogy.*
 - **Visible lens signposting.** "A feminist lens reveals…" / "From a decolonial perspective…" Strip from prose; the analysis still does the work. *Exception: subgroup = junior-MEL — keep visible signposting.*
 - **MEL jargon without first-use gloss.** *Outcome harvesting, contribution claim, theory of change pathway, attribution gap, MEAL.* Add 6-word gloss in parentheses on first use, or replace with plain verb.
