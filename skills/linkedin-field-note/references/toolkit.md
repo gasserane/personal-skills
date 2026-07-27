@@ -21,7 +21,8 @@ Content lives in the script (it IS the canonical source for the toolkit, alongsi
 ## The quality bar (checklist — all items, every toolkit)
 
 - **Cover page:** monogram PNG at 2.4cm; title in Newsreader (DISPLAY) ~34pt wine; apricot `rule_below`; subtitle naming it a companion to the article (quote the article title); name · title line; date · `linkedin.com/in/anemariegasser`; page break.
-- **Page map** ("Inside this kit" or similar) with **printed page numbers** per part. Page numbers must be real: after the first render, read the actual page of each anchor (Word COM `doc.Repaginate()` + `Find` + `Information(3)`, PowerShell 5.1 — pwsh 7 nulls COM methods), write the numbers into the map, render again, and re-check once (a changed map can reflow). Never ship guessed page numbers.
+- **Cover illustration:** one diagram on the title page, below the byline, at full text width (`Cm(16.2)` on the A4 page set by `page_setup`), with a right-aligned Zilla Slab (LABEL) 9.5pt slate caption stating what it shows. Build it in its own `render_<slug>_cover.py` beside the kit generator so wording changes re-render in seconds: PIL on a `GROUND` canvas, slate spine and faint notebook rules for the field-note family look, wine and slate as the two carriers, apricot on the numbered stations only. Draw at 3x and downsample with LANCZOS — PIL arcs are not anti-aliased. Make it *procedural*, not conceptual: whatever the article illustrated as an idea, the kit cover shows as the steps the reader will run, numbered, in the order the kit teaches them. Newsreader variable-font axes are `[Weight, Optical Size]` in that order.
+- **Page map** ("Inside this kit" or similar) with **printed page numbers** per part. Page numbers must be real: after the first render, read the actual page of each anchor (Word COM `doc.Repaginate()` + `Find` + `Information(3)`, PowerShell 5.1 — pwsh 7 nulls COM methods), write the numbers into the map, render again, and re-check once (a changed map can reflow). Never ship guessed page numbers. Do not loop `Range.Information(3)` over every paragraph: it repaginates on each call and took over two minutes on a 5-page kit. `doc.ComputeStatistics(2)` returns the page count in one fast call — enough to confirm a cover change did not reflow the map.
 - **Type-first box labels**, Zilla Slab (LABEL) 10pt slate caps, one per box: `COPY-PASTE ...` for paste-ready blocks; `WHY IT MATTERS` / `WATCH OUT` / `TRY THIS` / `NOTE` for callouts. The label tells the reader what to DO with the box before they read it.
 - **Copy-paste blocks:** `box(doc, fill=GROUND, border=SLATE)`, body lines in IBM Plex Mono (MONO) at 9.5-10pt ink, `space_after=0` between lines. Mono carries paste-ready instructions and values only, never running prose.
 - **Callouts:** `box(doc, fill=GROUND_TINT, border=SLATE)`, body 11pt Nunito Sans ink.
@@ -34,7 +35,11 @@ Content lives in the script (it IS the canonical source for the toolkit, alongsi
 ## Outputs
 
 1. `build_<slug>_kit.py` + `YYYY-MM-DD <Kit name> (article companion).docx` + `.md` mirror.
-2. **PDF** for the LinkedIn document post: Word COM `SaveAs2(path, 17)` from the final `.docx` (fonts embed per brand rule). Regenerate the PDF from whichever file is authoritative at that moment.
-3. **Cover visual** PNG if the document post wants one, per `AG Business/Brand/BRAND-SPEC.md` (field-notebook motifs, `FIELD NOTE #NN` stamp, apricot on exactly one element).
+2. **PDF** for the LinkedIn document post, regenerated from whichever file is authoritative at that moment. **Ask Ane to export it from the Word UI; do not automate this step.** Word COM `ExportAsFixedFormat` and `SaveAs2(path, 17)` hang on these kits: three runs on 2026-07-27 each passed 25 minutes without writing a file, on the OneDrive path and on a local copy, while the same export by hand finished in seconds. Hand her the `.docx` and say plainly that the PDF is stale. Word COM stays fine for opening and page counts.
+3. **Cover visual** PNG if the document post wants one, per `AG Business/Brand/BRAND-SPEC.md` (field-notebook motifs, `FIELD NOTE #NN` stamp, apricot on exactly one element). This is the LinkedIn post image and is separate from the title-page illustration inside the kit; they share the visual family, so build the kit cover from the same motifs.
+
+## After a Word save
+
+Once Ane opens the `.docx` in Word and saves (which she does to export the PDF), her saved file is newer than the generator's output. Re-running `build_<slug>_kit.py` would overwrite it. Check timestamps before regenerating, and if hers is newer, ask what changed in Word and fold it into the generator first.
 
 Present the rendered PDF to Ane page by page if she asks; iterate; record approval per artifact. Update the ledger.
