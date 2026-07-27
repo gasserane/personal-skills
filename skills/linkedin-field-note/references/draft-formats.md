@@ -33,7 +33,23 @@ The `.md` files are canonical; `.docx` renders follow them until Ane hand-edits 
 
 The article link placeholder plus any P.P.S. that was trimmed from the post. Posted by Ane or by the skill immediately after the post goes live.
 
+## Sequencing check (run before showing Ane; caught a publish-blocker on #02)
+
+The article and the short post get drafted together, but they **publish in order**: article first, post second, first comment third. The post may point back to the article. The article must never point at the post.
+
+Check every cross-reference in the article and delete or rewrite any that assumes the reader has already read the post: "in the short version I gave one answer", "the short post tells this story in full", "as I said in the post". A reader meets the article cold, so each of those sentences points at something they have not seen.
+
+Two consequences follow, both proven on #02:
+
+- **The article carries the full story.** If a concrete example lives only in the post, and the post is being cut to the ultra-short shape, move that example into the article before cutting. The long article is where the whole story belongs.
+- **A toolkit reference is a look-back, not a promise**, whenever the calendar puts the kit's Tuesday document post ahead of the article. Write "the kit I posted on Tuesday", not "a kit I will publish".
+
+Grep the article draft for `short version|short post|as I (said|wrote)` and confirm zero hits before presenting.
+
 ## Rendering the .docx
+
+**A stale `.docx` is the series' known failure mode.** After any revision round on the `.md`, the previously rendered `.docx` is out of date and must not be reviewed or published from. Do not re-render mid-revision either: rendering text Ane may still change recreates exactly the divergence her standing rule guards against (final text is copied only from the source file, never from an earlier draft). Render once, after she approves the text; from that point the `.docx` she hand-edits is authoritative.
+
 
 Render from the `.md` with the personal-brand generators: read `generators/gen_article.py` and follow its pattern (fall back to `pb.py` primitives: `base_document`, `page_setup`, `para`, `style_run`, `rule_below`, `brand_footer`). Wine & Slate only. The `.docx` exists so Ane can review and hand-edit in Word; keep it faithful to the `.md`, no extra decoration.
 
