@@ -33,7 +33,7 @@ Run the stages in order for a new field note; enter mid-pipeline when Ane resume
 | 1 TOPIC | The next topic, chosen by Ane from 2-3 ledger-grounded proposals | `references/ledger.md` |
 | 2 INTERVIEW | Lessons, story, numbers, toolkit promise — extracted one question at a time | `references/interview.md` |
 | 3 DRAFT | Article `.md` + branded `.docx`, short post `.md`, first-comment text | `references/draft-formats.md` |
-| 4 TOOLKIT | The companion artifact the article promises: generator script, `.docx`, `.pdf`, cover visual | `references/toolkit.md` |
+| 4 TOOLKIT | The companion artifact the article promises: generator script, `.docx`, `.pdf`, cover illustration, cover visual, and the caption for the document post | `references/toolkit.md` |
 | 5 PUBLISH | The posts live on LinkedIn per the agreed calendar; ledger updated | `references/publish.md` |
 
 After every stage: update the ledger entry for the note (status, paths, decisions). Milestone writes — draft and correct in conversation, write files at confirmed decision points, not per message.
