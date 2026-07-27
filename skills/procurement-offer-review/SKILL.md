@@ -1,6 +1,6 @@
 ---
 name: procurement-offer-review
-description: 'Review an incoming supplier technical/financial offer against an IPPF ToR, and keep the internal procurement pack consistent. Use when Ane asks to "review this offer/proposal against the ToR", "is the final proposal aligned with the ToR and my comments", "check their revised offer", "add my comments to the offer", "propagate [a decision] across the procurement/waiver docs", "sweep the new figure across the pack", or "compare my scores with the AI scores" in a multi-bidder evaluation. Three modes: offer-review (clause-by-clause gap table vs the ToR and vs Ane''s prior comment round, arithmetic and VAT checks, residual issues ranked by cheapest fix, anchored Word margin comments on a _COMMENTS copy — never the vendor original), pack-propagate (apply one procurement decision across ToR, waiver justification, best-value note and acquisition checklist, with a residual scan and ⚠ Finance-to-confirm flags for compliance calls it never decides itself), score-compare (evaluator-vs-AI comparison tab and formula-linked single-source scoring workbook). Distinct from tor-procurement (drafts and grades the ToR itself, upstream of offers), /proposal (writes funding proposals TO donors), implementation-pack (post-award tracking), and accreditation-desk-review (MA compliance).'
+description: 'Review an incoming supplier technical/financial offer against an IPPF ToR, and keep the internal procurement pack consistent. Use when Ane asks to "review this offer/proposal against the ToR", "is the final proposal aligned with the ToR and my comments", "check their revised offer", "add my comments to the offer", "propagate [a decision] across the procurement/waiver docs", "sweep the new figure across the pack", "compare my scores with the AI scores" in a multi-bidder evaluation, or "write up the evidence for each criterion" and "explain the scores for the committee". Three modes: offer-review (clause-by-clause gap table vs the ToR and vs Ane''s prior comment round, arithmetic and VAT checks, residual issues ranked by cheapest fix, anchored Word margin comments on a _COMMENTS copy — never the vendor original), pack-propagate (apply one procurement decision across ToR, waiver justification, best-value note and acquisition checklist, with a residual scan and ⚠ Finance-to-confirm flags for compliance calls it never decides itself), score-compare (evaluator-vs-AI comparison tab and formula-linked single-source scoring workbook). Both evaluation modes emit plain-language evidence cards, one per criterion, written so a committee member who never read the ToR can check any single judgement. Distinct from tor-procurement (drafts and grades the ToR itself, upstream of offers), /proposal (writes funding proposals TO donors), implementation-pack (post-award tracking), and accreditation-desk-review (MA compliance).'
 model: opus
 ---
 
@@ -23,17 +23,49 @@ If the mode is ambiguous, ask in one line before working.
 - **OneDrive revert hazard.** In non-git OneDrive folders, sync can silently revert a fresh write within seconds. After any file write, verify the content landed (re-read a changed line). In git folders, write and commit in one block.
 - Extraction mechanics (docx text, tracked changes, comments XML, PDF text, openpyxl formulas) live in `references/docx-xlsx-mechanics.md`. Read it before writing any comment, in-place docx edit, or workbook formula.
 
+## Evidence cards — the per-criterion synthesis (OFFER-REVIEW and SCORE-COMPARE)
+
+Both evaluation modes produce one **evidence card** per ToR requirement or scored criterion. The card, not the classification and not the score, is what a committee member reads.
+
+Write every card for someone who did not draft the ToR and is not a specialist in what is being bought. That describes most people on most procurement committees, Ane included whenever the subject is IT rather than MEL. A classification without a card is not a finding. A card without a source location is not evidence.
+
+Cards can also be requested on their own ("write up the evidence for each criterion"), against an existing scoring workbook or review.
+
+**The six fields, in this order:**
+
+1. **What this asks for.** One sentence in plain English. The ToR reference goes in brackets at the end, never as the opening words.
+2. **Why it matters.** One sentence naming the operational consequence if the bidder is weak here. Specific to this contract. Generic risk language fails this field.
+3. **What the bidder offered.** The evidence, with its location (section or page). Quote the load-bearing phrase whenever the exact wording decides the judgement.
+4. **What is missing or unclear.** The gap, named plainly. "Not stated" is a legitimate and useful entry.
+5. **Judgement.** met / partial / missing / diverges, or the score with the band label from the template's own rating scale.
+6. **What would change it.** The specific evidence that would move this up a band. This makes the judgement falsifiable and doubles as the clarification question to send the bidder.
+
+**Language rules for cards.** Tier 1 working brief; the reader is a colleague, not a specialist.
+
+- Spell out every acronym in every card. Cards get read out of order and in isolation.
+- Gloss every technical term in six words at first use inside the card.
+- State consequences operationally. "We could not get our own data out when the contract ends" beats "vendor lock-in risk".
+- Anglo-Saxon verbs over Latinate: use not utilise, run not facilitate, check not ascertain.
+- Sentences under 25 words, active voice, actor first.
+
+**Two hard rules:**
+
+- **Field 2 comes from the ToR wherever the ToR states a reason.** Where it does not, the card says `(rationale inferred, not stated in the ToR)`. Never present your own inference as the ToR's intent.
+- **Every claim in field 3 carries a location.** No location means the claim does not go in the card.
+
+**Reader test before delivery.** Take one card and ask: could a committee member who has never opened the ToR understand what was asked, why it matters, and why this bidder landed where it did? If not, the card fails, and the fix is field 1 or field 2. It is almost never more detail in field 3.
+
 ## OFFER-REVIEW mode
 
 Inputs: the offer (docx or PDF), the ToR it answers, and — when this is a resubmission — Ane's prior comment round (margin comments and/or tracked changes; extract both from the docx XML, they carry the negotiation history).
 
 1. **Extract all three sources** before judging anything. For a resubmission, build the list of Ane's prior asks: each margin comment and each tracked insertion is one ask.
-2. **Walk the ToR clause by clause.** For every ToR requirement (scope items, deliverables, budget lines, IP and handover, VAT declaration, safeguarding, reporting), classify the offer's response: **met / partial / missing / diverges**. Note offer content with no ToR basis separately — new scope items need a deliberate accept, especially anything touching security or access models.
+2. **Walk the ToR clause by clause.** For every ToR requirement (scope items, deliverables, budget lines, IP and handover, VAT declaration, safeguarding, reporting), write an evidence card. The **met / partial / missing / diverges** classification is field 5 of the card, not the whole answer. Note offer content with no ToR basis separately — new scope items need a deliberate accept, especially anything touching security or access models.
 3. **Check the arithmetic yourself.** Recompute every total: days × rate, VAT (net × rate = gross), sum of budget lines, and every ceiling figure against the approved amount. Figures that agree in the table but disagree on a cover page are a classic drift — check every occurrence of every figure, not the first.
 4. **Verify the prior round.** For each of Ane's prior asks: taken up / partially / not taken up. Not-taken-up items are findings, not footnotes — they are the negotiation's open positions.
 5. **Watch the known traps** (each cost a real review round): licence granted where the ToR requires assignment; a licence quietly narrowed ("within X network"); advance-payment trigger named differently in ToR and offer; deliverable timing moved without the payment schedule moving; a deferred component whose safety consequence is unstated (e.g. submissions with no approval gate); hosting/maintenance implied but never committed.
 6. **Rank residual issues by cheapest fix**, in this order: (a) contract precedence — the contract states which document governs, no reissue; (b) one-line written confirmation by email; (c) vendor reissue — reserve for errors that would mislead a signatory or auditor. Minimising reissue rounds is a feature: every reissue costs a week.
-7. **Deliver BLUF:** verdict sentence first (aligned / aligned with N residuals / not aligned), then what was taken up (confirmed line by line), then residual issues numbered with severity and fix route, then good news (scope gained, items resolved). Offer to draft the reply that carries the fix routes.
+7. **Deliver BLUF:** verdict sentence first (aligned / aligned with N residuals / not aligned), then what was taken up (confirmed line by line), then residual issues numbered with severity and fix route, then good news (scope gained, items resolved). The evidence cards follow as an annex, one per requirement, so a reader can check any single judgement without reading the offer. Offer to draft the reply that carries the fix routes.
 8. **Margin comments (on request, docx offers only).** Write anchored comments on the `_COMMENTS` copy via `scripts/add_offer_comments.py`. Anchor each comment to the specific paragraph it concerns; a comment anchored to the wrong paragraph is worse than none.
 
 ## PACK-PROPAGATE mode
@@ -52,7 +84,8 @@ For multi-bidder evaluations with a scoring workbook (evaluator's working matrix
 
 1. **Single source of truth first.** Link the official form's score cells (and any benchmark-duplicate sheet) by formula to the evaluator's working Evidence Matrix, so scores are edited once and every dependent sheet follows. **Before linking, diff the sheets** — a silent revision in the working sheet changes official scores the moment the link lands. Surface any divergence and back up the workbook first.
 2. **Comparison tab:** side-by-side evaluator / AI / Diff per criterion, plus totals, ranks, and a threshold-agreement column. Flag rule anchored to the template's own rating bands: red = diff ≥ 20% of the criterion max (a full band) or 10+ total points; amber = 10–19% (or 5–9 total); separate flags for threshold divergence and rank shifts of 3+ places. Live formulas and conditional formatting, not pasted values.
-3. **The comparison informs, the evaluator decides.** AI scores never overwrite evaluator scores; the tab exists so divergences get looked at, and the look is Ane's.
+3. **Cards alongside the numbers.** The comparison tab shows *where* the evaluator and the system disagree. It never shows *why*, and a committee reading only the numbers cannot check either score. Add a `Criterion cards` sheet: one row per criterion, the six card fields as columns, wrapped text, criterion ID matching the comparison tab so a red diff cell is one lookup from the evidence behind it. Where evaluator and system diverge, field 6 names what evidence would settle it.
+4. **The comparison informs, the evaluator decides.** AI scores never overwrite evaluator scores; the tab exists so divergences get looked at, and the look is Ane's.
 
 ## Scope boundary
 - Drafting or grading the ToR itself is `tor-procurement` (upstream). Post-award tracking is `implementation-pack`. Donor-facing proposals are `/proposal`.
