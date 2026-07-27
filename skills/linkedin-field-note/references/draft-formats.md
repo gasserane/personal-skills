@@ -42,7 +42,9 @@ Check every cross-reference in the article and delete or rewrite any that assume
 Two consequences follow, both proven on #02:
 
 - **The article carries the full story.** If a concrete example lives only in the post, and the post is being cut to the ultra-short shape, move that example into the article before cutting. The long article is where the whole story belongs.
-- **A toolkit reference is a look-back, not a promise**, whenever the calendar puts the kit's Tuesday document post ahead of the article. Write "the kit I posted on Tuesday", not "a kit I will publish".
+- **A toolkit reference is a forward promise, not a look-back.** Within one field note the order is always article, then post, then kit. Write "I am publishing the kit on Tuesday", never "the kit I posted on Tuesday".
+
+**Do not misread the calendar** (this cost a wrong revision round on #02). "Tuesday toolkit, Wednesday/Thursday article" describes the **weekly rhythm across notes**: Tuesday carries the *previous* note's kit, Wednesday or Thursday opens the *next* note. It does not mean a note's own kit precedes its own article. Three checks confirm the order: #01 published article and post on Wednesday 22 July with the Start-with-three kit following after; the Run the loop kit opens with "The article argued that…", which only parses if the article ran first; and a kit promised but not yet published is what gives the article's closing question something to point at.
 
 Grep the article draft for `short version|short post|as I (said|wrote)` and confirm zero hits before presenting.
 
