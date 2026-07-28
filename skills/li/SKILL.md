@@ -142,6 +142,13 @@ Sub-commands:
   Known limitation: DOIs absent from CrossRef (e.g. some UTP book DOIs) are
   skipped for metadata refresh; the Zotero record itself is unaffected.
 
+- **Non-DOI sources (guidance PDFs, blog posts, books, living repos).** Push
+  them too: `add_or_update` falls back to URL matching, so it stays idempotent.
+  Set `item_type` (report / blogPost / book / document) and send only fields
+  valid for THAT type — `_record_to_data` always emits publicationTitle/volume/
+  DOI, which blogPost rejects (it takes `blogTitle`). A rejected write returns
+  `created=True` with an EMPTY key: re-probe by URL, empty key means failure.
+
 - `/li biblio check` — run the candidate-surfacer (`surface_candidates`)
   across the full Zotero group library. Stages any returned candidates in
   `agent-improvements/_pending-biblio-updates.md`.
