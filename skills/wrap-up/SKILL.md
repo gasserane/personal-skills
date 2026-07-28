@@ -33,7 +33,9 @@ Otherwise capture the branch once: `git branch --show-current`. Hold it as the *
 Run `git status --short`. For unpushed commits, run `git log --oneline "@{u}.." 2>/dev/null`. If the branch has **no upstream** (`git rev-parse @{u}` fails), say so explicitly: nothing is pushed yet, and the push step will set `-u`. Do not report "all pushed" when there is no upstream. Report uncommitted files (count + list), unpushed commits (count + list), and the current branch. If both are clean, state that clearly.
 
 **2. Test harness (project-aware)**
-If `tests/run_tests.py` exists in the repo root AND there is at least one uncommitted text file (markdown, code, config), run `python tests/run_tests.py` and include the result. If it passes, report `✅ Harness N/N`. If it fails, list each failure as `⚠️ HARNESS:` and recommend `/test` for detail. If the harness file does not exist, skip this check silently — most repos have no MEL harness.
+If `tests/run_tests.py` exists in the repo root AND the session **touched** a text file the harness covers (markdown, code, config), run `python tests/run_tests.py` and include the result. "Touched" means edited at any point this session, whether the change is still uncommitted or already committed. If it passes, report `✅ Harness N/N`. If it fails, list each failure as `⚠️ HARNESS:` and recommend `/test` for detail. If the harness file does not exist, skip this check silently — most repos have no MEL harness.
+
+**Do not gate this check on a dirty working tree.** A clean tree means the work is committed, not that it is correct. On 2026-07-28 the tree was clean at wrap-up and the harness was red: an edit had gone into `claude-ai-shareable-export/` (a generated mirror) instead of the canonical root file, and `check_claude_ai_sync` caught the divergence. Gating on uncommitted files would have closed the session with a red harness and a broken claude.ai export already pushed to origin.
 
 **3. Recent errors**
 Scan this conversation for error messages, failed commands, or unresolved issues identified but not fixed: stack traces, "error:", "failed", "TODO", explicit "I'll fix this later" statements.
