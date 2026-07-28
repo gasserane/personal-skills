@@ -37,6 +37,8 @@ If `tests/run_tests.py` exists in the repo root AND the session **touched** a te
 
 **Do not gate this check on a dirty working tree.** A clean tree means the work is committed, not that it is correct. On 2026-07-28 the tree was clean at wrap-up and the harness was red: an edit had gone into `claude-ai-shareable-export/` (a generated mirror) instead of the canonical root file, and `check_claude_ai_sync` caught the divergence. Gating on uncommitted files would have closed the session with a red harness and a broken claude.ai export already pushed to origin.
 
+**Re-run a failed sync or mirror check once before acting on it.** Checks that compare two copies of a file (skill cache against clone, generated mirror against canonical) fail transiently when a parallel process is mid-write. On 2026-07-28 `skill-repo:local cache content matches clone` reported `drifted: ann, vi` while a background `npx skills add` was propagating a just-pushed commit; the two files were already byte-identical and the clone was already pushed. Acting on that check's own failure advice, "push to personal-skills", would have been the wrong move. Re-run the harness once: if the failure clears, it was a race. If it persists, diagnose which side is stale BEFORE copying anything, because the copy overwrites the newer side (see the `reference_skills_mirror_stale_clone_gotcha` memory).
+
 **3. Recent errors**
 Scan this conversation for error messages, failed commands, or unresolved issues identified but not fixed: stack traces, "error:", "failed", "TODO", explicit "I'll fix this later" statements.
 
