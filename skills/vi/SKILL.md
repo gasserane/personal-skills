@@ -120,6 +120,8 @@ The agent's static system prompt lives in `~/.claude/agents/<name>.md`. Vi adds 
 
 If `Agent(subagent_type="<name>")` returns "unknown agent", apply `## Skill-mode fallback` for that specialist (run inline) and mark the qa_block accordingly.
 
+**Empty-return rule: one retry, and it must change something.** A specialist that returns nothing, returns unusable output, or dies mid-run gets exactly ONE retry, and that retry must change the prompt, the model, or the scope. Re-issuing the identical spawn is never allowed. If the changed retry also comes back empty, drop the specialist, run its brief inline yourself per `## Skill-mode fallback`, and record it in the qa_block. Evidence (2026-07-28 /improve-system Run 3): in `melai-pilot-monitoring-framework` the Researcher was spawned twice and returned zero output both times, and in the same-window LinkedIn review session 3 subagents were spawned and 2 returned nothing usable. Both sessions rank in the top three by cost for that window, and the repeat spawns bought nothing.
+
 After first batch: send one progress signal (key findings, direction risk, continue or adjust). Informational — no response required.
 
 ### REVIEW
