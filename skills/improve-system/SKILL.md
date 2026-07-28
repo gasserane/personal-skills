@@ -34,7 +34,7 @@ Mine the system's own correction history for recurring failure patterns, trend t
 
 4. **Propose edits.** Per pattern: target surface (CLAUDE.md rule, skill edit, agent edit, checklist, feedback memory, or PreToolUse hook for never-do rules), draft wording, expected effect on the metric. Present all proposals as a numbered list and wait for Ane's per-item approve/reject/defer.
 
-5. **Apply approved items only.** Use the Edit tool, scope-bounded. Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists.
+5. **Apply approved items only.** Use the Edit tool, scope-bounded. Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists. **When an approved item edits a skill or agent file, re-run the harness before closing the run.** P1 line budgets gate those files (`budget:vi ≤ 250` and siblings), so adding a rule can breach one and the failure surfaces only at the final harness run. Fix it by folding the addition into an adjacent paragraph, never by trimming content you did not write. Evidence: Run 3's vi one-retry rule took the file from 249 to 251 lines and cost a follow-up commit.
 
 6. **Close the run.** Append a dated summary (metric figures, patterns found, proposals + Ane's decisions) to `agent-improvements/improve-system-runs.md` (create with a `# Improve-System Run Log` header if absent). Then mark the cadence: `python ~/.claude/hooks/maintenance_due.py --mark improve-system 2>/dev/null || true`.
 
