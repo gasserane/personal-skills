@@ -232,8 +232,10 @@ Graduates this session's `cost-calibration-log.md` row from an estimate to a fir
 
 **Trigger.** The session appended, or should have appended, a row to `agent-improvements/cost-calibration-log.md`: a COMPLEX `/ann` run, or a system-improvement session (`/grade-system`, `/system-audit`, wiki expansion, specialist deployment, harness or P1/P2 budget work). Skip for conversation, trivia, light edits, and any session with no calibration row.
 
+**It re-triggers on every wrap-up, not only the first.** A figure pasted mid-session goes stale the moment work continues. On 2026-07-29 the row was written at 210k, then the session ran on to 269k through a branch move, a script fix and a second wrap-up, so the log understated that run by about a quarter and nothing flagged it. When a row for this session already carries a firm actual, do NOT treat the loop as done: offer it again, naming the figure already captured and the work done since, and on accept overwrite that row's `Actual` and `Variance` in place. Never append a second row for the same run. The last paste before the terminal closes is the true one.
+
 **On accept.** Ask Ane to paste the `/cost` block (context tokens used, `$` cost, cache %, duration). Then:
-1. Identify the cost-calibration row(s) this session opened, matched by task slug and today's date.
+1. Identify the cost-calibration row(s) this session opened, matched by task slug and today's date. A row that already holds a firm actual from an earlier wrap-up in the same session is updated, not duplicated.
 2. **One row:** write the pasted figure to that row's `Actual`, then compute `Variance` against its `Estimated band` (flag `⚠️ over-band` at actual ≥ 1.5× the upper bound). Update the row in place with Edit (apply `edit-preservation`; touch only that row).
 3. **More than one row:** the `/cost` total is the session sum, not per-task. Ask Ane for the rough split. If she gives one, write each row. If not, record the total against the largest-scope row, annotate the others `[shared session total — see <slug>]`, and never write a fabricated per-row figure (factual-reliability rule).
 4. Refresh the log's variance-summary counts if the file maintains them (total rows, firm-observed count, over-band count).
