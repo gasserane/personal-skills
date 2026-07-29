@@ -37,6 +37,10 @@ If both documents are present and Ane has not said which mode, ask in one line. 
 
 # SCORE mode
 
+## Step 0. Blind-run hygiene
+
+Before opening anything, list the folder holding the supplied documents and match every file against `*ESR*`, `*evaluation*summary*`, `*evaluation*report*`. If one is there, name it in the output, state that it will not be opened, and recommend moving it out of the run scope before scoring starts. Restraint is not a control. A reader cannot verify that a file sitting in scope went unread, and in a live demonstration that gap is the whole difference between a test and a claim.
+
 ## Step 1. Extract the grid, and list it before scoring anything
 
 Read the call document award-criteria section. Produce, in the output, before any judgement appears:
@@ -164,6 +168,8 @@ The donor ESR has arrived. The value of this mode is entirely in its honesty, an
 
 **Never revise the original scores.** Show both, unchanged. Quiet retrofitting destroys the only thing the comparison is for, and it is tempting precisely because it makes the output look better. Reproduce the prior scoring exactly as published and say in the header that nothing was revised.
 
+**The ESR path is always supplied, never discovered.** Ane names the file. Do not scan a folder for it and do not open a candidate noticed while doing something else. Folder scanning is how an ESR ends up read during a SCORE run.
+
 ## Structure
 
 1. **Headline scores table.** Criterion, maximum, threshold, my score, donor score, difference, and both as percentages of the maximum. Percentages matter: a three-point gap on a twenty-point criterion is a different failure from a three-point gap on forty.
@@ -216,6 +222,8 @@ Recipes, the exact import lists, the branded-table helper and the glossary patte
 Every generator carries an edit-preservation staleness warning in its docstring, naming the .docx it builds and pointing at `mel_wiki/wiki/concepts/edit-preservation-protocol.md`. Apply that protocol whenever the target file already exists.
 
 **AI disclosure.** Both outputs close with the disclosure line: the model, that scoring judgement and recommendations need human verification before use, and that AI is not an author and not a source. For a blind run, state that the donor evaluation was present and deliberately not opened, because that sequence is what makes the comparison a test rather than a reconstruction.
+
+**Say which kind of blind.** The method note states either **structurally blind**, meaning the donor evaluation was absent from the run scope, or **blind by restraint**, meaning it sat in the folder and was not opened. These are not equally strong claims. The first a reader can verify; the second rests on the operator word, so name it as such rather than letting "blind" carry the stronger reading.
 
 **Glossary.** Non-specialist readers get every term glossed: the call vocabulary (award criteria, threshold, call fiche, funding rate, work package, milestone, deliverable, dissemination level, sub-granting or FSTP, Declaration of Honour) and the MEL vocabulary (baseline, indicator, outcome, output, theory of change).
 
