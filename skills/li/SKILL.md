@@ -351,7 +351,9 @@ Return: *"CURATE complete — [N] skills updated — overlays archived — harne
 
 **Purpose:** Keep claude.ai project knowledge in sync with Claude Code canonical (`C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/domain-standards.md`). Direction: Code → claude.ai. Note: the PostToolUse hook auto-syncs root claude-ai files to `claude-ai-shareable-export/` after every Edit/Write — this operation produces a structured diff for Ane to re-paste into the claude.ai Project UI when the canonical content has shifted.
 
-**claude.ai files in scope:** `claude-ai-project-instructions.md`, `mel-framework-reference.md`, `mel-concepts-reference.md`, `writing-style-guide.md`, `calibration-examples.md`.
+**claude.ai files in scope:** `claude-ai-project-instructions.md`, `mel-framework-reference.md`, `mel-framework-appendix.md`, `mel-concepts-reference.md`, `writing-style-guide.md`, `calibration-examples.md`.
+
+**The framework mirror is two files, split 2026-07-30 at the 194KB mark.** `mel-framework-reference.md` holds the standing rules, the framework quick-reference table, the lens definitions and the ECA calibration; `mel-framework-appendix.md` holds the numbered framework entries with their full citations, core vocabulary and misapplication flags. They are one document and are uploaded together. Below, read "the framework mirror" as both files: quick-reference-table work lands in the core, per-framework entry work lands in the appendix, and the pending-verification list lives at the end of the appendix. Report the diff per file so Ane re-pastes only the one that changed, which is the whole point of the split.
 
 **Concept pages flow to claude.ai as an aggregate** (decision 2026-06-13: concept pages should reach the Desktop/web project). `mel-concepts-reference.md` is the concept-side analogue of `mel-framework-reference.md` — one pasteable mirror of every `mel_wiki/wiki/concepts/*.md` lead summary, generated, not hand-maintained. It is byte-stable across regens, so it only diffs when a concept page actually changed.
 
