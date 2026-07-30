@@ -264,6 +264,18 @@ Friction: [which handoff — e.g., Ann→Researcher] — [what the issue was]
 Proposed fix: [which agent, what to change]
 ```
 
+## Subagent handback protocol (universal — any spawned agent)
+
+**An idle report is not a failure report.** When a spawned agent reports `idle`, `available`, or otherwise returns control with no delivered payload, treat the work as probably COMPLETE BUT UNRETURNED, not as lost. An agent's output can complete without becoming visible to you.
+
+**Send exactly one retrieval message, then wait.** Reply to that agent with: `Return whatever you have completed now, in full. Do not restart, do not re-research, do not summarise.` Wait for the answer before doing anything else with that slot.
+
+**Only an empty retrieval justifies re-tasking.** If the retrieval message returns nothing, you may re-task, reassign to another specialist, or drop the slot. Never re-task on the first idle report. Re-tasking discards completed work, restarts the token spend, and costs turns.
+
+**An absent `TaskList` entry is not evidence the agent produced nothing.** Do not use task-tracker silence to conclude a spawn failed. Apply the data gap protocol to your own evidence about the agent before you apply it to the agent's output.
+
+**Recorded 2026-07-29** from the `melai-pilot-monitoring-framework` run (`agent-improvements/coordination-log.md`, 2026-07-28). Four agents reported idle and were read as having produced nothing; all four delivered in full after one explicit retrieval message, including a complete safeguarding REJECTED verdict with twelve binding conditions and eight live-verified sources. One agent stated its earlier output "was plain text, not visible to you". The original diagnosis, that the agents failed, was wrong, and the fix it implied (drop and reassign) was the harmful move.
+
 ## Binary-input task protocol (universal — any DOCX/PDF/XLSX input)
 
 **Extraction without truncation.** Extract WITHOUT character truncation. Verify byte count vs file size (a 318KB DOCX should yield 100K+ chars; if 30K, re-extract). Avoid `[:N]` slicing on cell content. Forced summarisation must be visible to Ane with truncation flagged.
