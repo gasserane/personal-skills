@@ -308,15 +308,17 @@ Start in: <mode>. Lane: <Claude directly | /ann | /skill-name>.
 
 **Redaction — same rule as any continuity note.** Never quote or paraphrase recognisably any `5 JURNAL` journal content. Never write SOGIESC, GBV, or SRH service-seeker identifiers into a handoff. Reference sensitive material by path, not by content.
 
-**Retirement.** If this session FINISHED a workstream that has a handoff file, delete that file (`git rm`). A handoff for completed work is the stale-instruction hazard above.
+**Retirement — run the scan, do not rely on memory.** Run `python scripts/handoff_status.py` if it exists in the repo. It prints every handoff with its age, status, and staleness flag, read fresh off the directory. Do NOT skip it because you think you know what is there.
 
-**Open-handoff listing.** Read the `handoffs/` directory fresh and list every other file with its date, flagging anything older than 7 days:
-```
-OPEN HANDOFFS
-  <slug>                <time> today
-  <other-slug>          4 days ago   ⚠️ stale, still open
-```
-Generate this from the directory at every run. Do NOT create a stored index file. This system has twice been bitten by an index drifting from reality — the pinned harness count went stale within hours, both times — and a list read off the directory cannot drift.
+This step is scripted for the same reason `cap_status_hook.py` exists. A "delete the handoff when the workstream finishes" instruction depends on the model remembering, which is the failure class that killed the item 8 scope gate twice. And it misses abandoned workstreams entirely: nothing ever finishes them, so nothing ever fires. Only a scan catches those.
+
+Act on the output in two ways:
+1. **Finished this session.** If this session closed a workstream that has a handoff, delete that file (`git rm`) and report it. A handoff for completed work is a stale-instruction hazard.
+2. **Flagged stale (7 days or older, no activity).** Do NOT delete it. Show Ane the line and ask once: `close it? (y/n)`. On yes, `git rm` it. On no or no answer, leave it and move on.
+
+**Never auto-delete on age.** Ane's decision, 2026-07-30. An age rule cannot tell an abandoned workstream from one waiting on a partner, and several of her real workstreams run with multi-week gaps. Deleting the wrong one loses context that cannot be rebuilt, and silent loss is the failure class this system has already paid for twice.
+
+The listing is generated from the directory at every run and is never stored as an index file. This system has twice been bitten by an index drifting from reality — the pinned harness count went stale within hours, both times — and a list read off the directory cannot drift.
 
 **Commit.** This lands after the Phase 4 commit, so it commits itself, the same way the Loop 2 stash and the Loop 4 cost row do. Stage the handoff file (and any deletion), commit, and push, using a single-quoted heredoc message and the conventional prefix per CLAUDE.md.
 
