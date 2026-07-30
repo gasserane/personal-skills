@@ -109,6 +109,8 @@ BRANCH INTEGRITY
   ✅ Branch matches + commits ahead of origin/main verified
   OR  ⚠️  SUSPICIOUS — [findings]; commit/push held pending Ane's confirmation
 ```
+**SUSPICIOUS is not a verdict — inspect before you repeat the script's advice.** The script's own recovery text (`cherry-pick`, `reset --hard`, `push --force-with-lease`) is written for a loop hijack and is destructive. Two of its three symptoms fire just as readily on a second Claude Code session committing the repo's own work, and on a repo that commits to `main` by design, which this one does. So before surfacing anything, run `git show --stat <sha>` on every commit it flagged and say plainly whether the content is work this session recognises. Never pass the reset advice through to Ane as the recommendation unless the script reports loop markers. Evidence (2026-07-31): commit `29d2a31` landed on `main` mid-wrap-up, unauthored by the session; it held exactly the six files sitting uncommitted moments earlier, so it was a parallel session, and `reset --hard` would have destroyed an evening of real work that was never at risk.
+
 If both checks pass, state the branch you are about to commit to and continue.
 
 **Gate 3 — Sensitive-file scan.**
