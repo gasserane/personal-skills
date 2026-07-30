@@ -20,6 +20,8 @@ A session-end workflow in phases, not a single parallel check. Run them in order
 
 ## Phase 1 — Preflight
 
+**The thread is now closed.** From this point, park every new question, explainer request and follow-up ask in the Phase 6 handoff rather than answering it in-session. Say so in one line when it happens: `Parked for the next session: <ask>.` Ane can override by repeating the ask, and then you answer it. Reason (2026-07-30 /improve-system Run 4): across five consecutive logged sessions the thread itself closed at 190k–227k and the whole overage came from post-decision Q&A, one extra check, and the wrap-up loops. Closing costs about 50k; answering new asks inside the close-out is what doubles it.
+
 Run `git rev-parse --git-dir 2>/dev/null`. If it fails (not a git repository), skip the git, harness, and commit sections. Run only checks 3 and 4, deliver a short report, and end with:
 
 ```
