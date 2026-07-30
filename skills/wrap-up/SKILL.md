@@ -30,6 +30,8 @@ Run `git rev-parse --git-dir 2>/dev/null`. If it fails (not a git repository), s
 
 Otherwise capture the branch once: `git branch --show-current`. Hold it as the **expected branch** for the branch guard in Phase 4, and show it in the report header.
 
+**Resume check — never run a full wrap-up twice.** If a wrap-up already ran in this session and stopped at the Phase 4 harness gate, this invocation is a RESUME, not a fresh close-out. Say `Resuming wrap-up at the harness gate.` then run ONLY: the harness (Phase 2 check 2), the Phase 4 gates, commit and push, and Phase 6. Skip Phases 2 and 3 otherwise, and skip Phase 5 unless Ane asks for it. Their findings have not changed, and re-deriving them is the largest avoidable cost in the close-out: the 2026-07-28 `local-analyst-mirror-freshness-check` row logged two wrap-up passes plus the cost-log reconciliation, which almost exactly doubled the session spend. A resume is one harness run and a commit, not a second session review.
+
 ## Phase 2 — Gather (read-only checks)
 
 **1. Git status**
@@ -95,6 +97,8 @@ After the report, if there are uncommitted files or unpushed commits, finish the
 
 **Gate 1 — Harness must pass (if it ran).**
 If check 2 ran and reported any `⚠️ HARNESS:` line, STOP. Do not commit. Tell Ane the harness is red and recommend `/test` for detail. The wrap-up ends here.
+
+**Name the resume path in the same breath**, or the stop costs a second full pass: `Fix, then re-run /wrap-up — it resumes at the harness gate and will not repeat the session review.` Without that line Ane re-invokes a fresh wrap-up and pays Phases 2, 3 and 5 twice for findings that have not changed.
 
 **Gate 2 — Branch guard (checkout + content).**
 First, compare the current `git branch --show-current` to the expected branch captured in Phase 1. If they differ, a background process may have checked out another branch mid-session and hijacked the working tree (the documented ralph-loop hazard). STOP and ask Ane before committing.
@@ -263,6 +267,8 @@ Writes the prompt that starts the next session. Runs last because it must descri
 - Ane invoked `/wrap-up continue`.
 
 Stay silent on a finished session. A handoff describing completed work is a stale-instruction hazard, and the next session may act on it.
+
+**When the next session is a BUILD, write a spec, not a status note.** A handoff that describes state leaves the next session an exploration phase to pay for. A handoff that specifies the build removes it. Evidence: `donor-proposal-scoring-skill-build` closed at $6.38 against $18.28 and $20.59 for comparable builds the same week; the one isolated difference was that the preceding session wrote a complete paste-ready spec and handed over instead of building in place. So when the open workstream is a build whose shape is already known, the handoff names the files to read, the exact change in each, the acceptance test, and the close-out. Then tell Ane in the report to `/clear` and paste it rather than continue here. Building at high context measured roughly three times the cost.
 
 **Storage — one file per workstream.** Write to `agent-improvements/handoffs/<workstream-slug>.md`. Create the directory if absent.
 
