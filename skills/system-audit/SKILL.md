@@ -25,12 +25,16 @@ Run in this order:
 
 Parse failures. Each `[FAIL]` line goes into the findings list with file:line as shown. Do NOT re-run the failures or attempt fixes; just record.
 
+3. **Resolve `SKILLS_DIR` before measuring anything against it, and report which root it returned.** Run `python -c "import sys; sys.path.insert(0,'tests'); import run_tests as rt; print(rt.SKILLS_DIR, len(list(rt.SKILLS_DIR.glob('*/SKILL.md'))))"`. Several install roots hold `SKILL.md` copies and they drift from each other, so a line count, a budget check, or a coverage claim measured against the wrong root is simply wrong. **Never infer the root from a path written in CLAUDE.md or in this skill; ask the harness.** A flat check count across two runs does NOT prove a skills change had no effect, because the glob-based sweeps report one aggregate check each regardless of how many files they cover.
+
+   Then compare that root against the personal-skills clone, listing skills **absent** from the root as well as skills whose content differs. On 2026-07-29 the resolved root was missing 7 first-party skills outright and held stale copies of 6 more while the harness reported green, and the audit brief initially named the wrong directory because it assumed rather than resolved. When the two differ, **diagnose which side is older before copying anything** (compare line counts and `diff` direction): the newer side is not always the installed one, and the copy overwrites whichever side you point it at.
+
 ### Step 2 — Documentation consistency (medium severity, high impact)
 
 Read in parallel:
 - `~/.claude/CLAUDE.md` — scan for self-contradictions. Common patterns: specialist count drift ("16" vs "20" in same file), version-number drift, layer-table drift.
 - `<work folder>/CLAUDE.md` — scan for stale numbers (specialist count, harness check count, page count, agent-team member count).
-- `~/.claude/skills/{ann,vi,li,researcher}/SKILL.md` — line counts vs budgets (Ann ≤ 320; Vi ≤ 250; Li ≤ 400; Researcher ≤ 200; authoritative source is `SKILL_BUDGETS` in `tests/run_tests.py`). Em-dash counts in body prose (per CLAUDE.md voice rule, which carves out list-item separators and frontmatter in skill files).
+- `{ann,vi,li,researcher}/SKILL.md` **under the `SKILLS_DIR` you resolved in Step 1**, not a hardcoded path — line counts vs budgets (read the current numbers from `SKILL_BUDGETS` in `tests/run_tests.py`, which is the authoritative source; do not trust any figure quoted here, they go stale). Report headroom, not just pass or fail: a skill within 5 lines of its budget is a finding, because the next edit fails the harness on arithmetic rather than on substance. Em-dash counts in body prose (per CLAUDE.md voice rule, which carves out list-item separators and frontmatter in skill files).
 - `agent-improvements/agent_registry.md` — count `### ` entries. Cross-reference with Vi taxonomy table for completeness. Cross-reference each name with `~/.claude/agents/<name>.md` existence.
 
 For each finding, capture: file path, line number where shown, what's wrong, suggested fix from the failure-fix table below.
