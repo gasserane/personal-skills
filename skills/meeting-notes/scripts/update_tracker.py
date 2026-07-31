@@ -274,6 +274,34 @@ def ensure_guide(wb):
         c.alignment = Alignment(wrap_text=True, vertical="top")
 
 
+
+def extend_table_refs(wb):
+    """Grow each Excel table (ListObject) to cover the rows just appended.
+
+    openpyxl writes appended cells below a table's stored ref without moving it,
+    so the new rows sit OUTSIDE the ListObject: Ane's filters, sorting and banded
+    formatting all stop at the old last row and the newest actions are the ones
+    that go missing. Re-point every table at its sheet's real extent.
+    """
+    fixed = 0
+    for ws in wb.worksheets:
+        for tname in list(getattr(ws, "tables", {})):
+            tbl = ws.tables[tname]
+            ref = tbl.ref if hasattr(tbl, "ref") else tbl
+            m = re.match(r"([A-Z]+)(\d+):([A-Z]+)(\d+)$", str(ref))
+            if not m or int(m.group(4)) == ws.max_row:
+                continue
+            new_ref = "%s%s:%s%d" % (m.group(1), m.group(2), m.group(3), ws.max_row)
+            if hasattr(tbl, "ref"):
+                tbl.ref = new_ref
+                if getattr(tbl, "autoFilter", None) is not None:
+                    tbl.autoFilter.ref = new_ref
+            else:
+                ws.tables[tname] = new_ref
+            fixed += 1
+    return fixed
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--note", required=True)
@@ -323,6 +351,7 @@ def main():
                           "Watching", ""])
         added["pending"] += 1
 
+    refs_fixed = extend_table_refs(wb)
     wb.save(book)
     print(f"Tracker updated: {book}")
     print(f"  note: {note.name} (meeting {meeting_date}, counterpart {counterpart or '?'})")
@@ -330,6 +359,8 @@ def main():
           f"{added['pending']} pending items (existing rows untouched)")
     print(f"  topics: {t_added} new, {t_updated} last-discussed updated "
           f"(your judgement columns untouched)")
+    print(f"  table ranges grown to cover the appended rows: "
+          f"{refs_fixed}")
 
 
 if __name__ == "__main__":
