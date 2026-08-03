@@ -198,6 +198,8 @@ Spec: `docs/superpowers/specs/2026-05-23-bibliography-zotero-design.md`.
 
 **Step 1 — Run folder.** Create `CLAUDE MEL new RESOURCES/literature-reviews/[YYYY-MM-DD]_[task-slug]/` with three files: `full-literature-review.md`, `sources-list.md`, `wiki-insights.md`.
 
+In `sources-list.md`, each entry MUST carry a `[lang: <ISO 639-1 code>]` marker (e.g., `[lang: en]`, `[lang: ru]`, `[lang: fr]`, `[lang: ar]`, `[lang: es]`, `[lang: pt]`, `[lang: ro]`). Default to `[lang: en]` only when the source is genuinely English; do not default-tag everything `en`. Li's OVERLAY-DIGEST quarterly counter relies on this field. If Researcher's inbound Artifact B omits the marker on an entry, preserve the entry verbatim and append `[lang: unmarked]`, then raise a data gap naming this run folder. Never guess the language.
+
 **Step 2 — Artifact log.** Append to `CLAUDE MEL new RESOURCES/artifact-log.md` (create with header `| Date | Task slug | Folder path | Source count | Wiki status |` if missing): `| [date] | [slug] | literature-reviews/[date]_[slug]/ | [N] new sources | Wiki staged: PENDING |`.
 
 **Step 3 — Tier-branch: auto-merge Tier-1 verified, stage all others.** For each bullet in `wiki-insights.md`:
@@ -261,7 +263,11 @@ For each: extract title, author(s), year, language, doc_type (framework / manual
 3. For each Active entry, check whether the same behaviour pattern appears in 3+ runs (CURATE-eligible).
 4. For coordination-log: count entries; flag any whose "Proposed fix" agent has no matching overlay entry.
 5. Read `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/log.md`; find most recent `CURATE:` line; compute days since.
-6. Read `CLAUDE MEL new RESOURCES/artifact-log.md` and the per-run `sources-list.md` files for the current quarter (Q1 = Jan-Mar; Q2 = Apr-Jun; Q3 = Jul-Sep; Q4 = Oct-Dec). Count non-English sources by language family (francophone / lusophone-hispanophone / arabophone) per the `## Ingestion targets` section. If the per-run `sources-list.md` does not record source language, treat as English by default and flag as data gap.
+6. Read `CLAUDE MEL new RESOURCES/artifact-log.md` and the per-run `sources-list.md` files for the current quarter (Q1 = Jan-Mar; Q2 = Apr-Jun; Q3 = Jul-Sep; Q4 = Oct-Dec), and count against the `## Ingestion targets` section as follows.
+   - **Parse, do not inspect.** Read the `[lang: <ISO 639-1 code>]` marker on each entry. Map the code to a family: `fr` → francophone; `es` or `pt` → lusophone-hispanophone; `ar` → arabophone; `en` → English; any other code → other, named by its code.
+   - **Fallback, preserved.** An entry with no marker (or `[lang: unmarked]`) counts as English AND raises `⚠️ Data gap: [N] source(s) in [run folder] carry no language marker — the quarterly non-English count is understated by up to [N] — re-tag the entries at source`. A silently unmarked run must be visible, not invisible.
+   - **Report as computed.** State the figure as parsed from markers, and say so, so it is never confused with a hand-derived one. Where any part was hand-derived, label that part separately.
+   - **Two counts, never a half.** Report the language count and the regional-authorship count as two separate figures, per the rule at the head of this skill. Language comes from the marker and is mechanical. Regional authorship has no marker, so derive it by hand and say so. Never average the two into a fraction.
 
 Return:
 ```
