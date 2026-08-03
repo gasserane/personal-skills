@@ -38,6 +38,10 @@ Quarter starts: Q1 = January 1; Q2 = April 1; Q3 = July 1; Q4 = October 1.
 
 Targets are aspirational, not binding. Li flags but does not refuse English-only ingestion when the target is unmet — the function is to surface the gap, not to gate work.
 
+**Check every candidate against `wiki/index.md` before recording it, not against recollection.** A candidate list is written in one session and acted on in another, so "we already have that one" has to be a lookup, never a memory. Grep the index for the source's organisation, title and year before the candidate goes on any list, and again before the ingestion runs. Evidence (2026-08-03): the Q3 2026 candidates file proposed ESCWA (2023) AGIF23 for the arabophone slot and a handoff made it the named next step, but AGIF23 had been ingested on 2026-05-21 as the *Q2* arabophone source and already lived at `indicators/escwa-agif-2023`. The same pass had correctly caught the duplicate in the hispanophone family (ReLAC) and simply did not run the check on the arabophone one. Acting on the instruction would have written a duplicate page.
+
+**Count language and regional authorship separately; never report a fraction.** Language comes from the `[lang:]` marker and is mechanical. Regional authorship is a separate judgement about where the knowledge was produced, and it has no marker, so report it as hand-derived and say so. A source can be region-authored and English-published (Ben Brik 2025, the Q3 2026 arabophone substitution): that is two facts, and averaging them into "0.5" destroys both. Decided by Ane 2026-08-03.
+
 Cross-references: `mel_wiki/wiki/calibration.md` ingestion priorities for Caribbean and Arab World (Q3 2026 search targets); `agent-improvements/community-overlay.md` (parallel claimed-space mechanism).
 
 ## Operations
