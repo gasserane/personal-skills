@@ -167,6 +167,32 @@ def test_cli(checks: Checks, tmp: Path) -> None:
     checks.check(missing.returncode == 2,
                  "cli: archiving a generator that does not exist is refused")
 
+    # Only a real subprocess reproduces this: in-process calls never touch the
+    # console encoding, so the unit tests above all passed while the shipped
+    # command died on the first accented word it was asked to compare.
+    from docx import Document
+
+    for name, third in (("gen.docx", "The workshop ran in Chișinău."),
+                        ("edited.docx", "The workshop ran in Chisinau.")):
+        document = Document()
+        document.add_paragraph("A baseline paragraph that did not change.")
+        document.add_paragraph(third)
+        document.save(str(tmp / name))
+
+    diff = subprocess.run(
+        [sys.executable, str(driver), "diff", str(tmp / "edited.docx"),
+         "--against", str(tmp / "gen.docx")],
+        capture_output=True, text=True, encoding="utf-8", check=False,
+    )
+    checks.check(diff.returncode == 0,
+                 f"cli: diff survives non-ASCII document text (exit {diff.returncode})")
+    checks.check("UnicodeEncodeError" not in diff.stderr,
+                 "cli: diff does not die on the console encoding")
+    checks.check("accents dropped" in diff.stdout,
+                 "cli: diff flags the diacritic strip end to end")
+    checks.check("Chișinău" in diff.stdout,
+                 "cli: the accented original is printed, not mangled — it is the evidence")
+
 
 def main() -> int:
     checks = Checks(title="office-repair driver")
