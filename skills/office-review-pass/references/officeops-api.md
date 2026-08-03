@@ -1,0 +1,151 @@
+# `ane_package.officeops` — the API this skill sits on
+
+Read this before writing any code. Every name below already exists and is tested
+(`tests/test_officeops.py`, 85 checks). Do not invent names, and do not re-implement
+Office surgery inside the skill: a capability this skill needs and officeops lacks is
+an addition to officeops, with its own test.
+
+Import from the package root; the COM submodules are lazy so importing the package
+on a machine without Word still works.
+
+```python
+from ane_package.officeops import (
+    Checks, Comment, CommentRequest, ReviewBlock, TrackedEditor,
+    add_comments, read_comments, read_review, render_review, review_blocks,
+    read_revisions, assert_branded, docx_word_count, hyperlink_targets,
+    stranded_hyperlinks,
+)
+from ane_package.officeops import wordcom          # Windows only
+```
+
+If the import fails from outside the work folder, call
+`officeops.bootstrap.ensure_ane_package_importable()` first, or set `WORK_FOLDER_ROOT`.
+
+## Contents
+
+- [Reading a review](#reading-a-review) — read mode
+- [Tracked changes](#tracked-changes) — track mode
+- [Word COM](#word-com) — revise mode
+- [Verification](#verification) — all modes
+- [Traps](#traps)
+
+## Reading a review
+
+```python
+render_review(path, include_resolved=True) -> str
+```
+The document as plain text with every comment at its anchor. This is what read mode
+reads. Blocks are numbered `[n]` in document order so a finding can cite one.
+
+```python
+review_blocks(path, include_empty=False) -> list[ReviewBlock]
+```
+The structured form behind the rendering. `ReviewBlock` carries `.index .text .style
+.in_table .comments .has_insertions .has_deletions` and `.is_heading`. A comment
+attaches to the block where its range **opens**, so a comment spanning three
+paragraphs is reported once.
+
+```python
+read_comments(path) -> list[Comment]
+read_review(path)   -> {"comments": [Comment], "revisions": [Revision]}
+```
+`Comment` carries `.id .author .initials .date .text .anchor .parent_id .resolved`
+and `.is_reply`. `.anchor` is the document text the comment range covers, read from
+`commentRangeStart`/`End` — a finding never arrives without the words it is about.
+Replies point at their parent through `.parent_id`.
+
+```python
+add_comments(source, requests: list[CommentRequest], out_path=None) -> Path
+CommentRequest(match, text, author="Ane Gasser (MEL review)", initials="")
+```
+Writes anchored margin comments to a **copy**; refuses to comment in place. Matching
+is paragraph-level and requires exactly one hit — see [Traps](#traps).
+
+## Tracked changes
+
+```python
+from docx import Document
+document = Document(str(path))
+editor = TrackedEditor(document, author="Ane Gasser")
+count = editor.replace(old, new, limit=None)   # -> int, how many were made
+editor.delete(text, limit=None)
+editor.insert_after(anchor, text, limit=1)
+document.save(str(out))
+```
+Real `w:ins` / `w:del` / `w:delText` with run splitting, so a phrase split across
+runs is matched. `w:id` allocation is document-wide, so a second review round does
+not collide with the first. python-docx cannot author these; this is the only path.
+
+```python
+read_revisions(path) -> list[Revision]     # .kind ("insertion"|"deletion") .text .author .date
+```
+The only correct way to assert a tracked edit landed.
+
+## Word COM
+
+Windows, Word installed, and the file **closed in Word**. An open handle raises
+`PackageNotFoundError`, which reads like corruption and is not.
+
+```python
+wordcom.word_available() -> bool
+wordcom.find_replace(path, pairs, match_case=True, whole_word=False,
+                     include_headers=False, track_changes=None,
+                     backup=True, timeout=600) -> dict[str, int]
+```
+`pairs` is a dict `{old: new}` or a list of `Replacement(old, new)`. Returns search
+string to the number of replacements **read back from Word**. A pair returning `0`
+is a wrong search string, not a no-op. A timestamped backup is written before the
+first edit; COM edits in place and there is no undo.
+
+```python
+wordcom.export_pdf(path, out_path=None, allow_known_hang=False, timeout=300) -> Path
+```
+**Refuses by default.** `ExportAsFixedFormat` hangs indefinitely on Wine & Slate kit
+documents — page counts return, the export does not, and Word stays alive holding
+the file. Export by hand from Word. Only pass `allow_known_hang=True` when Ane
+confirms this document is unaffected.
+
+## Verification
+
+```python
+assert_branded(path)                      # header + footer + logo, together
+assert_header_footer_present(path)
+assert_logo_present(path)
+assert_markers_absent(path, markers)      # placeholder strings that must not ship
+assert_no_alternate_content(path, where="header")
+hyperlink_targets(path)    -> {rId: url}
+stranded_hyperlinks(path)  -> {rId: url}  # relationships nothing in the body references
+docx_word_count(path, include_tables=True) -> int
+table_row_counts(path) / assert_table_covers_rows(path, table, expected)
+```
+
+`Checks` is the pass-fail collector: `checks.check(condition, label)`,
+`checks.expect(label, fn, *args)` for a call that should not raise, then
+`checks.report()` returns a process exit code.
+
+Assertions run on the **written file**. A `save()` that returned proves nothing:
+six ToR versions shipped with the palette but no logo, and each run exited cleanly.
+
+## Traps
+
+1. **`add_comments` matches at paragraph level and needs exactly one hit.** Zero or
+   several raise rather than guess, and no half-written copy is left behind. Pick
+   match strings of five or more consecutive words, and catch the raise rather than
+   loosening the match — a comment on the wrong paragraph reads as a review error.
+
+2. **`paragraph.text` does not include text inside `w:ins`.** After a tracked
+   insertion the paragraph reads as if the new words are not there. Never assert on
+   it after a tracked edit; assert on `read_revisions(written_path)`.
+
+3. **`render_review` shows tracked changes as accepted** — insertions present,
+   deletions gone — because reviewing the accepted state is the useful default.
+   Blocks carrying changes are marked `+ins` / `-del` so the reading is visible.
+
+4. **Word stores headers twice**, as an `mc:Choice` drawing and an `mc:Fallback` VML
+   twin. Text removed from one survives in the other.
+   `assert_no_alternate_content` catches it.
+
+5. **`win32com` is not installed in this Python.** Both COM surfaces drive
+   PowerShell 5.1 through an ASCII script file with a UTF-8 payload beside it. Do
+   not reach for win32com, and do not switch to pwsh 7 — its null-method handling
+   breaks the Excel path.
