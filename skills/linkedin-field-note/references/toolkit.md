@@ -9,7 +9,7 @@ One Python script beside the content, named `build_<slug>_kit.py`:
 ```python
 import sys
 from pathlib import Path
-sys.path.insert(0, r"C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/personal-brand/generators")
+sys.path.insert(0, r"C:/Users/AGasser/OneDrive/2. Ane's AREAS/AG Business/Brand/generators")
 from pb import (APRICOT, BODY, CTA, DISPLAY, GROUND, GROUND_TINT, INK, LABEL,
                 MONO, MONOGRAM, SLATE, WINE, base_document, box, brand_footer,
                 page_setup, para, rule_below, style_run)
