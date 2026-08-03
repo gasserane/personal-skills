@@ -63,6 +63,28 @@ def _bootstrap_ane_package() -> None:
 _bootstrap_ane_package()
 # -----------------------------------------------------------------------------
 
+
+def _speak_utf8() -> None:
+    """Print document text without dying on the console encoding.
+
+    A Windows console is cp1252 by default, and this driver's whole job is
+    printing text Ane wrote — which contains Chișinău, curly quotes and
+    em-dashes. Left alone, ``diff`` raises ``UnicodeEncodeError`` on exactly the
+    content its flagship heuristic exists to judge: a run that reports dropped
+    diacritics cannot itself be unable to print them.
+
+    UTF-8 with replacement rather than ASCII, because here the characters are the
+    evidence. A reader deciding whether "Chisinau" was an accident needs to see
+    "Chișinău" next to it; the sibling skill renders to ASCII because there the
+    text is context rather than the thing under judgement.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
+
+_speak_utf8()
+
 from ane_package.officeops import (  # noqa: E402
     Checks,
     VerificationError,
