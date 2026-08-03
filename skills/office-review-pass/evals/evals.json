@@ -1,0 +1,29 @@
+{
+  "skill_name": "office-review-pass",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Stefanie sent back the AI research ToR with her comments all over it - projects/ai-research/ToR_v1.0_SG_comments.docx. Read her comments and tell me what you make of them before I reply to her.",
+      "expected_output": "read mode. Document rendered with comments at their anchors via scripts/review_pass.py read, then a BLUF verdict and a comment-by-comment cross-read that agrees, pushes back or reframes each one, plus findings she missed anchored to block numbers. Nothing written to the document. A transmittal email offered, not written unprompted.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "The contractor's proposal has about a dozen places where they say 'the Consultant shall ensure the submission of' and I want 'the Consultant will submit'. Mark it up so they can accept or reject each one - I don't want to just silently change their document.",
+      "expected_output": "track mode. TrackedEditor via scripts/review_pass.py track, author attribution confirmed first, a marked-up COPY written and the source left alone. Replacement count reported per edit, with any zero raised as a wrong search string. Verified with read_revisions, never paragraph.text.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I've hand-edited the meeting note and I want three fixes applied without breaking my formatting: 'Director of Risk' should be 'Director of Risk & Assurance' everywhere including the header, the date needs to be 31 July not 30 July, and drop the sentence about the pilot budget. Then I need the PDF again.",
+      "expected_output": "revise mode. Edit-preservation protocol acknowledged and Ane's file treated as baseline; confirms the file is closed in Word; wordcom.find_replace with include_headers for the header occurrence; counts read back from Word and reported, with any zero raised. Verifies the written file (branding, stranded hyperlinks). Does NOT produce the PDF - explains the ExportAsFixedFormat hang and hands the export back to Ane.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Before this goes out to the MAs it needs a glossary - there are a lot of acronyms in it - and an annex listing every document and regulation we reference, with links people can actually click.",
+      "expected_output": "annex mode. Glossary built by reading the document rather than from a standard list. Every source hyperlink verified by WebSearch or WebFetch in the same session, canonical publisher preferred, anything unverifiable flagged as unverified rather than guessed. Existing heading styles matched, IPPF template intact, verified with hyperlink_targets and stranded_hyperlinks.",
+      "files": []
+    }
+  ]
+}
