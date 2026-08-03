@@ -115,8 +115,31 @@ BRANCH INTEGRITY
 
 If both checks pass, state the branch you are about to commit to and continue.
 
-**Gate 3 — Sensitive-file scan.**
-Before staging, scan the uncommitted file list **case-insensitively** against these patterns: `.env`, `.env.*`, `*credentials*`, `*secret*`, `*token*`, `*.key`, `*.pem`, `*.pfx`, `*api_key*`. This is a filename scan, not a content scan: it will not catch a secret hardcoded inside a normally-named file, and it may flag innocent names (e.g. `token_utils.py`). If any file matches, list the matches and ask Ane explicitly which (if any) to include. Otherwise continue silently.
+**Gate 3 — Sensitive-file scan (filename, then content).**
+
+*3a — Filename scan.* Before staging, scan the uncommitted file list **case-insensitively** against these patterns: `.env`, `.env.*`, `*credentials*`, `*secret*`, `*token*`, `*.key`, `*.pem`, `*.pfx`, `*api_key*`. It may flag innocent names (e.g. `token_utils.py`), so treat matches as a question, not a verdict: list them and ask Ane explicitly which (if any) to include.
+
+*3b — Convention and content scan.* The filename scan reads names only, and names are exactly what personal data hides behind. On 2026-07-03, six documents holding two people's national-register numbers, identity-card numbers and an IBAN, plus three identity-card scans, passed the filename scan in the Personal-project-a repo and were staged against a **public GitHub remote**. Every filename looked ordinary. Only manual judgement caught them, which is not a control.
+
+So after 3a, run the content scan over what is actually staged:
+
+```
+python <skill-dir>/scripts/scan_staged_privacy.py --repo .
+```
+
+It checks two things the filename scan cannot. First, the **repo's own convention**: if `.gitignore` declares a privacy family (`*.local.*`, `**/*private*`), any staged file carrying personal data without the marker is breaking a rule the repo already set. Offer the rename rather than the commit — renaming to `*.local.*` does not merely label the file, it drops it from the commit entirely, because the repo already ignores that family. Second, the **content**: Romanian CNP, Belgian rijksregister and IBAN, each confirmed by its own checksum rather than by digit count, plus image filenames that look like identity documents.
+
+Read the exit code, not the prose:
+
+| Exit | Meaning | What to do |
+|---|---|---|
+| `0` | nothing matched | continue silently — say nothing |
+| `1` | ADVISORY: personal data, but the remote is private or not a public forge | report the findings in the wrap-up, then continue committing |
+| `2` | HOLD: personal data **and** a public-forge remote | do not commit or push; surface the findings and ask Ane to confirm or rename |
+
+**The bias is deliberately toward not blocking.** A gate that interrupts clean sessions gets clicked through, and then it protects nothing. Only the co-occurrence of personal data and a publicly-reachable remote is worth stopping for — that is the one combination where a mistake is irreversible, because a push to a public forge is public the instant it lands and stays so in clones and caches after any deletion. Everything else is a note in the report.
+
+Two things to know before you trust or doubt a result. Findings are **masked by design**: the scanner prints a file, a line and a type, never the number, because its output flows into the transcript and from there into the handoff file. And it validates by checksum, so a 13-digit epoch-millisecond timestamp or an 11-digit order ID does not match — measured at zero matches across 3,546 files of Ane's working corpus. A match therefore means something. If the script is missing (older install), say so in the report and fall back to 3a alone rather than skipping the gate silently. This covers staged content only; `/li lint` covers the wiki.
 
 **Gate 4 — WIP exclusion.**
 If any uncommitted file is unrelated to the current session's work and looks mid-edit (a single file the user was clearly developing in another window, e.g. a `TODO` marker or `None` placeholder added inline), exclude it from the commit. List excluded files in the report so Ane sees what was left behind.
