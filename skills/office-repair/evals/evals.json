@@ -1,0 +1,29 @@
+{
+  "skill_name": "office-repair",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "The 2027 planning tool is throwing a circular reference warning every time I open it and two of the budget columns show #REF!. Can you find what's broken? Do NOT touch the slicers, I spent hours on those.",
+      "expected_output": "repair mode, diagnosis first. scripts/office_repair.py scan with --com, because a circular reference is not visible in the stored XML and needs Excel. Reports cached errors with the formula behind each, ListObject coverage, fragmented validation ranges and the feature inventory. Nothing written. Fix list agreed with Ane naming each cell and its current value before any COM apply.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Right, apply those three fixes to the planner. C14 and C15 on the CERV_OPS sheet plus the SUM on the summary tab. The sheet is protected, don't leave it unlocked.",
+      "expected_output": "repair mode, apply. A JSON payload of {sheet, cell, old, new} where old is the value read from the scan, then office_repair.py repair. Backup taken automatically; protection captured and re-applied as found; single save; a mismatch discards the run rather than half-applying. Any skipped cell raised as a stale payload, not reported as a no-op. Verified with --baseline against the backup, and the feature inventory compared so nothing was lost.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I redid the EN staff AI briefing deck by hand in PowerPoint - the generated one was ugly. That version is the real one now. Can you check what I actually changed and make sure the script doesn't clobber it next time someone runs it?",
+      "expected_output": "canonical mode. office_repair.py diff of the edited .pptx against the generated one, with extraction recursing into grouped shapes so bullets are not silently lost. Change list in Ane's terms plus any flagged Office artefacts (autocorrect, diacritics, URL spaces) put to her one at a time rather than propagated. Then office_repair.py archive on the generator: a code-level refusal, not a docstring warning. Her edits are NOT folded back into the generator.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Some of the dropdowns in the events sheet have stopped working. Not all of them - it's like every third row is just a plain cell now.",
+      "expected_output": "repair mode, diagnosis. Recognises the fragmented data-validation signature: row insertion shatters a contiguous sqref into single-row areas so the rule holds on some rows and not others, with nothing erroring because a missing dropdown looks like an empty cell. scan reports areas and single_row_areas per rule. Fix proposed as a COM re-application over the contiguous range, agreed with Ane before writing.",
+      "files": []
+    }
+  ]
+}
