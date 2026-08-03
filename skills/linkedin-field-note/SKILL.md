@@ -19,8 +19,8 @@ This is personal thought-leadership on Ane's personal brand. Wine & Slate tokens
 |---|---|
 | Content folder | `C:/Users/AGasser/OneDrive/2. Ane's AREAS/AG Business/LinkedIn content/` |
 | Series ledger | `<content folder>/field-notes-ledger.md` (create at first run: see `references/ledger.md`) |
-| Brand tokens (canonical) | `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/personal-brand/brand-tokens.md` |
-| docx/pptx helpers | `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/personal-brand/generators/pb.py` (+ `gen_report.py`, `gen_article.py`) |
+| Brand tokens (canonical) | `C:/Users/AGasser/OneDrive/2. Ane's AREAS/AG Business/Brand/brand-tokens.md` |
+| docx/pptx helpers | `C:/Users/AGasser/OneDrive/2. Ane's AREAS/AG Business/Brand/generators/pb.py` (+ `gen_report.py`, `gen_article.py`) |
 | Visual spec (LinkedIn) | `2. Ane's AREAS/AG Business/Brand/BRAND-SPEC.md` |
 | Quality-bar exemplars | `2026-07-26 Three-Agent Starter Kit (article companion).docx` and `Start-with-three.docx` (Ane's hand-edited final), `build_three_agent_kit.py`, `2026-07-22 LinkedIn POST v3 ULTRA-SHORT - 33-agent AI system.md` |
 

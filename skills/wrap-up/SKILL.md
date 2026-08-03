@@ -119,7 +119,7 @@ If both checks pass, state the branch you are about to commit to and continue.
 
 *3a — Filename scan.* Before staging, scan the uncommitted file list **case-insensitively** against these patterns: `.env`, `.env.*`, `*credentials*`, `*secret*`, `*token*`, `*.key`, `*.pem`, `*.pfx`, `*api_key*`. It may flag innocent names (e.g. `token_utils.py`), so treat matches as a question, not a verdict: list them and ask Ane explicitly which (if any) to include.
 
-*3b — Convention and content scan.* The filename scan reads names only, and names are exactly what personal data hides behind. On 2026-07-03, six documents holding two people's national-register numbers, identity-card numbers and an IBAN, plus three identity-card scans, passed the filename scan in the Antwerphouse repo and were staged against a **public GitHub remote**. Every filename looked ordinary. Only manual judgement caught them, which is not a control.
+*3b — Convention and content scan.* The filename scan reads names only, and names are exactly what personal data hides behind. On 2026-07-03, six documents holding two people's national-register numbers, identity-card numbers and an IBAN, plus three identity-card scans, passed the filename scan in the Personal-project-a repo and were staged against a **public GitHub remote**. Every filename looked ordinary. Only manual judgement caught them, which is not a control.
 
 So after 3a, run the content scan over what is actually staged:
 
