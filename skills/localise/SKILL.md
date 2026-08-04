@@ -1,6 +1,6 @@
 ---
 name: localise
-description: Produce an MA-facing deliverable in a target language (Romanian, French, Spanish, or Russian) to IPPF rigour, with English as the canonical source. Use when Ane asks to "localise", "translate this brief", "in Romanian/French/Spanish/Russian", "Romanian version", "produce a French companion", or "review my Spanish draft". Applies a curated SRHR glossary (controlled terminology), preserves the Tier 1 working-brief register, makes safeguarding-aware term choices, runs back-translation QA, and flags for native review. Never authors from scratch in the target language. Does not design instruments or audit English voice (use ane-voice for English).
+description: Produce an MA-facing deliverable in a target language (Romanian, French, Spanish, or Russian) to IPPF rigour, with English as the canonical source. Use when Ane asks to "localise", "translate this brief", "in Romanian/French/Spanish/Russian", "Romanian version", "produce a French companion", or "review my Spanish draft". Use it too when the review target is a slide deck or e-learning module exported to Word whose translatable text sits inside the slide images rather than in the body, on "review this Storyline export", "deck export", "the French is in the slide images", "review the translated slides", or a commented deck export handed over for language review. Applies a curated SRHR glossary (controlled terminology), preserves the Tier 1 working-brief register, makes safeguarding-aware term choices, runs back-translation QA, and flags for native review. Never authors from scratch in the target language. Does not design instruments, audit English voice (use ane-voice for English), or analyse research video (use video-content-analysis).
 ---
 
 # Localise
@@ -16,8 +16,9 @@ Trigger for: localising a finished English brief; producing a target-language co
 1. **Localise a finished doc** then you provide an English deliverable (paste or path) and get a target-language version plus a QA note.
 2. **English plus companion** then Vi or you provide the finished English deliverable and get a target-language companion alongside it.
 3. **Review my draft** then you provide your target-language draft (plus the English source if available) and corrections are walked one by one, never a silent rewrite.
+4. **Review an image-based deck export** then you provide a slide deck or e-learning module exported to Word (Articulate Storyline, PowerPoint), where the translatable text is rasterized inside the slide images and the body holds only slide titles. You get anchored Word comments on a copy plus a branded slide-keyed corrections sheet. Read `references/deck-export-mode.md` before running it.
 
-**Image-based deck exports (Storyline / PowerPoint exported to Word).** When a mode-3 review target is a slide-deck or e-learning export (e.g. Articulate Storyline `.docx`/PPT export), the translatable text is rasterized inside the slide images, not live in the document body. The only live text is slide titles and layer labels. Three consequences: (a) read the slide images to review the translation, not the body text; (b) a Word comment cannot sit on text inside an image, so anchor each comment to that slide's title paragraph and have the comment name the slide and give the EN→FR correction; (c) corrections are made in the source deck and re-exported, so also deliver a slide-keyed branded corrections sheet (Slide · EN page · Type · EN source · Current FR · Proposed FR · Why · Severity) as the actionable worklist. `python-docx` 1.2.0 `add_comment(runs, …)` preserves the export's unusual package; verify no parts are dropped on save and write to a copy, never the original.
+Mode 4 triggers when a review target is a `.docx` whose text lives in images rather than in the body. Confirm it rather than assuming: `python scripts/extract_deck.py extract DECK.docx --out-dir slides/` prints the verdict with the evidence behind it, and routes you back to mode 3 when the text is live. The linguistic core (glossary, controlled terminology, back-translation, safeguarding) is identical to mode 3; only the input and output machinery differ.
 
 ## Required inputs
 1. The English source (or, for mode 3, the target-language draft plus the English source). Required.
@@ -33,6 +34,8 @@ Trigger for: localising a finished English brief; producing a target-language co
 5. Safeguarding pass. List every `sensitive`-flagged rendering used; in a restrictive context, surface the term choice for confirmation and route it to safeguarding-reviewer (mandatory for the legally-exposed Russian terms: LGBTI+, gender identity, sexual orientation, CSE, reproductive rights).
 6. Output. IPPF-branded Word via `ane_package.reporting.word_export` with the document language set via the `lang` parameter (`ro`/`fr`/`es`/`ru`); plus the QA note.
 
+Steps 1 to 5 are identical in mode 4. Step 6 is not, because the corrections belong in the source deck rather than in a Word file: follow `references/deck-export-mode.md` for the extract, comment and sheet steps.
+
 ## Output structure
 1. The target-language deliverable.
 2. Terminology-compliance note.
@@ -40,6 +43,8 @@ Trigger for: localising a finished English brief; producing a target-language co
 4. Sensitive-term list and the choices made.
 5. Native-review stamp ("native review recommended" / "validated by author").
 6. Data gaps.
+
+Mode 4 replaces item 1 with two artefacts: the commented copy of the export (the original is never touched) and the branded slide-keyed corrections sheet, which is the actionable one. Items 2 to 6 are unchanged.
 
 ## Citation requirements
 ITC (2017) *ITC Guidelines for Translating and Adapting Tests* 2nd ed; Brislin (1970) back-translation (canonical); WHO process of translation and adaptation. Controlled terms cite their glossary source.
