@@ -192,3 +192,19 @@ six ToR versions shipped with the palette but no logo, and each run exited clean
    PowerShell 5.1 through an ASCII script file with a UTF-8 payload beside it. Do
    not reach for win32com, and do not switch to pwsh 7 — its null-method handling
    breaks the Excel path.
+
+6. **TOC cached text lives in hyperlink runs `paragraph.runs` cannot reach.** A
+   run-level replace over `p.runs` updates the body heading but leaves the stale
+   wording in the TOC's cached entry, because TOC lines are hyperlinks and
+   python-docx does not expose their runs. After heading renames, do an XML pass
+   over every `w:t` in the document part for the old string, and tell Ane to
+   refresh the TOC in Word (Ctrl+A, F9) so pagination regenerates. Proven
+   2026-08-04 on the MELA framework five-CLQ alignment.
+
+7. **.odt input: convert through Word COM first.** `Documents.Open` on the .odt
+   then `SaveAs2(dst, 16)` yields a .docx that keeps formatting AND carries ODT
+   annotations over as real Word comments (`read_comments` sees them), opening the
+   whole officeops toolchain to OpenDocument files. Drive it through
+   powershell.exe 5.1 per trap 5; keep the .odt untouched as the archive copy and
+   treat the converted .docx as the new canonical. Proven 2026-08-04, three
+   comments carried.
