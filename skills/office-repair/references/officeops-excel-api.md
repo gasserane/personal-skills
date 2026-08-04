@@ -1,7 +1,8 @@
 # `ane_package.officeops` — the Excel and extraction API this skill sits on
 
 Read this before writing any code. Every name below already exists and is tested
-(`tests/test_officeops.py`, 123 checks). Do not invent names, and do not
+in `tests/test_officeops.py` — run it for the current check count rather than
+trusting a number written here, which went stale twice. Do not invent names, and do not
 re-implement Office surgery inside the skill: a capability this skill needs and
 officeops lacks is an addition to officeops, with its own test.
 
@@ -159,6 +160,34 @@ Both readers recurse. In Word that means table cells, including a table nested i
 a cell. In PowerPoint it means grouped shapes, table cells and speaker notes.
 `where` carries the location — `body table r2c1`, `slide 4 group`,
 `REF_SAM!B7` — so a change list can point at something.
+
+### Word tables as grids
+
+```python
+document_tables(path) -> list[DocTable]    # .index .where .depth .rows .merged .ragged
+                                           # .n_rows .n_cols
+                                           # .header() .column(i) .records()
+```
+`.docx` only. Use this and never `extract_blocks` whenever a table's *shape*
+carries meaning — award criteria against their weights, a compliance checklist, a
+milestone schedule. Added for `selection-toolkit`, which reads the criteria out of
+a published procurement ToR.
+
+`extract_blocks` cannot do this job and fails at it silently. It labels every cell
+`body table r2c1` with **no table ordinal**, so two tables in one ToR are
+indistinguishable, and it **drops empty cells**, so a criterion row with a blank
+weight shifts every later column one place left. The caller gets plausible strings
+and scores a panel against the wrong weights for six weeks.
+
+`rows` is padded to a constant width, so `rows[r][c]` always addresses the cell a
+reader sees. `merged` holds the positions that *continue* a span rather than being
+cells of their own — python-docx returns the same cell object for every position a
+merge covers, so a header reading `Financial | Financial | Financial` is one merged
+heading, not three columns. `records()` keys body rows by the header and **raises**
+on a repeated or blank header rather than dropping the collision. Nested tables
+arrive as their own entries with `depth` above 0; a cell holding a table reads as
+empty in its parent, because python-docx reads only direct paragraphs for
+`cell.text`.
 
 ### Image-based deck exports
 
