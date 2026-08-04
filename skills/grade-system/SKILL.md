@@ -69,6 +69,11 @@ For each component: assign a grade with one-line rationale citing the evidence f
 
 For each dimension: assign a grade. Each must be defensible from the evidence collected in Step 1. Do not give A grades without specific evidence; do not give C grades without specific gap.
 
+Then answer two graph-shape questions explicitly. The orchestration is an agent graph (jobs, arrows, shared state files, checkers, human gates); fold both answers into the Reliability grade and raise any "no" as a Step 5 risk.
+
+1. **Is every checker separated from its writer?** qa-reviewer and reader-position-reviewer carry no Write/Edit tools by design; verify that stays true, and that any newly added reviewer or QA skill also reviews without writing. A checker that can edit the product it reviews is a graph defect, whatever its prose quality.
+2. **Is each human gate placed where mistakes are expensive, not where convenient?** Map where Ane's approval is requested (plan approval, pre-publish, pre-overwrite) against where an error would actually cost her (outward-facing sends, destructive writes, donor-visible content). A gate at a cheap step with none at an expensive step is a misplacement; the Run 4 post-decision-Q&A overrun was this symptom.
+
 ### Step 4 — Apply OECD-DAC adapted (6 criteria)
 
 Adapt the 2019 six-criteria framework to the system context:

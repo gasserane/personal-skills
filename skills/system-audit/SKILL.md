@@ -86,6 +86,16 @@ Read the first-party skills under the personal-skills `skills/` tree plus the `{
 
 Record each as a finding with the skill path and the failing axis (listing-unreachable, trigger-collision, steering-weak, or steering-leak). This rubric is adapted from Pocock (2026) *Building Great Agent Skills: The Missing Manual*; the steering axis is the contribution this step adds to the audit, and the listing-reachability axis was added 2026-07-30 after a sweep graded five skills' routing as correct while one of them could not be reached by routing at all.
 
+### Step 8 — Conflicting-instruction audit (loaded-surface lint)
+
+Overlapping and contradictory directives consume the model's judgment before any task begins; on Claude 5 generation models this failure mode outranks missing rules (Shihipar 2026, Anthropic context-engineering guidance). Audit the surfaces that load into every session: `~/.claude/CLAUDE.md`, the project `CLAUDE.md`, the output-style block, and the model-invocable skill descriptions in the session listing.
+
+1. **Duplicate-drifted directives.** The same rule stated on two surfaces with different wording, scope, or numbers. Grep both CLAUDE.md files for shared anchor phrases (rule names, thresholds, file paths) and diff the matching passages. The governance-marker regions are duplicated ON PURPOSE for web parity: for those, compare the shared-rule text between matching `governance:*` marker pairs and flag only drift, never the duplication itself.
+2. **Contradictions.** One surface requires what another forbids, or sets a different threshold for the same act (permission modes, length caps, citation placement). Read candidate pairs by eye; report file and line for both sides.
+3. **Trigger ownership.** The same behaviour claimed by two surfaces, such as a skill description and a CLAUDE.md rule both claiming one trigger. Resolve per the trigger-discipline rules in the project CLAUDE.md skill-routing section.
+
+Classify each finding: contradiction (medium), duplicate-drifted (medium), or benign duplicate outside a governance region (low, candidate for goal + pointer). The fix lane for governance content is `governance-rules.md` + `sync_governance_rules.py`, never a hand edit between markers.
+
 ## Failure-fix mapping (your quick reference)
 
 | Issue category | Most likely fix |
@@ -102,6 +112,7 @@ Record each as a finding with the skill path and the failing axis (listing-unrea
 | Trigger collision between two model-invocable skills | Name the lane in the more specific skill's description and route the neighbour away; or set `disable-model-invocation: true` on the one Ane always calls by name |
 | Steering-weak skill (fires but does not constrain) | Add a numbered workflow, decision rules, or an output template to the body; a description alone does not steer |
 | Steering leak (body allows what description forbids) | Add an explicit guard in the body matching the description's constraint (e.g. a no-write skill states it must not use Write/Edit) |
+| Conflicting or duplicate-drifted directive across loaded surfaces | Keep one canonical statement and replace the copy with a pointer; governance regions regenerate via `governance-rules.md` + `sync_governance_rules.py`, never hand-edited apart |
 
 ## Output format
 
@@ -128,6 +139,11 @@ Use this template:
 
 | # | Skill | Axis (trigger-collision / steering-weak / steering-leak) | Fix |
 |---|---|---|---|
+
+## Conflicting instructions (medium severity)
+
+| # | Directive | Surfaces (file:line vs file:line) | Class (contradiction / duplicate-drifted / benign duplicate) | Fix |
+|---|---|---|---|---|
 
 ## Hygiene (low severity)
 
