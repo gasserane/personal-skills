@@ -52,6 +52,20 @@ def _bootstrap_ane_package() -> None:
 
 _bootstrap_ane_package()
 
+
+def _speak_utf8() -> None:
+    """Print paper titles without dying on the console encoding.
+
+    A Windows console is cp1252 by default; scholarly titles carry curly
+    quotes, diacritics and dashes that mangle or crash without this.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
+
+_speak_utf8()
+
 from ane_package.literature import (  # noqa: E402
     OpenAlexClient,
     citation_velocity,
