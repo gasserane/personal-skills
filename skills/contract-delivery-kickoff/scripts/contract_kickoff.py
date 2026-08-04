@@ -100,11 +100,17 @@ SIGNED_WORDS = (
 )
 
 UNSIGNED_WORDS = (
-    "not signed", "unsigned", "awaiting signature", "pending signature",
-    "non signe", "en attente de signature",
-    "sin firmar", "no firmado", "pendiente de firma",
-    "nesemnat", "in asteptarea semnaturii",
-    "nicht unterzeichnet", "unterschrift ausstehend",
+    "not signed", "not yet signed", "yet to be signed", "unsigned",
+    "awaiting signature", "pending signature",
+    # French negates around the verb, so "non signe" misses the commonest
+    # phrasing of all: "le contrat n'est pas encore signe". Found by running
+    # `read` against a French offer, not by any unit test.
+    "non signe", "pas signe", "pas encore signe", "en attente de signature",
+    "sin firmar", "no firmado", "aun no firmado", "pendiente de firma",
+    "nesemnat", "nu este semnat", "nu a fost semnat",
+    "in asteptarea semnaturii",
+    "nicht unterzeichnet", "noch nicht unterzeichnet",
+    "nicht unterschrieben", "unterschrift ausstehend",
 )
 
 CURRENCY_SYMBOLS = ("€", "$", "£", "EUR", "USD", "GBP", "CHF", "RON")
@@ -342,6 +348,22 @@ def read_buckets(tables, lines, role_codes: list[str]) -> tuple[list[dict], list
                 "window": "",
                 "days_proposed": None,
             })
+
+    # A contract titled "Phase II" makes its own name look like a tranche, and
+    # nothing raises: the caller just gets four tranches where there are three.
+    # A document that numbers its tranches in digits is not also numbering them
+    # in roman, so when both appear the roman ones are the title bleeding in.
+    numeric = [b for b in found if b["code"].isdigit()]
+    roman = [b for b in found if not b["code"].isdigit()]
+    if numeric and roman:
+        gaps.append(
+            f"dropped {len(roman)} roman-numeral candidate(s) "
+            f"({', '.join(b['code'] for b in roman)}) because the contract also "
+            f"numbers tranches in digits; this is usually the contract's own "
+            f"title reading as a tranche. Confirm nothing real was dropped"
+        )
+        found = numeric
+    found.sort(key=lambda b: (len(b["code"]), b["code"]))
 
     if not found:
         gaps.append(

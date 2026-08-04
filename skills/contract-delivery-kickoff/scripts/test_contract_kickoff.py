@@ -201,6 +201,19 @@ def test_signature() -> None:
         check(ck.read_signature((line,))[0] is False,
               f"{language} unsigned wording is recognised")
 
+    # French negates around the verb. "non signe" misses the commonest phrasing
+    # there is, and this was found by running `read` against a French offer
+    # rather than by any test above it.
+    for language, line in (
+        ("French, negated verb", "Le contrat n'est pas encore signé à ce jour."),
+        ("English, not yet", "The contract is not yet signed."),
+        ("Spanish, aún no", "El contrato aún no firmado."),
+        ("Romanian, nu este", "Contractul nu este semnat."),
+        ("German, noch nicht", "Der Vertrag ist noch nicht unterzeichnet."),
+    ):
+        check(ck.read_signature((line,))[0] is False,
+              f"{language} unsigned wording is recognised")
+
     silent, gaps = ck.read_signature(("A contract for services.",))
     check(silent is None and any("not stated" in g for g in gaps),
           "silence produces the gap that forces the question")
@@ -253,6 +266,36 @@ def test_draft_spec() -> None:
     named = ck.draft_spec(payload)
     check(any("supplier not named" in g for g in named["_gaps"]),
           "an unnamed supplier is a gap, not a blank string in the workbook")
+
+    # A contract titled "Phase II" makes its own name look like a tranche.
+    # Nothing raises; the caller just gets one tranche too many, which is the
+    # failure mode worth a regression test. Found by running `read` against a
+    # real French offer, not by any unit test.
+    titled = ck.DocumentPayload(
+        path="Offre.docx",
+        tables=payload.tables,
+        lines=("Proposition technique et financière — Phase II",
+               "Phase 1 : corrections des anomalies.",
+               "Phase 2 : améliorations.",
+               "Phase 3 : nouvelles fonctionnalités."),
+    )
+    spec_titled = ck.draft_spec(titled, supplier="S", contract="Phase II")
+    codes = [b["code"] for b in spec_titled["buckets"]]
+    check(codes == ["1", "2", "3"],
+          f"the contract's own title does not become a tranche (got {codes})")
+    check(any("roman-numeral" in g for g in spec_titled["_gaps"]),
+          "dropping a roman-numeral candidate is reported, never silent")
+
+    # When roman numerals are the only numbering, they are the tranches.
+    roman_only = ck.DocumentPayload(
+        path="Offer.docx", tables=payload.tables,
+        lines=("Phase I: discovery.", "Phase II: build."),
+    )
+    roman_codes = [b["code"] for b in
+                   ck.draft_spec(roman_only, supplier="S", contract="C")["buckets"]]
+    check(roman_codes == ["i", "ii"],
+          f"roman numerals survive when nothing else numbers the tranches "
+          f"(got {roman_codes})")
 
 
 def test_artefacts() -> None:
