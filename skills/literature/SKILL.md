@@ -1,15 +1,17 @@
 ---
 name: literature
-description: 'Search 250M+ scholarly works via OpenAlex, direct API, no third-party relay. Four modes: quick literature search, duplication test (nearest published work to a planned question, state your value-add), debate map (common-ancestor anchor papers on a topic), forensic search (source one specific claim). Use when Ane says "search the literature", "is there a review on", "has this been done already", "duplication test", "who does everyone cite", "find me a citation for", "anchor papers", "is this field emerging or settled". For a full structured evidence review use /evidence-synthesis; for a COMPLEX-tier Evidence Brief use /researcher — both of those call this capability as a step. Not for reference management (Zotero via /li) or Ane''s own library (mcp knowledge search).'
+description: 'Search 250M+ scholarly works via OpenAlex, direct API, no third-party relay. Five modes: quick literature search, duplication test (nearest published work to a planned question, state your value-add), debate map (common-ancestor anchor papers on a topic), forensic search (source one specific claim), era split (same topic either side of a split year, reporting which vocabulary entered and which faded). Plus a Consensus escalation for design-filtered searching (sample size, study type, human-only, journal tier). Use when Ane says "search the literature", "is there a review on", "has this been done already", "duplication test", "who does everyone cite", "find me a citation for", "anchor papers", "is this field emerging or settled", "has the terminology changed", "what did they call this before", "only RCTs", "filter by sample size". For a full structured evidence review use /evidence-synthesis; for a COMPLEX-tier Evidence Brief use /researcher — both of those call this capability as a step. Not for reference management (Zotero via /li) or Ane''s own library (mcp knowledge search).'
 model: sonnet
 ---
 
-# Literature — direct OpenAlex search, duplication test, debate map
+# Literature — direct OpenAlex search, duplication test, debate map, era split
 
 Wires Claude Code straight to the OpenAlex catalogue (open index of the
-global research system, hundreds of millions of works). Query text goes to
-OpenAlex only. Every result line carries year, citations, a velocity signal,
-a retraction flag, and an open-access-first link.
+global research system, hundreds of millions of works). In the default modes
+query text goes to OpenAlex only, with no third-party relay; the Consensus
+escalation below is the one exception and is opt-in per search. Every result
+line carries year, citations, a velocity signal, a retraction flag, and an
+open-access-first link.
 
 ## When to use
 
@@ -19,12 +21,16 @@ a retraction flag, and an open-access-first link.
 - Entering an unfamiliar field: map the debate to find the anchor papers
   everyone cites.
 - A specific claim needs a source: forensic search.
+- A duplication test came back clean, or the field looks older than expected:
+  run the era split before concluding anything.
+- Study design or sample size decides whether a finding is usable: escalate
+  to Consensus (see "Consensus escalation").
 
 ## Where the code lives
 
 - `ane_package.literature` in the work folder — `OpenAlexClient` (client.py)
-  and the four moves (moves.py): `duplication_test`, `citation_velocity`,
-  `map_topic_debate`, `forensic_search`.
+  and the moves (moves.py): `duplication_test`, `citation_velocity`,
+  `map_topic_debate`, `forensic_search`, `era_split`, `terminology_shift`.
 - `scripts/literature_cli.py` in this skill — thin driver, no logic.
 - Tests: `tests/literature/` in the work folder (mocked, offline).
 
@@ -56,6 +62,19 @@ python scripts/literature_cli.py debate-map "comprehensive sexuality education o
 python scripts/literature_cli.py forensic "school-based CSE does not increase sexual activity"
 ```
 
+5. Era split — has the vocabulary moved? Two searches, one either side of the
+   split year (default 2015):
+
+```
+python scripts/literature_cli.py era-split "comprehensive sexuality education" --split-year 2015 --per-page 25
+```
+
+A single search can also be windowed to one era with `--to-year`:
+
+```
+python scripts/literature_cli.py search "adolescent contraception" --from-year 2005 --to-year 2014
+```
+
 ## Reading the output
 
 - One work per line: `year | citations | signal | title | link`.
@@ -71,6 +90,80 @@ python scripts/literature_cli.py forensic "school-based CSE does not increase se
 - Duplication verdicts (`high`/`moderate`/`low` risk) ask for a stated
   value-add; they never decide. Put the nearest-neighbour paper and the
   value-add sentence into the deliverable, not just the verdict.
+- Era split prints both cohorts, then the terms that entered and the terms
+  that faded, as the change in the share of works using each term. Read it
+  two ways. **Vocabulary:** re-run the search with the faded terms before
+  concluding a field is empty, because current terms alone drop the
+  foundational older work. **Maturity:** terms like `trial`, `cohort` or
+  `implementation` entering signal an evidence base that has matured; a
+  cohort that is all commentary and no design signals one that has not.
+  When either cohort is too thin to compare, the driver says so rather than
+  reporting a shift it cannot support.
+- The stopword list behind the era split is heuristic. A few filler words
+  survive it. Read the top of each list, not the tail, and judge the terms
+  rather than counting them.
+
+## Consensus escalation — when design filters decide usability
+
+OpenAlex is the default and stays the default: direct API, no relay, no
+per-query cap. It cannot filter by study design. When the question turns on
+whether a finding is usable rather than whether it exists (only randomised
+trials, only human studies, a minimum sample size, top-tier journals only),
+escalate to the Consensus connector, `mcp__claude_ai_Consensus__search`.
+
+Filters Consensus exposes that OpenAlex does not: `study_types`, `human`,
+`sample_size_min`, `sjr_max` (journal tier), plus `year_min` / `year_max`.
+
+Rules for the escalation, all mandatory:
+
+1. **Say why you escalated**, in one line, naming the filter that OpenAlex
+   could not apply. Escalation without a design filter in play is just a
+   second search engine and does not belong here.
+2. **Never apply a filter Ane did not ask for or the question did not
+   require.** A silent `sample_size_min` reshapes the evidence base and looks
+   identical to a genuine gap in the literature.
+3. **Sequential only.** Consensus rate-limits at one query per second.
+   Confirm each result arrived before sending the next; never batch or
+   parallelise.
+4. **Cite only what Consensus returned in this session.** Anything recalled
+   from training knowledge is labelled `[not from Consensus — model
+   knowledge]` and excluded from every count.
+5. **Record the result cap.** Consensus returns a limited number per query and
+   the cap depends on the account tier. Read the actual count off the first
+   response and log it. ⚠️ The tier cap on Ane's account is unverified;
+   report the number observed, never a remembered one.
+6. **Follow the connector's own citation format** (numbered inline references
+   plus a linked reference list, and its sign-up or usage message reproduced
+   verbatim) whenever Consensus results reach Ane directly.
+
+Consensus is a relay: query text leaves for a third party. That is the trade
+for the design filters, so it is a deliberate escalation, never the default.
+
+## Audit log — report the three numbers, always
+
+Any run that feeds a deliverable ends with an audit block. Three numbers,
+tracked separately and never conflated:
+
+- **Queries sent** — how many searches actually executed, including retries.
+- **Results received** — how many works came back, deduplicated by title.
+- **Results cited** — how many reached the deliverable.
+
+Report alongside them: the tool used (OpenAlex or Consensus), any result cap
+observed, every failed search with its query, and any cohort or facet that
+came back thin. Format:
+
+```
+Searched OpenAlex: 6 queries, 43 unique works received, 11 cited.
+Cap: none (OpenAlex returns the full page). Budget left: $0.086.
+Thin: the pre-2015 cohort returned 4 works — coverage there is incomplete.
+Failures: none.
+```
+
+Three rules this enforces. A search is not done until its result is back, so
+never count a query you have not seen return. A thin or empty result is
+surfaced, never quietly topped up from training knowledge. And the counts are
+computed from the run, never estimated, per the computed-counts rule: a
+number describing an artefact goes stale silently.
 
 ## Things that will bite
 

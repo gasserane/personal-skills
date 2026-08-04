@@ -52,6 +52,10 @@ Choose one, name the choice:
 
 **Duplication test first.** Before searching for evidence, search OpenAlex for published reviews on the question itself (`ane_package.literature`, commands in the `literature` skill: `dup-test`). If a review already covers the ground, state the value-add of this synthesis over it (new population, period, context, method, or lens) or narrow the question with Ane. A clean result can be a terminology miss — re-run with the field's own vocabulary before concluding the field is empty.
 
+**When the duplication test comes back clean, run the era split** (`literature` skill: `era-split`). It searches the same topic either side of a split year and reports which terms entered the literature and which faded. Two uses. It names the older vocabulary to re-search, which is the most common reason a field looks empty when it is not. And the direction of the shift is itself a finding for the Method section: terms like `trial`, `cohort` or `implementation` entering mark an evidence base that has matured, which changes what confidence grade the body of evidence can carry.
+
+**When study design decides usability, escalate to Consensus.** OpenAlex cannot filter by sample size, study type, human-only, or journal tier. For effectiveness questions where an underpowered or non-human study is not usable evidence, use the Consensus escalation documented in the `literature` skill, apply only the filters the question requires, and record the result cap it reports.
+
 If Ane provides sources, use them. If not, ask where to search:
 - Grey literature: WHO, UNFPA, UNAIDS, IPPF, Cochrane, 3ie, relevant IGOs
 - Academic: PubMed, Scopus, Global Health Database, Cochrane; OpenAlex via the `literature` skill (open-access links, citation-velocity signals)
@@ -103,6 +107,19 @@ Name what the evidence does not answer. Use `⚠️ Evidence gap:` format. Disti
 - Gaps in population (research exists but excludes the target group)
 - Gaps in method (research exists but with weak designs only)
 
+### Step 10 — order the reading
+
+A brief that lists twenty sources and ranks none of them hands the reader the sorting problem back. Before writing, pick 5 to 7 sources and put them in the order a newcomer should read them. The ordering logic, in sequence:
+
+1. **The best recent review or meta-analysis first.** Broadest orientation for the least reading time. When a good systematic review exists it is almost always first.
+2. **Then the foundational work** the rest of the field builds on. Usually older and heavily cited; the `anchor` signal from the `literature` skill identifies these.
+3. **Then two or three at the current frontier**, especially any that extend or challenge the earlier consensus. The `rising` signal identifies these.
+4. **Last, one source that exposes a gap or a live disagreement**, so the reader sees where the unsettled questions sit.
+
+For each, write two sentences and no more: what it contributes in this sequence (not what it is about), and what to look for while reading it ("the effect sizes are compared in Table 3", "the discussion sets out the unresolved debate"). Hyperlink every title, open-access target first, because MA staff and partners cannot pass paywalls.
+
+Order by what the reader needs, never by confidence grade or alphabetically. A low-confidence source can still be the right first read when it is the only one that frames the whole question.
+
 ## Output structure
 
 Produce an evidence brief with these sections:
@@ -116,8 +133,10 @@ Produce an evidence brief with these sections:
 4. **Where the evidence conflicts** — disagreements surfaced in Step 7, not smoothed. For each: the opposing findings with citations, which reading the evidence currently favours and why, or `⚠️ Unresolved:` where it cannot yet be settled
 5. **Lens observations** — feminist, decolonial, intersectional notes
 6. **Implications** — what this means for the stated purpose (programme design, evaluation, etc.). Be concrete.
-7. **Evidence gaps** — `⚠️ Evidence gap:` entries
-8. **Sources** — full citations, alphabetical by first author
+7. **Start here** — the 5 to 7 sources from Step 10, in reading order, each with its one-line contribution and one-line what-to-look-for. Move this section up to sit directly after the executive summary when the brief's purpose is orientation rather than a decision, because a reader entering an unfamiliar field needs the reading order before the findings.
+8. **Evidence gaps** — `⚠️ Evidence gap:` entries
+9. **Sources** — full citations, alphabetical by first author
+10. **Search audit** — the three numbers, never conflated: queries sent, unique results received, results cited. Name the tool used (OpenAlex, Consensus, hand-supplied), any result cap observed, every failed search, and any thin result set. Compute these from the run; never estimate them. A thin result is reported, never topped up from training knowledge.
 
 ## Citation requirements
 
