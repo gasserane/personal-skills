@@ -1,6 +1,6 @@
 ---
 name: implementation-pack
-description: Generate a post-award implementation / project-management pack (CERV first) from a proposal baseline. Use when Ane asks to "build an implementation pack", "PM pack", "set up project tracking", "after award", "implementation tracker", or runs "/implementation-pack --donor cerv". Reads the proposal handback baseline, applies the awarded grant-agreement figures, then emits a six-tab branded Implementation_Tracker.xlsx (Guide, Dashboard, BudgetBurn, Milestones, RiskIssue, Indicators), a periodic technical-report scaffold, and a README. Donor is an argument so Gates/OSF/UN are later --donor values. Does not replace the finance system of record, portal reporting, or the authorising officer's sign-off.
+description: 'Generate a post-award implementation / project-management pack (CERV first) from a proposal baseline: applies the awarded grant-agreement figures, then emits a six-tab branded Implementation_Tracker.xlsx, a periodic technical-report scaffold, and a README. Use when Ane sets up project tracking after an award or runs ''/implementation-pack --donor cerv''; donor is an argument so Gates/OSF/UN are later --donor values. Does not replace the finance system of record, portal reporting, or the authorising officer''s sign-off. Distinct from /proposal (pre-award).'
 model: opus
 ---
 

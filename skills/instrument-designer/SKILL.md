@@ -1,6 +1,6 @@
 ---
 name: instrument-designer
-description: Design MEL/SRHR data-collection instruments to IPPF/UNFPA publication standard. Use when Ane asks for a "questionnaire", "survey instrument", "interview guide", "KII guide", "focus group guide", "FGD guide", "observation checklist", "data collection tool", or "topic guide". Closes the gap between indicator design and analysis. Applies Groves et al. (2009) total survey error, Willis (2005) cognitive interviewing, Krueger & Casey (2015) FGD design, Brinkmann & Kvale (2015) interviewing, and ITC (2017) translation standards. Builds disaggregation in by construction and embeds consent and care-referral for sensitive content. Does not define indicators or analyse data.
+description: 'Design MEL/SRHR data-collection instruments to IPPF/UNFPA publication standard: questionnaires, survey instruments, KII/IDI interview guides, focus group (FGD) guides, observation checklists, and topic guides, with disaggregation, consent, and care-referral for sensitive content built in by construction. Use when Ane asks for the data-collection tool itself, closing the gap between indicator design and analysis. Does not define indicators (indicator-designer) or analyse data.'
 ---
 
 # Instrument Designer

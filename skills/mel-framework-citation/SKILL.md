@@ -1,6 +1,6 @@
 ---
 name: mel-framework-citation
-description: Enforce IPPF/UNFPA/UNAIDS evidence-and-rigour citation standard on MEL/SRHR output. Tier-aware on placement — Tier 1 working brief uses an Evidence base line at end of section; Tier 2 publication uses inline citations; Tier 1 / junior-MEL keeps framework names visible in prose AND uses an annotated Evidence base line. Use whenever Ane produces a theory of change, evaluation design, indicator set, donor report, or SRHR programme analysis. Injects current authoritative framework versions with author and year, flags outdated versions, and applies the data-gap protocol. Do not use for non-MEL work.
+description: 'Enforce the IPPF/UNFPA/UNAIDS evidence-and-rigour citation standard on MEL/SRHR output: injects current authoritative framework versions with author and year, flags outdated versions, applies the data-gap protocol, and places citations tier-aware (Tier 1 evidence-base line, Tier 2 inline, junior-MEL annotated). Use whenever Ane produces a theory of change, evaluation design, indicator set, donor report, or SRHR programme analysis. Do not use for non-MEL work.'
 ---
 
 # MEL Framework Citation

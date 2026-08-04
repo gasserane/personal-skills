@@ -1,6 +1,6 @@
 ---
 name: procurement-offer-review
-description: 'Review an incoming supplier technical or financial offer against an IPPF ToR, and keep the internal procurement pack consistent. Three modes: offer-review, pack-propagate, score-compare. Use when Ane asks to "review this offer against the ToR", "is the final proposal aligned with the ToR and my comments", "check their revised offer", "add my comments to the offer", "propagate [a decision] across the procurement/waiver docs", "sweep the new figure across the pack", "compare my scores with the AI scores", or "explain the scores for the committee". Distinct from tor-procurement (drafts and grades the ToR itself, upstream of offers), /proposal (writes funding proposals TO donors), implementation-pack (post-award tracking), and accreditation-desk-review (MA compliance).'
+description: 'Review an incoming supplier technical or financial offer against an IPPF ToR, and keep the internal procurement pack consistent: offer-review, pack-propagate, and score-compare modes. Use when Ane checks an offer or revised offer against a ToR and her comments, propagates a decision or figure across the procurement/waiver pack, or compares her panel scores with the AI scores. Distinct from tor-procurement (drafts and grades the ToR itself, upstream of offers), /proposal (funding proposals TO donors), implementation-pack (post-award tracking), and accreditation-desk-review (MA compliance).'
 model: opus
 ---
 

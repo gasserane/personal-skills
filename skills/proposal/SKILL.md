@@ -1,6 +1,6 @@
 ---
 name: proposal
-description: Generate a donor proposal pack (CERV first) with the full MEL stack. Use when Ane asks to "build a proposal", "CERV proposal", "proposal pack", "draft a grant proposal", or runs "/proposal --donor cerv". Runs intake, builds a fixed CERV roster, delegates to Vi to spawn evidence-synthesis, toc-builder, indicator-designer, the gender and safeguarding lens specialists and proposal-architect, validates the architect handback, then emits the seven-artefact branded pack via pack.build_pack with the AI-disclosure colophon. Donor is an argument so Gates/OSF/UN are later --donor values, not new skills. Does not fill Part A portal forms, submit, or sign off finance/legal.
+description: 'Generate a donor proposal pack (CERV first) with the full MEL stack: intake, a fixed roster delegated to Vi (evidence-synthesis, toc-builder, indicator-designer, the gender and safeguarding lens specialists, proposal-architect), then the seven-artefact branded pack with the AI-disclosure colophon. Use when Ane builds a grant proposal or runs ''/proposal --donor cerv''; donor is an argument so Gates/OSF/UN are later --donor values. Does not fill Part A portal forms, submit, or sign off finance/legal. Distinct from donor-proposal-scoring (scores a written proposal) and implementation-pack (post-award).'
 model: opus
 ---
 

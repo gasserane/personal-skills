@@ -1,6 +1,6 @@
 ---
 name: ane-voice
-description: Audit and rewrite AI-generated or AI-edited prose to match Ane's IPPF MEL/SRHR voice. Tier-aware — defaults to Tier 1 working brief register (IPPF colleagues, MA staff, NGO and collaborative partners, management); Tier 2 publication only when the prompt names it. Use when the user pastes text and asks to "humanize", "de-AI", "fix the voice", "remove AI slop", "sharpen this", "tighten", "edit for tone", or "review this draft". Strips hedging, filler, nominalisations, em-dashes, passive voice, abstract openings, framework name-dropping in working briefs, and inline citations in the running text where an evidence-base line belongs. Preserves MEL/SRHR rigour. Does not push prose toward casual or blog tone.
+description: 'Audit and rewrite AI-generated or AI-edited prose to match Ane''s IPPF MEL/SRHR voice, preserving rigour: strips hedging, filler, nominalisations, em-dashes, passive voice, abstract openings, misplaced framework name-dropping, and inline citations where an evidence-base line belongs. Tier-aware, defaulting to the Tier 1 working-brief register. Use when the user pastes text and asks to humanize, de-AI, sharpen, tighten, fix the voice, or review the draft''s tone. Does not push prose toward casual or blog tone.'
 ---
 
 # Ane Voice

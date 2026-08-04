@@ -1,6 +1,6 @@
 ---
 name: decision-debate
-description: 'Run a formal multi-perspective debate on a single contested MEL/SRHR design decision, then hand Ane a readable synthesis she decides on. Persona agents mapped to real specialist lenses research the call independently and blind, debate one round, then a synthesis lands in the decision-memo shape with agreements and genuine disagreements both kept visible. Use when Ane says "debate this", "run a decision debate", "I cannot decide between X and Y", "argue both sides of this design call", "get me independent perspectives on this", or names a genuinely contested MEL design choice where reasonable experts would disagree. Token-heavy by design: reserve for real decisions. Not for sharpening a design Ane already leans on (/grill-mel), not for net-new builds (brainstorming), not for a plain options paper (/decision-memo), and never for building anything.'
+description: 'Run a formal multi-perspective debate on one contested MEL/SRHR design decision: persona agents mapped to real specialist lenses research the call independently and blind, debate one round, then a decision-memo-shaped synthesis keeps agreements and genuine disagreements visible for Ane to decide on. Use when Ane cannot decide between named options and wants independent perspectives argued. Token-heavy by design: reserve for real decisions. Not for sharpening a design she already leans on (/grill-mel), net-new builds (brainstorming), or a plain options paper (/decision-memo), and never for building anything.'
 ---
 
 # Decision-debate (MEL/SRHR)

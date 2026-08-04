@@ -1,6 +1,6 @@
 ---
 name: linkedin-field-note
-description: 'Produce and publish the next entry in Ane personal AI Field Notes series on LinkedIn, end to end: topic proposal from the series ledger, a dictation interview, the article plus short post, the companion toolkit, then publication via claude-in-chrome after per-artifact approval. Runs on Ane personal Wine & Slate brand, never IPPF branding. Use whenever Ane says "next field note", "field note 04", "AI Field Notes", "new LinkedIn article", "LinkedIn post about my AI work", "draft the toolkit for the article", "publish my field note", "stage my LinkedIn post", or wants any personal AI/MEL thought-leadership piece for LinkedIn. Not for IPPF-branded MA-facing learning products from an Evidence Brief (learning-product), meeting notes (meeting-notes), a voice audit of existing text (ane-voice), or LinkedIn profile edits.'
+description: 'Produce and publish the next entry in Ane''s personal AI Field Notes series on LinkedIn, end to end: topic proposal from the series ledger, a dictation interview, the article plus short post, the companion toolkit, then publication via claude-in-chrome after per-artifact approval. Runs on Ane''s personal Wine & Slate brand, never IPPF branding. Use for any personal AI/MEL thought-leadership piece for LinkedIn. Not for IPPF-branded MA-facing learning products (learning-product), meeting notes (meeting-notes), voice audits of existing text (ane-voice), or LinkedIn profile edits.'
 ---
 
 # LinkedIn Field Note

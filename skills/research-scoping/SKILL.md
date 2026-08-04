@@ -1,6 +1,6 @@
 ---
 name: research-scoping
-description: A fast single-pass scoping map that surfaces the perspectives a MEL/SRHR question demands, where those perspectives conflict, and whether the question is worth a full orchestration — before committing tokens to one. Produces a map and a triage verdict, never citations or findings. Use when Ane says "scope this", "research scoping", "map the angles", "what perspectives does this need", "is this worth a full /ann run", "triage this before I build it", or wants a cheap first look at a question, proposal angle, learning question, or evaluation framing. Not an interview of Ane (use /grill-mel), not the deliverable or any sourced evidence (use /ann, /researcher, or /evidence-synthesis), and not a multi-agent debate (use /decision-debate).
+description: 'A fast single-pass scoping map of a MEL/SRHR question: which perspectives it demands, where those perspectives conflict, and whether it is worth a full orchestration, ending in a triage verdict, never citations or findings. Use when Ane wants a question, proposal angle, learning question, or evaluation framing scoped or triaged before committing tokens to a full run. Not an interview of Ane (/grill-mel), not the deliverable or any sourced evidence (/ann, /researcher, /evidence-synthesis), and not a multi-agent debate (/decision-debate).'
 ---
 
 # Research Scoping

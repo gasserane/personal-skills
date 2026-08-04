@@ -1,6 +1,6 @@
 ---
 name: donor-proposal-scoring
-description: 'Score a written grant proposal against the donor published award criteria (SCORE mode), or compare that scoring against the donor own Evaluation Summary Report (CALIBRATE mode). Use whenever Ane says "score this proposal", "how would the donor score this", "assess our application against the call criteria", "will this pass the threshold", "where would we lose points", "compare my scoring with the donor evaluation", or hands over a call document plus a submitted proposal. Distinct from /proposal (writes proposals TO donors), procurement-offer-review and tor-procurement (the buying side, supplier offers against a ToR), accreditation-desk-review (Member Associations against IPPF standards), and check-deliverable (a QA gate, not a scored assessment against an external grid).'
+description: 'Score a written grant proposal against the donor''s published award criteria (SCORE mode), or compare that scoring against the donor''s own Evaluation Summary Report (CALIBRATE mode). Use when Ane asks how a donor would score an application, whether it passes the threshold, where points would be lost, or hands over a call document plus a submitted proposal. Distinct from /proposal (writes proposals TO donors), procurement-offer-review and tor-procurement (the buying side, supplier offers against a ToR), accreditation-desk-review (MAs against IPPF standards), and check-deliverable (a QA gate, not a scored assessment).'
 model: opus
 ---
 
