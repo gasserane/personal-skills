@@ -1,11 +1,13 @@
 ---
 name: meeting-notes
-description: 'Turn Ane meetings and 1-1s into structured, IPPF-branded meeting notes from any capture method, and prepare the next one. Five modes selected by input: dictated notes, 1-1 prep, handwritten photos or scans, recordings and transcripts, and a shareable learning document. Use whenever Ane says "meeting note", "meeting notes", "minutes", "I want to dictate my meeting", "debrief my 1-1", "prep my 1-1", "prepare my meeting with [name]", "draft notes from this photo or scan of my notebook", "process this meeting recording", "here is the Teams transcript", or "learning document from these notes". Not for importing typed claude.ai sessions (capture-desktop), options papers (decision-memo), personal reflection (journal-reflection), daily planning (daily-brief), or analysing FGD/research videos for MEL evidence (video-content-analysis).'
+description: 'Turn Ane meetings, 1-1s and document review cycles into structured, IPPF-branded meeting notes from any capture method, and prepare the next one. Six modes selected by input: dictated notes, 1-1 prep, handwritten photos or scans, recordings and transcripts, comments inside a reviewed Word document, and a shareable learning document. Use whenever Ane says "meeting note", "meeting notes", "minutes", "I want to dictate my meeting", "debrief my 1-1", "prep my 1-1", "prepare my meeting with [name]", "draft notes from this photo or scan of my notebook", "process this meeting recording", "here is the Teams transcript", or "learning document from these notes". Use it too whenever decisions arrive as margin comments rather than as a meeting: "the decisions are in the comments", "marginalia", "the notes are in the document comments", "turn the review comments into notes", "extract the decisions from this reviewed ToR", or a commented .docx path handed over with any note-like ask. Not for importing typed claude.ai sessions (capture-desktop), options papers (decision-memo), personal reflection (journal-reflection), daily planning (daily-brief), analysing FGD/research videos for MEL evidence (video-content-analysis), or editing the reviewed document itself rather than writing it up (office-review-pass, or tor-procurement finalise for a ToR).'
 ---
 
 # Meeting Notes
 
 One skill for the full 1-1 and meeting-note lifecycle: prep → meeting → dictated or photographed notes → shareable learning document → next prep. The modes share one file convention, so each meeting's outputs become the next meeting's inputs.
+
+Not every meeting is a meeting. A ToR or implementation-plan review cycle settles decisions in the margins of a document, and those need the same note, the same action tables and the same tracker row as a call would. That is the marginalia mode.
 
 ## Mode selection
 
@@ -15,6 +17,7 @@ One skill for the full 1-1 and meeting-note lifecycle: prep → meeting → dict
 | "prep my 1-1", "prepare my meeting with [manager]", "what do I owe Lena" | 1-1 prep | `references/prep-mode.md` |
 | Image or scan paths + "draft notes from this photo/scan", handwritten notes | Handwritten notes (photo/scan) | `references/photo-mode.md` |
 | A voice/video recording file, or a transcript (Teams .vtt/.docx, txt) | Recordings and transcripts | `references/transcript-mode.md` |
+| A reviewed .docx whose decisions sit in comments: "the decisions are in the comments", "marginalia", "turn the review comments into notes" | Document marginalia | `references/marginalia-mode.md` |
 | "learning document", "shareable summary of this meeting" + a finished note | Learning document | `references/learning-document-mode.md` |
 
 Read only the reference file for the selected mode. If the mode is ambiguous, ask in one line; do not guess between prep and notes. Any other capture method (chat log, email thread as minutes, whiteboard photo) normalises to text and then follows `references/transcript-mode.md` from step 2, so every way a meeting gets captured has a route into the same note structure.
