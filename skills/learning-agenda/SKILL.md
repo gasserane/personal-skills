@@ -1,6 +1,6 @@
 ---
 name: learning-agenda
-description: Produce one of three learning-agenda output types — canonical federation agenda (v1), 1-page quarterly RAG dashboard (v2), or MA adaptation template (v3). Use when Ane asks for "learning agenda", "federation learning agenda", "annual learning questions", "RAG dashboard for the agenda", "MA learning agenda template", "MA adaptation template", or names one of the three output types directly. Operationalises the IPPF EN A+C hybrid (USAID structure + Patton use-anchoring + Britton AAR posture) locked 2026-05-10. Reuses verified citations from the wiki only; never fabricates sources. Applies IPPF Visual Identity 2025 brand template.
+description: 'Produce one of three learning-agenda output types: canonical federation agenda (v1), 1-page quarterly RAG dashboard (v2), or MA adaptation template (v3), operationalising the IPPF EN A+C hybrid locked 2026-05-10. Reuses verified citations from the wiki only; never fabricates sources; applies the IPPF Visual Identity 2025 brand. Use when Ane asks for a learning agenda, annual learning questions, the RAG dashboard, or the MA adaptation template.'
 model: opus
 ---
 

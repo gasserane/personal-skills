@@ -1,6 +1,6 @@
 ---
 name: learning-product
-description: Convert a Researcher Evidence Brief into one of four learning-product output types — MA-facing 2-page brief, workshop / CoP pack, regional learning brief, or donor / management talking-points memo. Use when Ane asks for "learning product", "learning brief", "MA brief from this Evidence Brief", "workshop pack", "CoP pack", "regional learning brief", "donor memo from research", "management memo from research", or names one of the four output types directly. Reads from a single Researcher Evidence Brief slug under `literature-reviews/<slug>/`. Reuses the brief's verified sources only; never fabricates citations. Applies IPPF Visual Identity 2025 brand template and Tier 1 working brief register.
+description: 'Convert a Researcher Evidence Brief (one slug under literature-reviews/) into one of four learning products: MA-facing 2-page brief, workshop / CoP pack, regional learning brief, or donor / management talking-points memo. Reuses the brief''s verified sources only; never fabricates citations; applies IPPF Visual Identity 2025 brand and the Tier 1 working-brief register. Use when Ane asks for a learning product or names one of the four output types from an Evidence Brief.'
 model: opus
 ---
 

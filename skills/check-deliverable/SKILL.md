@@ -1,6 +1,6 @@
 ---
 name: check-deliverable
-description: 'Run the qa-reviewer maker-checker gate against one finished text deliverable, without a full Ann orchestration. Use when Ane types "/check-deliverable <file>", or says "check this deliverable", "run the qa gate on this file", "qa-review this brief", "run qa-reviewer on this file", or wants a finished markdown brief checked against the full qa gate on its own. Spawns qa-reviewer alone against a single markdown or text file, sets the audience tier (default Tier 1 / colleague; override with --tier and --subgroup), and returns a BLUF verdict plus the full qa_block. Read-only: it rewrites nothing and writes nothing to disk. Not for producing a deliverable (/ann), voice rewriting (/ane-voice), or code review (/code-review). Refuses Office binaries (.docx/.xlsx/.pptx) because qa-reviewer cannot parse them.'
+description: 'Run the qa-reviewer maker-checker gate against one finished text deliverable without a full Ann orchestration: spawns qa-reviewer alone on a single markdown or text file, sets the audience tier (default Tier 1 / colleague; override with --tier and --subgroup), and returns a BLUF verdict plus the full qa_block. Read-only: rewrites nothing, writes nothing to disk. Use on ''/check-deliverable <file>'' or any ask to QA a finished brief on its own. Refuses Office binaries (.docx/.xlsx/.pptx). Not for producing a deliverable (/ann), voice rewriting (/ane-voice), or code review (/code-review).'
 ---
 
 # /check-deliverable — standalone qa gate
