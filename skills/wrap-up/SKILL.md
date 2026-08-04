@@ -281,7 +281,7 @@ Graduates this session's `cost-calibration-log.md` row from an estimate to a fir
 4. Refresh the log's variance-summary counts if the file maintains them (total rows, firm-observed count, over-band count).
 5. Stage, commit, and push this one file in the work-folder repo. It lands after the Phase 4 commit, so it commits itself (single-quoted heredoc message, conventional prefix, `Co-Authored-By` footer per CLAUDE.md).
 
-**OPEN MEASUREMENT QUESTION — run this once, then delete this block (/improve-system Run 5, 2026-07-31).** Does `/cost` reset across `/clear`? Two rows contradict each other: `improve-system-run-4` says the panel reports the terminal session and `/clear` does NOT reset it, so its figure may cover a prior thread; `session-economy-rule-then-wrap-up-tail` a day later saw the figure fall from $16.87 to $3.02 across one `/clear`. Every firm row's attribution depends on the answer. **The test:** the next time a wrap-up is followed by a `/clear` in the same terminal, ask Ane to paste `/cost` immediately before and immediately after. Write the pair into the cost log as a dated note, add a one-line resolution pointer to both contradicting rows, and delete this block. If the terminal was restarted between the two observations, the test is void and must be re-run.
+**Attribution note (measured 2026-08-04, `openalex-literature-capability-build`).** The `/cost` panel RESETS across `/clear` (same-terminal pair observed: $15.09 pre-clear, $2.68+$30.72 at the next thread's close). A pasted figure therefore covers the current thread only, back to the last `/clear` or terminal start.
 
 **On skip.** Leave the row(s) as `[pending — Ane: paste from terminal]`; the 14-day rule graduates them to `not observed` at the next Li CURATE.
 
