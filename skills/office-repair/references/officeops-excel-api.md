@@ -32,6 +32,45 @@ script living in the clone — copy that preamble.
 - [Verification](#verification)
 - [Extraction](#extraction) — canonical mode, plus image-based deck exports
 - [Traps](#traps)
+- [Writing a branded workbook](#writing-a-branded-workbook) — not officeops, but check here before building one
+
+## Writing a branded workbook
+
+`officeops` repairs and reads Office files. It does not *author* them. Anything
+that writes a branded artefact lives in `ane_package.reporting`, on xlsxwriter,
+reading `IPPF_FORMAT_TEMPLATE` — never a hard-coded colour, font or number
+format. Check this list before writing a builder; the shape you need often
+exists.
+
+```python
+from ane_package.reporting.excel_templates import (
+    build_disaggregation_crosstab,   # a category x category table
+    build_time_trend,                # a series over periods
+    build_indicator_tracker,         # indicator x target x actual x variance x status
+    build_baseline_endline,          # before / after with change
+    build_review_worklist,           # one row per finding, severity colour-coded
+)
+from ane_package.reporting.selection_toolkit import (
+    SelectionSpec, build_master_workbook, build_scorer_workbook,
+    panel_mean, financial_score, decide, rank_rows,   # the engine, tested directly
+)
+from ane_package.reporting.delivery_kickoff import (
+    KickoffSpec, Role, Bucket, Item, build_kickoff_workbook,
+    allocation, budget_status, over_commitment_signal, lane_split,  # the engine
+)
+```
+
+`selection_toolkit` runs a weighted selection between a published ToR and the
+award. `delivery_kickoff` runs the first working session of a delivery contract
+against a fixed day budget, and is the shape to copy for any multi-sheet
+workbook whose numbers matter: a validated frozen dataclass, then pure
+arithmetic, then builders that write formulas agreeing with that arithmetic.
+
+**Why the arithmetic is a separate importable layer in both.** A formula string
+proves nothing about the number Excel produces. Test the rules in Python, write
+the formulas to agree with them, then assert Excel's computed values against the
+same functions through COM. Reading a formula back only proves you wrote the
+formula you wrote.
 
 ## Diagnosis
 

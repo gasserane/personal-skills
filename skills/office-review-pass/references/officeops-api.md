@@ -28,6 +28,49 @@ If the import fails from outside the work folder, call
 - [Word COM](#word-com) — revise mode
 - [Verification](#verification) — all modes
 - [Traps](#traps)
+- [Writing a branded document](#writing-a-branded-document) — not officeops, but check here before building one
+
+## Writing a branded document
+
+`officeops` reads, marks up and repairs Word files. It does not *author* them.
+Anything that writes a branded document lives in `ane_package.reporting`,
+reading `IPPF_FORMAT_TEMPLATE`. Two entry points, and they are not
+interchangeable.
+
+```python
+from ane_package.reporting.word_export import (
+    WordReport, Section, FindingCard, artifact_labels, write_word_report,
+)
+from ane_package.reporting.markdown_docx import (
+    render_markdown, render_markdown_file, RenderReport,
+)
+```
+
+`write_word_report` takes a fixed analytical shape: bottom-line-up-front
+bullets, then sections with finding cards, then a method note and a glossary.
+Right for a report or a brief.
+
+`render_markdown` renders a markdown subset — headings `#` to `###`, `**bold**`,
+`[text](url)` as real hyperlinks, lists to two levels, pipe tables, rules —
+against the same brand. Right for an agenda, a run sheet, a note template or
+anything whose structure *is* the content, where the report skeleton fights the
+document. Markdown stays the source of truth and the `.docx` is regenerated.
+
+It returns a `RenderReport`. **Read `report.unsupported` and surface it.**
+Constructs it cannot render structurally (code fences, block quotes, images,
+headings below `###`, lists nested deeper than two) are recorded there and their
+text is still written, so a page can lose formatting but never content. A
+renderer that swallows them silently produces a document that looks complete and
+is not.
+
+Both default to `template="general"` (logo header on every page, pillar footer).
+Use `"letterhead"` only for memos and correspondence.
+
+**The branded base carries no `List Bullet`, `List Number` or `Table Grid`
+style**, so any list writes its glyph onto `IPPF Body` and indents, and any
+table sets `tblBorders` XML directly. Asking python-docx for one of those styles
+raises `KeyError` at render time. Both modules above already handle it; a new
+builder has to.
 
 ## Reading a review
 
