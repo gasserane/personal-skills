@@ -29,7 +29,7 @@ script living in the clone — copy that preamble.
 - [Diagnosis through Excel](#diagnosis-through-excel) — COM, read-only
 - [Applying a repair](#applying-a-repair) — COM, writes
 - [Verification](#verification)
-- [Extraction](#extraction) — canonical mode
+- [Extraction](#extraction) — canonical mode, plus image-based deck exports
 - [Traps](#traps)
 
 ## Diagnosis
@@ -159,6 +159,40 @@ Both readers recurse. In Word that means table cells, including a table nested i
 a cell. In PowerPoint it means grouped shapes, table cells and speaker notes.
 `where` carries the location — `body table r2c1`, `slide 4 group`,
 `REF_SAM!B7` — so a change list can point at something.
+
+### Image-based deck exports
+
+```python
+looks_like_deck_export(path) -> DeckExportCheck   # .is_deck_export .reason .main_part
+                                                  # .image_count .body_paragraphs
+                                                  # .mean_paragraph_chars .has_altchunk
+slide_images(path, out_dir=None) -> list[SlideImage]
+                                                  # .index .anchor .anchor_index .part
+                                                  # .image_format .size .digest .path
+```
+`.docx` only. For a Storyline or PowerPoint export where the translatable text is
+rasterised inside slide images and the body holds only slide titles. Used by
+`localise` deck mode.
+
+Four things it gets right that a hand-rolled reader does not. The main part is
+resolved through `_rels/.rels`, because these exports name it `document2.xml` and
+a reader hard-coded to `word/document.xml` reports an empty document. Relationship
+targets are normalised, so `../media/image1.bin` resolves to the package root.
+The image format is sniffed from the bytes, because the parts are `.bin` and hold
+JPEGs. And both the DrawingML (`a:blip`) and legacy VML (`v:imagedata`) paths are
+read, since a reader that knows only the first drops whole slides.
+
+`anchor` is the slide-title paragraph the image sits under, and it is what a
+comment hangs on, since a comment cannot sit on text inside an image. Match on
+`anchor` text, not on `anchor_index`: `add_comments` resolves paragraphs by
+string, and its index space excludes empty paragraphs. `digest` is what separates
+a slide from the navigation chrome repeated on every one. Without `out_dir`
+nothing is written and `path` stays `None`, which is what the anchoring and
+worklist steps want.
+
+`DeckExportCheck` carries the evidence with the verdict because the verdict is a
+heuristic: three or more images plus either the Storyline layout, an `altChunk`,
+or live paragraphs averaging 80 characters or fewer.
 
 ## Traps
 
