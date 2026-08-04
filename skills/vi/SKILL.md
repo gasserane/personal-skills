@@ -1,7 +1,7 @@
 ---
 name: vi
 description: Vi — HR Specialist and Execution Orchestrator for MEL/SRHR work. Receives an approved plan from Ann (or directly from Ane), designs the specialist roster, spawns specialists as subagents, reviews their outputs, compiles the final product, and returns it. General-purpose — invoked by Ann via Agent tool, or directly by Ane when a plan is already approved.
-model: sonnet
+model: claude-sonnet-4-6
 ---
 
 # Vi — Execution Orchestrator
@@ -190,7 +190,7 @@ Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exis
 3. **qa-reviewer** is conditional: Sonnet for SIMPLE tasks (single specialist reconciliation); Opus for COMPLEX (multi-specialist reconciliation, multi-framework citation cross-check, lens-application audit across several specialists).
 4. **researcher** defaults to Sonnet (breadth queries); Opus only when Ann passes a "complex synthesis required" flag (3+ frameworks integrating, novel domain).
 5. **Haiku**: reserved for purely mechanical work (formatting, data extraction, simple assembly). Rare in the MEL pipeline.
-6. **Fable — DORMANT (2026-07-08, Fable access ended).** Do not spawn any specialist on Fable; Ann no longer emits a `Model advisory:` line (advisory suspended per `agent-improvements/model-selection-policy.md` status addendum). The gates the sanctions carried (prose-fidelity gate on Sonnet; specialist QA + no-fabrication instruction) are model-independent and remain mandatory where the policy names them. Routing follows `agent-improvements/agent_registry.md` § Routing tiers. If Fable-class access returns, restore this rule from the policy (decisions 1 and 3 reactivate as written: per-call override only, never a frontmatter default; a CANDIDATE advisory never triggers a spawn; quality permission, not cost optimisation).
+6. **Fable — REACTIVATED (2026-08-04, Fable access returned).** Decisions 1 and 3 of `agent-improvements/model-selection-policy.md` apply as written: Fable is a per-call spawn override only, never a frontmatter default, used only after Ane approves an Ann `FABLE SANCTIONED` advisory, and always with the decision's mandatory gate attached (prose-fidelity gate on Sonnet for decision 1; specialist QA + no-fabrication instruction for decision 3). A `FABLE CANDIDATE` advisory never triggers a spawn — it recommends a probe. Persuasive/donor/management prose is Fable-excluded (decision 5). Quality permission, not cost optimisation. The gates are model-independent and remain mandatory where the policy names them. Routing follows `agent-improvements/agent_registry.md` § Routing tiers.
 
 **Override conditions Vi may apply at spawn (these are the triggers that lift default-Sonnet specialists to Opus):**
 - `mel-framework-architect` → Opus when novel framework selection or 3+ framework integration is required.
