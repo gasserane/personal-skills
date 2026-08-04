@@ -84,9 +84,17 @@ reads. Blocks are numbered `[n]` in document order so a finding can cite one.
 review_blocks(path, include_empty=False) -> list[ReviewBlock]
 ```
 The structured form behind the rendering. `ReviewBlock` carries `.index .text .style
-.in_table .comments .has_insertions .has_deletions` and `.is_heading`. A comment
-attaches to the block where its range **opens**, so a comment spanning three
-paragraphs is reported once.
+.in_table .comments .has_insertions .has_deletions .bold` and the two heading tests,
+`.is_heading` and `.looks_like_heading`. A comment attaches to the block where its
+range **opens**, so a comment spanning three paragraphs is reported once.
+
+**Use `.looks_like_heading` on anything built on the IPPF letterhead.** The base
+carries no `Heading` style, so `tor_docx.py` and its siblings write section headings
+as direct bold formatting and `.is_heading` finds none at all: a first run over the
+AI-for-Research ToR placed all 23 comment threads in section `""`.
+`.looks_like_heading` falls back to a short fully-bold line (120 characters or less,
+not a list style). `.is_heading` keeps its style-only meaning for callers that need
+certainty.
 
 ```python
 read_comments(path) -> list[Comment]
@@ -96,6 +104,28 @@ read_review(path)   -> {"comments": [Comment], "revisions": [Revision]}
 and `.is_reply`. `.anchor` is the document text the comment range covers, read from
 `commentRangeStart`/`End` — a finding never arrives without the words it is about.
 Replies point at their parent through `.parent_id`.
+
+```python
+comment_threads(path, include_resolved=True) -> list[CommentThread]
+same_person(left, right) -> bool
+```
+`read_comments` returns replies as siblings of what they answer, which is the wrong
+shape for deciding what still needs a response. `CommentThread` groups a root comment
+with its replies (following a nested reply up to its true root) and carries `.root
+.replies .section .section_index .block_index .in_table .anchor .last_author`, plus
+`.answered_by(author)` and `.is_open(author="")`. `.section` is the nearest preceding
+heading, which is **not** the same question as `.anchor`: a reviewer selects a phrase
+and writes about the clause behind it, and on the 2026-07-31 ToR round the objection
+under discussion was anchored three sections away from the argument.
+
+`same_person` compares two Word author strings by containment, because one person
+appears under several profiles. That ToR carries `Ane Gasser`, `Ane Gasser PERSONAL`
+and `Ane Gasser [2]`; exact matching reports a thread she has answered as still open.
+
+**A reply is only threaded when the reply button was used.** An answer typed as a new
+comment on the same paragraph is a root of its own, so `.replies` can be empty beside
+an answer that plainly exists. Check for other threads sharing a `.block_index` before
+concluding nobody replied.
 
 ```python
 add_comments(source, requests: list[CommentRequest], out_path=None) -> Path
