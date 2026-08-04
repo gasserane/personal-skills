@@ -1,6 +1,6 @@
 ---
 name: tor-procurement
-description: 'Build, review and grade procurement Terms of Reference (ToRs) for consultancy and service contracts to open-market standard. Three modes: build (branded docx via a generator), review (two-lens analysis, strong and weak points, a 1-10 grade with a self-grading bias note), finalise (apply revisions with edit-preservation). Use when Ane asks to "draft a ToR", "write terms of reference", "procurement ToR", "review this ToR", "grade this ToR", "harden this ToR before publication", or is preparing to contract a consultant or service provider. Distinct from /proposal (writes funding proposals TO donors, this procures FROM consultants), implementation-pack (post-award tracking), and accreditation-desk-review (MA compliance). To evaluate incoming supplier offers against a ToR, use procurement-offer-review.'
+description: 'Build, review, grade and defend procurement Terms of Reference (ToRs) for consultancy and service contracts to open-market standard. Four modes: build (branded docx via a generator), review (two-lens analysis, strong and weak points, a 1-10 grade with a self-grading bias note), respond (a named reviewer has objected to a ToR Ane wrote and she must answer the person rather than change the document: reach a verdict, draft the reply at two lengths, size any follow-on contract), finalise (apply revisions with edit-preservation). Use when Ane asks to "draft a ToR", "write terms of reference", "procurement ToR", "review this ToR", "grade this ToR", "harden this ToR before publication", "answer this comment on my ToR", "a reviewer objects to", "how do I respond to this comment", "is this objection fair", "reply to the comments on my terms of reference", or is preparing to contract a consultant or service provider. Distinct from /proposal (writes funding proposals TO donors, this procures FROM consultants), implementation-pack (post-award tracking), and accreditation-desk-review (MA compliance). To evaluate incoming supplier offers against a ToR, use procurement-offer-review. When Ane is the reviewer commenting on someone else drafted, that is the opposite direction and not this skill.'
 model: opus
 ---
 
@@ -11,6 +11,7 @@ One job: get a procurement ToR to open-market standard. The spine is `references
 ## Mode routing
 - **build** — no ToR exists yet, or Ane wants a fresh start.
 - **review** — a ToR exists; Ane wants strong/weak points and a grade. Read-only.
+- **respond** — a named reviewer has commented a ToR Ane wrote and she needs to answer *them*. Produces reply text, not document edits. Hands to finalise only where a concession is agreed.
 - **finalise** — a review happened or Ane brings agreed revisions; apply them, nothing else.
 
 If the mode is ambiguous, ask in one line before working.
@@ -48,6 +49,44 @@ Grade anchors: 5 or below = not publishable, structural gaps; 6-7 = publishable 
 
 > Self-graded N/10 by the same model that worked on this document — treat as an upper bound. External read of sections [weakest sections] by [named colleague] recommended before publication.
 
+## Respond mode
+
+The stage between review and finalise. A named reviewer has objected to a clause, and the job is to answer the person. **The correct outcome is usually no change to the document**: three of the four verdicts leave the ToR exactly as published.
+
+| Verdict | What it says | Does the ToR change |
+|---|---|---|
+| **defend** | The clause is right as written, and here is what it actually says. | No |
+| **concede** | The reviewer is right. Name the minimal edit, nothing wider. | Yes |
+| **defer** | The point is legitimate and does not fit this contract. Size the follow-on. | No |
+| **escalate** | This is a governance question the ToR cannot settle. Name the owner. | No |
+
+A compound answer takes a primary verdict plus one secondary. **defend + defer** is the reference case: the clause stands, and the work the reviewer wants gets sized as a separate contract. **defend + concede** is refused, because a clause cannot be both right as written and in need of an edit.
+
+### Steps
+
+1. **Read the ToR and `references/open-market-checklist.md`.** An objection is often the checklist arriving from outside.
+2. **Extract the objections.** `python scripts/tor_respond.py extract "<ToR>.docx" --json round.json`. It reports each thread, the section it sits in, and whether it is already answered. Three things it tells you that a comment list does not:
+   - **The anchor is not the clause.** A reviewer selects a phrase and writes about the argument behind it. Read the section, not only the highlighted words, before drafting.
+   - **Her own margin notes are separated out.** They are working notes, not objections; nobody is waiting on a reply.
+   - **`also commented here`** names anyone who commented on the same paragraph in a separate thread. Word records a reply as a reply only when the reply button was used, so an answer she already typed can sit beside the objection looking like a new comment. Read it before answering twice.
+3. **State the strongest version of the objection before answering it** (challenge-by-default). Answering the weakest reading is how one objection becomes four rounds. Where the reviewer is right, concede; a defence of everything convinces nobody.
+4. **Answer from what the documents say** (factual reliability). Every defence cites the ToR section or the governance document it rests on. Never assert an institutional fact you cannot source: a 2026-07-31 draft reply carried a "we may not have a DPO" aside that was never checked and would have gone to an external reader as fact. The guard refuses a defence that cites nothing.
+5. **Draft the reply at two lengths.** Full for an email or a meeting; compact for the Word comment pane, where a reply that does not fit on a glance does not get read. Ceilings default to 500 and 180 words and are settings, not constants.
+6. **Where the verdict defers, size the follow-on.** Scope options, how the consultant profile differs, indicative bands marked uncosted, and the trigger condition that would justify commissioning it. Answering a legitimate point with a prohibition invites the next round; answering it with a plan closes it.
+7. **Compile.** `python scripts/tor_respond.py compile round.json --out <dir> --docx`. Writes `replies.md` (both lengths per objection, with the sizing sketch) and `response-register.md` (one row per objection, plus the revision list finalise mode takes). `--docx` renders both as branded Word.
+
+### What the guards refuse
+
+`compile` runs every guard before writing and **refuses a round that contradicts itself**, because finalise mode would act on it. Blocking: a contradictory verdict pair, an edit attached to anything but a concession, a concession naming no edit, a deferral that never sizes its follow-on, a defence citing no source, an empty reply, an option estimated at zero days. Warning only, and still written: an overlong reply, a missing steelman, and the standing prose findings (hedging, filler, em-dashes) from `ane_package.qa.prose_lint`.
+
+The line sits where a mistake reaches someone other than Ane. Length and voice are craft she can fix in the pane. A contradiction or an unsourced claim goes to a named external reviewer and costs more to retract than to catch. `--force` overrides, and says so.
+
+**Nothing is invented in a sizing sketch.** An option nobody estimated stays uncosted rather than costing zero, and the procurement route is assessed only against a threshold that was supplied. The skill holds no threshold of its own.
+
+### After responding
+
+Conceded objections, and only those, become finalise mode's revision list. Everything else closes with the reply. If Ane sends the replies as Word comment replies, she pastes them; this mode does not write into her document.
+
 ## Finalise mode
 1. Confirm the agreed revision list (from the review or from Ane). Scope is that list, nothing more.
 2. Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists — Ane's current content is the canonical baseline; read first, edit scope-bounded via the Edit tool, preserve everything out of scope byte-identical, report out-of-scope observations in the EDIT-PRESERVATION DELIVERY format. Never regenerate from scratch.
@@ -56,5 +95,6 @@ Grade anchors: 5 or below = not publishable, structural gaps; 6-7 = publishable 
 
 ## Scope boundary
 - Publication on the procurement channel, finance and VAT confirmation, contracting entity, and legal sign-off stay with their owners — the ToR carries their placeholders until they confirm.
+- Replying to a reviewer who commented Ane's own ToR is respond mode, above. **Reviewing a third party's draft that Ane has commented runs the opposite direction** and is not this skill: there she is the reviewer, here she is the author answering inbound comments. Do not rebuild either from the other.
 - Evaluating received offers and keeping a waiver pack consistent is the next lifecycle phase (`procurement-offer-review`, built 2026-07-22) — not this skill.
 - A ToR published outside IPPF is an AI-assisted publication: offer the standard colophon per mel_wiki/wiki/concepts/ai-use-in-publications.md (routine grammar-only edits exempt).
