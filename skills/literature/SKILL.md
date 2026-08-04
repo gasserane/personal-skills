@@ -75,6 +75,41 @@ A single search can also be windowed to one era with `--to-year`:
 python scripts/literature_cli.py search "adolescent contraception" --from-year 2005 --to-year 2014
 ```
 
+## Grey literature — use the report and dissertation types
+
+OpenAlex indexes more than journal articles. Two work types reach grey
+literature and both are worth running on any SRHR or programme question:
+
+```
+python scripts/literature_cli.py search "adolescent SRH programme evaluation" --type report --per-page 15
+python scripts/literature_cli.py search "youth friendly SRH services barriers" --type dissertation --per-page 15
+```
+
+Verified live 2026-08-04: `--type report` returned 3ie evidence gap maps,
+Population Council technical reports and an evaluation of the Family Planning
+Association of Kenya youth centre programme, which is an IPPF Member
+Association. `--type dissertation` returned theses from Kenyatta University,
+the University of KwaZulu-Natal and the Open University of Tanzania. All
+open-access links.
+
+Run these whenever the question concerns programme delivery, an MA context,
+or any Global South setting. An evidence base built from journal articles
+alone over-represents Western academic research and under-represents exactly
+the programme evidence the decolonial lens asks to be centred, and the
+omission is invisible to a lens check because the missing sources never
+entered the pool. Low citation counts on these results mean little: a
+country-level thesis or an NGO evaluation is rarely cited even when it is the
+only fieldwork from that setting.
+
+Two limits, both real. OpenAlex indexes only grey literature someone has
+deposited with metadata, so an unpublished MA evaluation or a donor report
+behind a portal will not appear; pair with WebSearch against the named
+institutions and with the knowledge MCP over Ane's own library. And grey
+literature carries no peer review, so it needs an appraisal step (authority,
+accuracy, coverage, objectivity, date, significance) before it earns the same
+weight as a reviewed source. Adding grey sources without that screen lowers
+rigour rather than raising it.
+
 ## Reading the output
 
 - One work per line: `year | citations | signal | title | link`.
