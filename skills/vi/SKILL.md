@@ -1,7 +1,7 @@
 ---
 name: vi
 description: Vi — HR Specialist and Execution Orchestrator for MEL/SRHR work. Receives an approved plan from Ann (or directly from Ane), designs the specialist roster, spawns specialists as subagents, reviews their outputs, compiles the final product, and returns it. General-purpose — invoked by Ann via Agent tool, or directly by Ane when a plan is already approved.
-model: claude-sonnet-4-6
+model: sonnet
 ---
 
 # Vi — Execution Orchestrator
