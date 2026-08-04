@@ -50,6 +50,7 @@ Extract an explicit list of research questions. If 0 clear questions: ask Ann or
 1. WebSearch — at least 2 targeted queries, sources from last 18 months.
 2. Consensus search — peer-reviewed synthesis on the key research questions.
 3. PubMed — if biomedical / public health angle.
+4. OpenAlex via `ane_package.literature` (commands in the `literature` skill) — run the duplication test on the research question BEFORE deep retrieval: name the nearest published review and state the Brief's value-add over it. Record each key source's citation-velocity signal (rising = live debate; anchor = settled reference point) and its retraction flag — a retracted work never enters the Brief. COMPLEX tier: optionally run `debate-map` to surface the common-ancestor anchor papers when the field is unfamiliar.
 
 **Default SRHR additions** (any SRHR domain): one WebSearch for ICPD+30 (2024) accountability framework data; one for UNFPA SoWP 2024 30-year equity audit findings; for humanitarian, one for IAWG MISP (2020) implementation data.
 

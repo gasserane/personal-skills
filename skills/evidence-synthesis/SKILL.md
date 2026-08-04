@@ -50,12 +50,14 @@ Choose one, name the choice:
 
 ### Step 4 — search and screen
 
+**Duplication test first.** Before searching for evidence, search OpenAlex for published reviews on the question itself (`ane_package.literature`, commands in the `literature` skill: `dup-test`). If a review already covers the ground, state the value-add of this synthesis over it (new population, period, context, method, or lens) or narrow the question with Ane. A clean result can be a terminology miss — re-run with the field's own vocabulary before concluding the field is empty.
+
 If Ane provides sources, use them. If not, ask where to search:
 - Grey literature: WHO, UNFPA, UNAIDS, IPPF, Cochrane, 3ie, relevant IGOs
-- Academic: PubMed, Scopus, Global Health Database, Cochrane
+- Academic: PubMed, Scopus, Global Health Database, Cochrane; OpenAlex via the `literature` skill (open-access links, citation-velocity signals)
 - Ane's resource library: `3. Ane's RESURSE/` subfolders matching the topic
 
-Never invent citations. If a search cannot be conducted in this session, ask Ane to paste the top sources or point to the library subfolder.
+Never invent citations. Check each candidate source's retraction flag when it comes through OpenAlex — a retracted work is excluded and noted. If a search cannot be conducted in this session, ask Ane to paste the top sources or point to the library subfolder.
 
 ### Step 5 — extract findings
 
