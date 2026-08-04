@@ -6,10 +6,11 @@ retraction flag | title | best link (open access preferred). The last line
 reports the remaining OpenAlex daily budget when the API sent it.
 
 Usage:
-    python literature_cli.py search "query" [--from-year N] [--type review] [--per-page N]
+    python literature_cli.py search "query" [--from-year N] [--to-year N] [--type review] [--per-page N]
     python literature_cli.py dup-test "planned question" [--from-year N]
     python literature_cli.py debate-map "topic" [--top-works N] [--ancestors N]
     python literature_cli.py forensic "claim to source"
+    python literature_cli.py era-split "topic" [--split-year N] [--per-page N]
 """
 
 from __future__ import annotations
@@ -70,10 +71,12 @@ from ane_package.literature import (  # noqa: E402
     OpenAlexClient,
     citation_velocity,
     duplication_test,
+    era_split,
     forensic_search,
     map_topic_debate,
     velocity_signal,
 )
+from ane_package.literature import config as lit_config  # noqa: E402
 
 
 def _line(work, signal: str | None = None) -> str:
@@ -110,6 +113,7 @@ def main(argv: list[str] | None = None) -> int:
     p_search = sub.add_parser("search", help="search works by topic")
     p_search.add_argument("query")
     p_search.add_argument("--from-year", type=int, default=None)
+    p_search.add_argument("--to-year", type=int, default=None)
     p_search.add_argument("--type", dest="work_type", default=None)
     p_search.add_argument("--per-page", type=int, default=10)
     p_search.add_argument("--sort", default=None)
@@ -127,6 +131,16 @@ def main(argv: list[str] | None = None) -> int:
     p_for = sub.add_parser("forensic", help="source one specific factual claim")
     p_for.add_argument("claim")
 
+    p_era = sub.add_parser(
+        "era-split", help="compare the literature either side of a split year"
+    )
+    p_era.add_argument("topic")
+    p_era.add_argument(
+        "--split-year", type=int, default=lit_config.ERA_SPLIT_YEAR_DEFAULT
+    )
+    p_era.add_argument("--per-page", type=int, default=25)
+    p_era.add_argument("--from-year", type=int, default=None)
+
     args = parser.parse_args(argv)
     client = OpenAlexClient()
 
@@ -134,6 +148,7 @@ def main(argv: list[str] | None = None) -> int:
         works = client.search_works(
             args.query,
             from_year=args.from_year,
+            to_year=args.to_year,
             work_type=args.work_type,
             per_page=args.per_page,
             sort=args.sort,
@@ -170,6 +185,42 @@ def main(argv: list[str] | None = None) -> int:
     elif args.command == "forensic":
         works = forensic_search(client, args.claim)
         _print_works(works, f"Sources for claim: {args.claim}")
+
+    elif args.command == "era-split":
+        result = era_split(
+            client,
+            args.topic,
+            split_year=args.split_year,
+            per_page=args.per_page,
+            from_year=args.from_year,
+        )
+        _print_works(
+            result.earlier, f"BEFORE {result.split_year} — {args.topic}"
+        )
+        _print_works(
+            result.later, f"\nFROM {result.split_year} — {args.topic}"
+        )
+        print(
+            f"\nCohort sizes: {len(result.earlier)} earlier, "
+            f"{len(result.later)} later."
+        )
+        if not result.is_comparable:
+            print(
+                "   One cohort is too small to compare vocabulary. Widen "
+                "--per-page or move --split-year, or read this as a field "
+                "that did not exist before the split."
+            )
+        else:
+            print("\nTerms that entered (share of works, later minus earlier):")
+            for term, delta in result.terms_gained:
+                print(f"   +{delta:.0%}  {term}")
+            print("\nTerms that faded:")
+            for term, delta in result.terms_lost:
+                print(f"   {delta:.0%}  {term}")
+            print(
+                "\nSearch BOTH vocabularies before concluding a field is "
+                "empty: current terms alone drop the foundational older work."
+            )
 
     _print_budget(client)
     return 0
