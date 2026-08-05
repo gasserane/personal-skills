@@ -24,6 +24,12 @@
       "prompt": "Before this goes out to the MAs it needs a glossary - there are a lot of acronyms in it - and an annex listing every document and regulation we reference, with links people can actually click.",
       "expected_output": "annex mode. Glossary built by reading the document rather than from a standard list. Every source hyperlink verified by WebSearch or WebFetch in the same session, canonical publisher preferred, anything unverifiable flagged as unverified rather than guessed. Existing heading styles matched, IPPF template intact, verified with hyperlink_targets and stranded_hyperlinks.",
       "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "I've been through the inception report and I agree with your read findings. Put them into my copy as comments so I can send it back to ITM - they should show as coming from me, not from a tool.",
+      "expected_output": "annotate mode. Findings become margin comments in Ane's working copy via scripts/review_pass.py annotate, authored 'Ane Gasser' by default. Anchors of five or more words pre-checked across body and table paragraphs; a timestamped backup written beside the original before the verified copy replaces it. Counts (pre-existing preserved, new added, word count unchanged) reported from the written file. Not track mode - commentary, not edits.",
+      "files": []
     }
   ]
 }

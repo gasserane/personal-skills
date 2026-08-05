@@ -134,6 +134,18 @@ CommentRequest(match, text, author="Ane Gasser (MEL review)", initials="")
 Writes anchored margin comments to a **copy**; refuses to comment in place. Matching
 is paragraph-level and requires exactly one hit — see [Traps](#traps).
 
+```python
+add_comments_in_place(source, requests, backup=True) -> Path | None
+```
+The annotate-mode variant: comments land in ``source`` itself. Ordering is
+verify-before-replace — the commented copy is written beside the original, asserted
+on (every new comment present, every pre-existing comment preserved under its own
+id, body word count unchanged), and only then is the original copied to a
+timestamped ``_BACKUP_`` file and atomically replaced. Returns the backup path
+(``None`` when ``backup=False``). A bad anchor or a failed assertion raises and
+leaves the original byte-identical. Anchor matching and the exactly-one-hit rule
+are ``add_comments``'s, including table paragraphs.
+
 ## Tracked changes
 
 ```python
