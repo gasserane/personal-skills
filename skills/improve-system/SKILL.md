@@ -1,6 +1,6 @@
 ---
 name: improve-system
-description: Use when Ane types /improve-system, asks to "mine recent sessions", "what is the system getting wrong", "improvement loop", "trend the rejection rate" — or when the SessionStart maintenance nudge reports improve-system due (14-day cadence). Mines the QA logs and session history for recurring correction patterns and proposes system edits. Not for one-off bug fixes (/system-audit finds those) and not for wiki integrity (/li lint).
+description: Use when Ane types /improve-system, asks to "mine recent sessions", "what is the system getting wrong", "improvement loop", "trend the rejection rate" — or asks "where are my tokens going", "token audit", "why was that session expensive" (spend-audit mode) — or when the SessionStart maintenance nudge reports improve-system due (14-day cadence). Mines the QA logs and session history for recurring correction patterns, proposes system edits, and audits where token spend goes. Not for one-off bug fixes (/system-audit finds those), not for wiki integrity (/li lint), not for quality-posture grading (/grade-system).
 ---
 
 # Improve System — the measured improvement loop
@@ -11,6 +11,8 @@ Mine the system's own correction history for recurring failure patterns, trend t
 
 - `/system-audit` finds specific bugs and drift to fix once. `/improve-system` finds *recurring behavioural patterns* across runs and turns them into standing rules.
 - `/li curate` consolidates agent overlays into skill diffs (3+ run threshold). Do not duplicate it: when a pattern's evidence lives only in overlays, note "route via CURATE" instead of drafting the diff here. This skill's distinct ground is the QA logs, the rejection-rate metric, and session-history corrections.
+- `/grade-system` grades overall quality posture. This skill measures corrections and spend; it grades nothing.
+- Model-routing questions are not adjudicated here from logs alone — see "Routing questions" below.
 - An improvement loop without a metric is a ritual. Every run reports the metric, even when it proposes nothing.
 
 ## Steps
@@ -44,12 +46,27 @@ Mine the system's own correction history for recurring failure patterns, trend t
 
 6. **Close the run.** Append a dated summary (metric figures, patterns found, proposals + Ane's decisions) to `agent-improvements/improve-system-runs.md` (create with a `# Improve-System Run Log` header if absent). Then mark the cadence: `python ~/.claude/hooks/maintenance_due.py --mark improve-system 2>/dev/null || true`.
 
+## Spend-audit mode — where the tokens actually go
+
+Runs on the spend triggers ("where are my tokens going", "token audit", "why was that session expensive", "context optimisation"), or when step 2's trending surfaces a cost anomaly worth explaining. Read-only: the output is a Tier 1 working brief; the only permitted write is an opt-in backlog line. Folded from the `token-economy-audit` backlog entry (2026-08-05); the 2026-07-30 hand-run pass is its evidence base.
+
+1. **Compute the always-loaded floor in-session; never quote a stored figure.** Sum the live sizes of user + project `CLAUDE.md`, `MEMORY.md`, skill frontmatter total, agent frontmatter total, and SessionStart injections. The computed-counts rule applies hardest here: a spend figure nobody computed this turn is a ⚠️ data gap, not a number.
+2. **Mine `agent-improvements/cost-calibration-log.md` as a dataset, via `ctx_execute_file` — never Read.** The file exceeds 140k chars and the large_read_gate hook refuses an unbounded Read. Extract per-row $/1k-output, cache-write ratios, and every "Calibration signals" block into a driver table. The three known drivers (output volume, cache write, spec-then-clear) were only ever found by reading the log end to end; the audit exists so nobody repeats that by hand.
+3. **Rank levers by (saving × confidence) / effort.** Label each lever quality-neutral, quality-positive, or a trade. Never propose a trade without naming exactly what is being traded.
+4. **What not to optimise — standing rule.** Never trim standing instructions to save tokens. The floor is not the cost: cache read runs 93–99%, so holding it costs cents, and the rules inside it are what hold output quality. Spend tracks words authored plus new bytes entering context; the lever is cutting rework, never rigour. A hand-run audit would very likely start by trimming CLAUDE.md, which is the one change that trades quality for pennies — this rule is why the mode exists.
+
+## Routing questions — run a pilot, never adjudicate from logs
+
+When the mining surfaces a model-routing question — a correction pattern implicating a model tier, a Haiku-tier candidate, an Opus escalation rule in doubt, a reviewer-model comparison — do not settle it from correction logs or cost rows. Run the seeded-defect blind pilot per `mel_wiki/wiki/concepts/routing-pilot-method.md`: sealed answer key, ~10 planted defects across gate classes, pre-declared pass criteria, unnamed async Agent spawns so per-arm token usage is observable. The registry (`agent-improvements/agent_registry.md` § Routing tiers) requires a logged pilot before any Haiku-tier addition, and an escalation removed by a pilot verdict needs a re-probe pilot before reinstatement. A pilot's verdict lands as a PILOT row in `cost-calibration-log.md` plus the registry edit it implies — propose that edit through step 4 like any other.
+
 ## Red flags — stop if you catch yourself doing these
 
 - Applying any edit before Ane approved that specific item. "She'll obviously approve" is not approval.
 - Promoting a single occurrence to a pattern because it "feels familiar".
 - Re-proposing an item the runs log shows Ane rejected, without new evidence.
 - Reporting "system healthy" without printing the metric figures.
+- Quoting a floor, spend, or cost figure that was not computed this turn (spend-audit mode).
+- Settling a model-routing question from logs instead of a seeded-defect pilot.
 
 | Excuse | Reality |
 |---|---|
