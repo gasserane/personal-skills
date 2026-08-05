@@ -69,6 +69,7 @@ If `agent-improvements/audit-drift-*.md` exists:
 1. Read the most recent (sort by filename date).
 2. For each previously-flagged item, check whether it has been resolved.
 3. Carry-forward unresolved items into your findings, marked `[carry-forward from audit-drift YYYY-MM-DD]`.
+4. **Verify numeric budgets against their authoritative source before re-flagging.** When a carried item's finding cites a numeric budget (a line cap, file-size cap, token cap), locate the cap's authoritative definition first: `SKILL_BUDGETS` or `P1_SECTION_TOKEN_CAP` in `tests/run_tests.py`, or the named config the finding cites. Confirm the metric still exists and still uses that number. If the cap was retired or changed, downgrade the finding to `[stale heuristic, not a live breach]`, name the real governing metric, and do not re-flag the old number. Motivating case: an "index.md > 200 lines" breach was carried forward as live although the harness replaced total-line caps with a per-section token cap (`P1_SECTION_TOKEN_CAP`) on 2026-04-30. This sub-step does not re-implement the harness: `/test` enforces the budgets; the audit only stops re-flagging retired ones.
 
 This prevents the same issue from getting re-flagged as new each audit and from being silently dropped between audits.
 
