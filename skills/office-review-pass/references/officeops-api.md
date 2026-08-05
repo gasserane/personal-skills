@@ -1,7 +1,8 @@
 # `ane_package.officeops` — the API this skill sits on
 
 Read this before writing any code. Every name below already exists and is tested
-(`tests/test_officeops.py`, 85 checks). Do not invent names, and do not re-implement
+(`tests/test_officeops.py`; run `python -m pytest tests/test_officeops.py -q` for the
+current check count — a pinned number here went stale twice). Do not invent names, and do not re-implement
 Office surgery inside the skill: a capability this skill needs and officeops lacks is
 an addition to officeops, with its own test.
 
