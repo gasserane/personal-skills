@@ -1,6 +1,7 @@
 ---
 name: capture-desktop
 description: Capture a claude.ai Desktop session into the MEL file system. Use when Ane finishes a session in the Claude Desktop app and wants the work captured on the device — triggered by "/capture-desktop", "capture this desktop session", "I did this on Claude desktop", "save my desktop work", "import from claude.ai". Paste-driven; no cloud API exists. Stages a local transcript, classifies content into deliverables, decisions/rules, project-knowledge changes, and full log, then files each to its home. Auto-files transcript + deliverables; confirms memory/wiki/CLAUDE.md writes one-by-one.
+disable-model-invocation: true
 ---
 
 # Capture Desktop Session

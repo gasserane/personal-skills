@@ -9,6 +9,7 @@ trigger_keywords:
   - .pbip
   - .pbix
   - DAX
+disable-model-invocation: true
 ---
 
 # /power-bi-build

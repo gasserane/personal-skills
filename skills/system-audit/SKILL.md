@@ -1,6 +1,7 @@
 ---
 name: system-audit
 description: 'Run a quality, sanity and efficiency audit of Ane''s MEL/SRHR system (Ann/Vi/Li/Researcher team, wiki, harness, three-repo architecture): surfaces drift, inconsistencies, hygiene issues and architectural ceilings, categorised by severity, as a Tier 1 working brief with sequencing. Does NOT auto-execute fixes. Use when Ane types /system-audit, /audit, /system-check, /system-health, or asks whether anything is broken or drifting; run before any /li curate and after agent-improvement work. Different from /test (harness only), /li lint (wiki only), and /grade-system (overall quality posture rather than specific issues).'
+disable-model-invocation: true
 ---
 
 # System Audit
