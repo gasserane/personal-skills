@@ -53,8 +53,22 @@ Cross-references: `mel_wiki/wiki/calibration.md` ingestion priorities for Caribb
 2. Library: check `3. Ane's RESURSE/RESOURCES_INDEX.md`, then Glob/Grep relevant subfolder.
 3. Return per result: file path + title + 3–5 sentence summary + direct quote if available. Rank by relevance, max 5 results.
 4. Flag data gaps: `⚠️ Data gap: [what is missing from the library on this topic]`.
+5. If the synthesised answer is novel and high-value (no existing wiki page covers it), offer to file it via INGEST-SESSION below — implements `mel_wiki/CLAUDE.md` QUERY step 6. Propose, do not auto-file.
 
 **Library subfolders:** `0 MEL`, `SRHR`, `0 AI`, `COMPLEXITY vs SYSTEM THINKING`, `STATISTICS`, `RESEARCH`, `KNOWLEDGE MANAGEMENT`, `DATA MANAGEMENT`, `ORG LEARNING`, `DEZV ORG`, `STRATEGY thinking`, `LEARNING-FACILITATION`.
+
+### INGEST-SESSION — File a conversation-derived page into the MEL Wiki
+**Trigger:** Ane: *"Li, capture this as a wiki page"* / `/li capture`. Also the target of `mel_wiki/CLAUDE.md` QUERY step 6 (novel high-value answer → file it). The route for a page whose evidence base is the conversation itself or this repo's own files. Every other page-creating route needs an external input (`INGEST-DOCUMENT` a file in `raw/`, `INGEST-FROM-RESEARCHER` a Researcher run, `APPROVE-INGEST` staged PENDING rows), so without this route such pages skip the index, log and lint discipline (observed 2026-07-31: a concept page reached the wiki with no `log.md` entry; a same-session LINT backfilled it).
+
+**Distinct from `INGEST-DOCUMENT`:** that operation starts from a source document and writes a `wiki/sources/` summary page. INGEST-SESSION has no source document and writes no `sources/` page. Do not merge them, and never touch `artifact-log.md`, which tracks literature runs only.
+
+**Inputs:** the draft (or the topic, drafted from session content), plus a required `epistemic_origin` — one or two frontmatter sentences naming what the page was derived from: conversation, at whose request, and which repo files (if any) claims were verified against in the same session. Missing origin → ask before writing; the field is what lets a later LINT tell a conversation-derived page from a source-derived one.
+
+1. Write the page under the correct `wiki/` section folder with standard frontmatter (`title`, `type`, `related`, `created`, `updated`, `confidence`, `epistemic_origin`). Default `confidence: medium`; `high` only when claims were verified against files read in the same session, named in `epistemic_origin`. This mirrors the conservative treatment `INGEST-AD-HOC` applies to Ann-direct captures.
+2. Add the index row to `wiki/index.md` under the correct section.
+3. Append to `wiki/log.md`: `[YYYY-MM-DD HH:MM] INGEST-SESSION: [slug] — [origin, one line]`.
+4. Run LINT steps 1–3 against that page alone — index membership plus inbound-link status, every `[[link]]` resolves, citation-error watchlist — and report findings.
+5. Return: `✅ INGEST-SESSION: [slug] filed — index + log updated — LINT: [clean / N flags]`.
 
 ### VAULT-SURVEY — Surface emergent unsynthesised themes from the Obsidian vault
 **Trigger:** Ane: `/li vault-survey`. Local-only — the vault is not provisioned on web / off-device. Origin: video-insights improvement #9. Pull-side feed into INGEST: find themes Ane keeps touching in her personal vault that the MEL Wiki has not yet synthesised, plus unprocessed notes sitting un-filed. Propose-only; never auto-stage.
