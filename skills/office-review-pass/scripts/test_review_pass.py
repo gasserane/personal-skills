@@ -143,6 +143,55 @@ def test_track_command(checks: Checks, tmp: Path) -> None:
                  "track: refuses to write the marked-up copy over the source")
 
 
+def test_annotate_command(checks: Checks, tmp: Path) -> None:
+    source = _fixture(tmp)
+    comments = tmp / "annotate-comments.json"
+    comments.write_text(json.dumps([
+        {"match": "inception report within two weeks",
+         "text": "Name the acceptance criterion."},
+    ]), encoding="utf-8")
+
+    result = _run("annotate", str(source), "--comments", str(comments))
+    checks.check(result.returncode == 0,
+                 f"annotate: exits 0 (stderr={result.stderr[:120]})")
+    found = read_comments(source)
+    checks.check(len(found) == 1, "annotate: comment landed in the working copy itself")
+    checks.check(bool(found) and found[0].author == "Ane Gasser",
+                 "annotate: authored as Ane by default")
+    backups = list(tmp.glob("driver-source_BACKUP_*.docx"))
+    checks.check(len(backups) == 1, "annotate: timestamped backup beside the source")
+    checks.check(bool(backups) and not read_comments(backups[0]),
+                 "annotate: backup holds the pre-annotation state")
+    checks.check("pre-existing preserved" in result.stdout and "1 new" in result.stdout,
+                 "annotate: counts reported from the written file")
+
+    # A short anchor is refused before anything is written.
+    short = tmp / "annotate-short.json"
+    short.write_text(json.dumps([{"match": "two weeks", "text": "x"}]),
+                     encoding="utf-8")
+    result = _run("annotate", str(source), "--comments", str(short))
+    checks.check(result.returncode == 2,
+                 f"annotate: an anchor under five words is refused (got "
+                 f"{result.returncode})")
+    checks.check(len(read_comments(source)) == 1,
+                 "annotate: nothing written on a refused anchor")
+
+    # An anchor matching nothing fails loudly and leaves the file untouched.
+    missing = tmp / "annotate-missing.json"
+    missing.write_text(json.dumps([{"match": "a phrase that is not in the document",
+                                    "text": "x"}]), encoding="utf-8")
+    result = _run("annotate", str(source), "--comments", str(missing))
+    checks.check(result.returncode == 1,
+                 f"annotate: an anchor hitting nothing exits non-zero (got "
+                 f"{result.returncode})")
+    checks.check("no comments written" in result.stderr,
+                 "annotate: the failure is named on stderr")
+    checks.check(len(read_comments(source)) == 1,
+                 "annotate: working copy untouched after a failed run")
+    checks.check(len(list(tmp.glob("driver-source_BACKUP_*.docx"))) == 1,
+                 "annotate: no backup written for a failed run")
+
+
 def test_verify_command(checks: Checks, tmp: Path) -> None:
     source = _fixture(tmp)
     result = _run("verify", str(source))
@@ -164,6 +213,7 @@ def main() -> int:
     test_edit_loading(checks, tmp)
     test_read_command(checks, tmp)
     test_track_command(checks, tmp)
+    test_annotate_command(checks, tmp)
     test_verify_command(checks, tmp)
 
     code = checks.report()
