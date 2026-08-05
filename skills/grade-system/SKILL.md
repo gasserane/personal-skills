@@ -28,7 +28,7 @@ Read in parallel:
 - `agent-improvements/ann-overlay.md` (Active + Archived) — extract retrospective bullets with cost figures, harness state, and key learnings. Count sessions. Note any major incidents (e.g., DOCX truncation, em-dash regression).
 - `agent-improvements/coordination-log.md` — friction events with status (OPEN / CLOSED).
 - `agent-improvements/cost-calibration-log.md` — count rows with observed actuals vs `not observed`. Note ⚠️ over-band entries.
-- `agent-improvements/qa-disagreement-log.md` — count rows. If 0, watch-trigger has not fired and structural test is open.
+- `agent-improvements/qa-rejection-log.md` — count data rows and trend the verdicts; this is the live QA telemetry signal. An empty table means the improvement loop steers on anecdote — flag it as a risk. `qa-disagreement-log.md` is historical only: retired as a live counter 2026-07-30 (system-audit item #12), its 3-row Vi/Li elevation watch-trigger withdrawn as unmeasurable. Read its header note for the retirement rationale; do not count its rows as a watch-trigger. The external structural test remains open regardless.
 - `agent-improvements/system-audit-*.md` (most recent) — design strengths and weaknesses.
 - `agent-improvements/audit-drift-*.md` (most recent) — drift items resolved or carrying forward.
 - `mel_wiki/wiki/index.md` — page counts (frameworks, concepts, indicators, lenses).
@@ -116,7 +116,7 @@ Single overall grade with rationale. Concrete recommendations for grade movement
 | Today (1-2 hours) | Cost-calibration log, scaffolding, one fixture capture |
 | This week | Em-dash sweep on 10 most-loaded P2 pages, send external auditor invitation, capture 2 more fixtures |
 | Next month | External MA practitioner sample audit fires, multilingual gap log accumulates first 3 entries, cost-calibration log gets 5+ observed actuals for one task type |
-| Strategic (no deadline) | Vi/Li elevation to true subagents pending watch-trigger evidence |
+| Strategic (no deadline) | Vi/Li elevation to true subagents — its 3-row disagreement watch-trigger was withdrawn as unmeasurable 2026-07-30; needs a new evidence route (qa-rejection-log trend) before it can move |
 
 Be honest about which moves are single-day vs structural ceilings. The A− → A jump usually requires the external auditor.
 
