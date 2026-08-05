@@ -1,6 +1,6 @@
 ---
 name: grill-mel
-description: 'A relentless one-question-at-a-time interview to stress-test a MEL/SRHR design before building it: a theory of change, evaluation design, indicator set, results framework, proposal angle, or learning question. Walks the MEL branches (assumptions tested vs untested, OECD-DAC criteria, output/outcome/impact, disaggregation, lens application, data gaps, audience tier), recommends an answer for each question, and flags any fact it cannot source. Use when Ane says "grill my ToC", "stress-test this evaluation/indicator set/proposal", "pressure-test my design", "interview me about this", or wants to sharpen a MEL design before drafting. This is the MEL-lane grill: whenever the design is MEL or SRHR, prefer it over the generic /grilling. Not for a full Ann orchestration (/ann), a code build (brainstorming), generic non-MEL plan sharpening (/grilling, or user-invoked /grill-me), or a contested call Ane cannot answer herself (/decision-debate).'
+description: 'A relentless one-question-at-a-time interview to stress-test a MEL/SRHR design before building it: a theory of change, evaluation design, indicator set, results framework, proposal angle, or learning question. Walks the MEL branches (assumptions tested vs untested, OECD-DAC criteria, output/outcome/impact, disaggregation, lens application, data gaps, audience tier), recommends an answer for each question, and flags any fact it cannot source. Use when Ane says "grill my ToC", "stress-test this evaluation/indicator set/proposal", "pressure-test my design", "interview me about this", or wants to sharpen a MEL design before drafting. This is the MEL-lane grill for any MEL or SRHR design. Not for a full Ann orchestration (/ann), a code build (brainstorming), generic non-MEL plan sharpening (/grill-me or /grilling, both user-invoked only), or a contested call Ane cannot answer herself (/decision-debate).'
 ---
 
 # Grill (MEL/SRHR)
@@ -12,8 +12,7 @@ A relentless interview that sharpens a MEL/SRHR design before any drafting start
 - **grill-mel** (this): sharpen or pressure-test a MEL/SRHR *design* before building it. No orchestration, no spec pipeline.
 - **/ann**: run the full MEL orchestration (complexity classification, Vi spawns specialists, quality gate). Use when the task is to *produce* the deliverable, not just sharpen the thinking.
 - **brainstorming** (superpowers): net-new builds headed into a code spec → writing-plans pipeline (ane_package features, new skills).
-- **grilling** (mattpocock): generic, non-MEL plan sharpening. Model-invocable, so it can collide with this skill on a MEL design. The description above resolves the collision by naming the MEL lane explicitly; when the design is MEL, this skill wins.
-- **/grill-me** (mattpocock): the same generic grill, but user-invoked only (`disable-model-invocation: true`). It never auto-fires, so it never competes for model selection. Ane calls it by name.
+- **grilling** and **/grill-me** (mattpocock): the same generic, non-MEL plan sharpener under two names, both user-invoked only (`disable-model-invocation: true` in both frontmatters since 2026-08). Neither auto-fires, so neither competes with this skill for model selection; Ane calls either by name for a non-MEL plan.
 - **/decision-debate**: brings independent perspectives *to* Ane on a contested call she has not answered. This skill instead pulls *from* Ane on a design she already leans on.
 
 If the user actually wants the deliverable produced, stop grilling and hand off to `/ann` or the right builder skill.
