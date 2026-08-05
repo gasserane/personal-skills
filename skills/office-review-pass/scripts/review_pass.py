@@ -8,6 +8,7 @@ plumbing is how two implementations of the same fix end up disagreeing.
 
 Usage:
     python review_pass.py read      DOC [--out FILE] [--no-resolved]
+    python review_pass.py annotate  DOC --comments COMMENTS.json [--author NAME] [--no-backup]
     python review_pass.py track     DOC --edits EDITS.json [--author NAME] [--out FILE]
     python review_pass.py revisions DOC
     python review_pass.py revise    DOC --edits EDITS.json [--headers] [--no-backup]
@@ -15,6 +16,9 @@ Usage:
 
 EDITS.json is either {"old text": "new text", ...} or
 [{"old": "...", "new": "..."}, ...]. Order is preserved in the list form.
+COMMENTS.json is either {"anchor words": "comment text", ...} or
+[{"match": "...", "text": "...", "author": "...", "initials": "..."}, ...];
+author and initials are optional per item and default to --author.
 """
 
 from __future__ import annotations
@@ -60,10 +64,14 @@ _bootstrap_ane_package()
 
 from ane_package.officeops import (  # noqa: E402
     Checks,
+    CommentRequest,
     TrackedEditor,
+    VerificationError,
+    add_comments_in_place,
     assert_branded,
     assert_header_footer_present,
     docx_word_count,
+    read_comments,
     read_revisions,
     render_review,
     stranded_hyperlinks,
@@ -83,6 +91,24 @@ def _load_edits(path: Path) -> list[tuple[str, str]]:
     return pairs
 
 
+def _load_comment_requests(path: Path, default_author: str) -> list[CommentRequest]:
+    """Both shapes, mirroring ``_load_edits``: a dict maps anchor to comment text."""
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    if isinstance(data, dict):
+        data = [{"match": match, "text": text} for match, text in data.items()]
+    requests = []
+    for index, item in enumerate(data):
+        if "match" not in item or "text" not in item:
+            raise ValueError(f"comment {index}: needs both 'match' and 'text' keys")
+        requests.append(CommentRequest(
+            match=str(item["match"]),
+            text=str(item["text"]),
+            author=str(item.get("author", default_author)),
+            initials=str(item.get("initials", "")),
+        ))
+    return requests
+
+
 def cmd_read(args: argparse.Namespace) -> int:
     text = render_review(args.document, include_resolved=not args.no_resolved)
     if not args.out:
@@ -93,6 +119,42 @@ def cmd_read(args: argparse.Namespace) -> int:
     # a second walk is how the two go out of step.
     summary = text.splitlines()[2]
     print(f"wrote {args.out}: {summary}")
+    return 0
+
+
+def cmd_annotate(args: argparse.Namespace) -> int:
+    source = Path(args.document)
+    requests = _load_comment_requests(Path(args.comments), args.author)
+
+    # The five-word floor is review discipline, not a library rule: a short
+    # anchor that happens to be unique today stops being unique on the next
+    # edit round, and the comment lands on the wrong paragraph.
+    short = [r.match for r in requests if len(r.match.split()) < 5]
+    if short:
+        print(f"{len(short)} anchor(s) shorter than five words — lengthen them "
+              f"before writing:", file=sys.stderr)
+        for match in short:
+            print(f"  - {match!r}", file=sys.stderr)
+        return 2
+
+    pre = len(read_comments(source))
+    words_before = docx_word_count(source)
+    try:
+        backup = add_comments_in_place(source, requests, backup=not args.no_backup)
+    except (ValueError, VerificationError) as exc:
+        print(f"no comments written — {exc}", file=sys.stderr)
+        return 1
+
+    # Counts computed from the written file, never from the request list.
+    after = len(read_comments(source))
+    words_after = docx_word_count(source)
+    for request in requests:
+        print(f"  + [{request.author}] {request.text[:70]}")
+    print(f"wrote {source.name}: {after} comment(s) on the written file "
+          f"({pre} pre-existing preserved, {after - pre} new); "
+          f"word count {words_after} (was {words_before})")
+    if backup:
+        print(f"backup: {backup.name}")
     return 0
 
 
@@ -187,6 +249,15 @@ def main() -> int:
     read.add_argument("--no-resolved", action="store_true",
                       help="drop comments Word marks done")
     read.set_defaults(func=cmd_read)
+
+    annotate = subs.add_parser(
+        "annotate", help="insert review findings as margin comments into the working copy")
+    annotate.add_argument("document")
+    annotate.add_argument("--comments", required=True)
+    annotate.add_argument("--author", default="Ane Gasser",
+                          help="author shown on comments without their own")
+    annotate.add_argument("--no-backup", action="store_true")
+    annotate.set_defaults(func=cmd_annotate)
 
     track = subs.add_parser("track", help="apply edits as real Word tracked changes")
     track.add_argument("document")
