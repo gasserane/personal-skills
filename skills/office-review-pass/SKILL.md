@@ -1,6 +1,6 @@
 ---
 name: office-review-pass
-description: 'Work on a Word deliverable inside the .docx itself: read and engage reviewer comments, apply real Word tracked changes a counterparty can accept or reject, make scoped formatting-preserving fixes via Word COM, or add a branded glossary and verified source annex. Use when Ane hands over a commented or hand-edited .docx for review, markup, or in-file edits. Distinct from ane-voice (prose voice only, never touches the file), localise (target-language work), check-deliverable (read-only QA verdict), and tor-procurement (builds ToRs).'
+description: 'Work on a Word deliverable inside the .docx itself: read and engage reviewer comments, insert review findings as margin comments authored as Ane into her working copy, apply real Word tracked changes a counterparty can accept or reject, make scoped formatting-preserving fixes via Word COM, or add a branded glossary and verified source annex. Use when Ane hands over a commented or hand-edited .docx for review, markup, or in-file edits. Distinct from ane-voice (prose voice only, never touches the file), localise (target-language work), check-deliverable (read-only QA verdict), meeting-notes marginalia (reads comments, never writes them), and tor-procurement (builds ToRs).'
 model: opus
 ---
 
@@ -13,11 +13,12 @@ All Office surgery lives in `ane_package.officeops`. This skill contributes judg
 ## Mode routing
 
 - **read** — a document carries comments, or needs an expert read. Read-only.
+- **annotate** — findings should land in the document itself, as margin comments authored as Ane. Writes into her working copy, backup kept.
 - **track** — edits must be visible and reversible by someone else. Writes a marked-up copy.
 - **revise** — Ane has agreed the fixes and wants them applied in place. Edits her file.
 - **annex** — the document needs a glossary and a source annex appended.
 
-Modes chain: `read` produces findings, `track` or `revise` applies them. If the mode is ambiguous, ask in one line before working. The dividing question between `track` and `revise` is **who decides**: if a counterparty must be able to reject an edit, it is `track`; if Ane has already decided, it is `revise`.
+Modes chain: `read` produces findings, `annotate` writes them into the margins, `track` or `revise` applies them as edits. If the mode is ambiguous, ask in one line before working. The dividing question between `track` and `revise` is **who decides**: if a counterparty must be able to reject an edit, it is `track`; if Ane has already decided, it is `revise`. The dividing question between `annotate` and `track` is **commentary versus change**: a comment says what is wrong, a tracked edit says what it should become.
 
 ## Shared rules — all modes
 
@@ -45,6 +46,19 @@ The point is not to summarise the document. It is to give Ane a second expert op
 Tracked changes count as review input too: `render_review` shows insertions as accepted and deletions as gone, and marks those blocks `+ins` / `-del`. `officeops.tracked.read_revisions(path)` gives them individually with author and date when a change needs discussing on its own.
 
 **On register.** A document under review usually has an author who is not Ane. Findings are about the text, never the person, and the collaborative voice holds — "the acceptance criterion is not stated" rather than "the author failed to state".
+
+## annotate mode
+
+The write path for read-mode findings: each finding becomes a margin comment in Ane's working copy — the recurring pattern where her feedback copy (the `fbANE` file) goes back to the document owner carrying her comments. Generalised from the 2026-08-04 HERA Formative Evaluation round, 21 comments inserted by hand.
+
+1. **Confirm the findings list and the author string.** Default author is "Ane Gasser", plain — her explicit instruction from the HERA round, because a comment carrying an AI label reads as machine output in a document going back to a counterparty. Attribution is her call: confirm it before writing, and treat a document that leaves IPPF as an AI-assisted publication per the scope boundary below.
+2. **Every anchor is five or more consecutive words hitting exactly one paragraph.** Write the comments to a JSON file and run
+   `python scripts/review_pass.py annotate <path> --comments comments.json --author "Ane Gasser"`
+   The file is `[{"match": "...", "text": "..."}]` or `{"anchor words": "comment text"}`; per-item `author` and `initials` override the default. Anchors are pre-checked across body AND table paragraphs before anything is written; zero or several hits fail the whole run with every bad anchor named, and the driver refuses an anchor under five words outright. Re-pick a failed anchor; never loosen it.
+3. **The original is replaced only after the commented copy verifies.** `officeops.add_comments_in_place` writes the copy beside the original, asserts on it — every new comment present, every pre-existing comment preserved under its own id, body word count unchanged — then writes a timestamped `_BACKUP_` file beside the source and swaps. A failed run leaves the working copy byte-identical; there is no window where her file is the damaged one.
+4. **Report the counts from the written file, not the request list**: comments total, pre-existing preserved, new added, word count unchanged, backup filename. The driver prints exactly these; repeat them in the delivery report.
+
+Comment text follows read-mode's register: about the text, never the person, and each comment carries the consequence or the fix, not just the objection — a margin comment that only says "unclear" makes the author guess.
 
 ## track mode
 
@@ -91,6 +105,7 @@ Every mode states its check before it works, and the check reopens the written f
 | Mode | What gets asserted |
 |---|---|
 | read | Read-only — nothing written. Report the block count and comment count from the rendering. |
+| annotate | `read_comments` on the written file: pre-existing plus new comment counts, pre-existing ids preserved, word count unchanged, backup present beside the source. |
 | track | `read_revisions` on the written copy: one insertion and one deletion per replacement, author and date set. |
 | revise | Replacement counts read back from Word, then `verify` — branding, header/footer, no stranded hyperlinks, word count. |
 | annex | `hyperlink_targets` plus `stranded_hyperlinks`, and the count of sources that failed verification. |
@@ -99,7 +114,7 @@ Every mode states its check before it works, and the check reopens the written f
 
 ## Scope boundary
 
-- English prose voice on its own, with no file surgery, is `ane-voice`. A read-only QA verdict on a finished brief is `check-deliverable`. Target-language work is `localise`. Building a ToR from a generator is `tor-procurement`.
+- English prose voice on its own, with no file surgery, is `ane-voice`. A read-only QA verdict on a finished brief is `check-deliverable`. Target-language work is `localise`. Building a ToR from a generator is `tor-procurement`. Extracting decisions from a commented document into meeting notes is `meeting-notes` marginalia mode — it reads comments and never writes them; writing them is this skill's `annotate` mode.
 - Excel repair and canonicalising a stale generator are `office-repair` (Wave 3), not this skill.
 - COM modes need Windows, Word, and the file closed. On a web container the read and track paths still work — they are pure python-docx and lxml — and `revise` does not.
 - A document that leaves IPPF after an AI-assisted pass is an AI-assisted publication: offer the colophon per `mel_wiki/wiki/concepts/ai-use-in-publications.md`. Routine grammar-only edits are exempt.
