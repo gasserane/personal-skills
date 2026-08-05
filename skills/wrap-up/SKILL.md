@@ -330,7 +330,7 @@ Where it stands
   Not started: <the rest>
 
 Decisions already locked — do not reopen
-  1. <decision> — because <reason>
+  1. <decision> — because <reason> — recorded in <file or file#section>
 
 Files, and how to treat them
   <path> — Ane hand-edited. Edit in place, never regenerate.
@@ -342,10 +342,17 @@ Next step
 Open questions for Ane — ask before building
   1. <question>
 
+Not yet specified — coming, but not yet sharp enough to ticket or ask
+  1. <the suspected question or area, as loosely as the view allows>
+
 Start in: <mode>. Lane: <Claude directly | /ann | /skill-name>.
 ```
 
-**The decisions section carries the most value.** Ane's session efficiency protocol names re-deriving settled decisions as a top waste category, and a fresh session re-derives by default because it cannot see the conversation. State each locked decision WITH its reason: a decision without its reason gets re-argued the moment it looks inconvenient.
+**The decisions section carries the most value.** Ane's session efficiency protocol names re-deriving settled decisions as a top waste category, and a fresh session re-derives by default because it cannot see the conversation. State each locked decision WITH its reason: a decision without its reason gets re-argued the moment it looks inconvenient. The `recorded in` pointer names where the decision physically lives (roadmap file, decision log, wiki section), so the next session can zoom to the primary source instead of trusting this summary — a handoff gist is lossy by construction (adopted 2026-08-05, wayfinder scan).
+
+**Refer by name, never by bare id.** In every human-read line, a file, ticket or decision is named (`the wayfinder scan, agent-improvements/wayfinder-scan-2026-08-05.md`), never a bare number or an unanchored "the file from yesterday". Names read at a glance; ids force a lookup (adopted 2026-08-05, wayfinder scan).
+
+**"Not yet specified" is on trial** (added 2026-08-05; keep-one decision pending — see `agent-improvements/wayfinder-scan-2026-08-05.md`). It holds fog: questions the session could see coming but could not yet state precisely. Distinct from "Open questions for Ane", which holds sharp questions awaiting her answer. Omit the section when there is no fog; if it grows monotonically across handoffs, that is the warning signal the scan names.
 
 **The dated HTML comment is load-bearing.** It is how a later session detects staleness. Keep it.
 
