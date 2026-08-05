@@ -1,6 +1,7 @@
 ---
 name: learned
 description: Fast post-deliverable learning capture. Use when Ane types "/learned", or says "capture what I learned", "log a learning", "what did I learn from this", or wants a quick 4-line note after finishing a piece of work. Appends a dated entry to the running learning log in the Obsidian vault. The explicit-command sibling of journal-reflection's Post-deliverable capture mode; for end-of-day, weekly, decision-review, or new-framework reflection, use journal-reflection instead.
+disable-model-invocation: true
 ---
 
 # /learned — post-deliverable learning capture

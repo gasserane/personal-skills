@@ -1,6 +1,7 @@
 ---
 name: wrap-up
 description: Session wrap-up. Use when Ane types /wrap-up to close a session. Gathers git, errors, and pending actions, delivers a concise status report, then commits and pushes pending work, and offers opt-in post-commit follow-ups (skill improvements, skill-fit signals, learning capture). Pass "report" for a read-only status with no commit. Writes a continuation handoff prompt for the next session whenever named work is still open, one file per workstream so parallel sessions cannot overwrite each other; pass "continue" to force one.
+disable-model-invocation: true
 ---
 
 # Session Wrap-Up
