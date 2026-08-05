@@ -4,6 +4,8 @@
 
 Publish only artifacts Ane approved **in this session**. If the drafts were approved in an earlier session, show her the final text/file now and get a one-line go per artifact before touching LinkedIn. Anything she edits after approval needs re-approval. No exceptions, including "just fixing a typo".
 
+**Disclosure check, per artifact, before anything goes up:** confirm the AI-use disclosure is present on every artifact in the batch — P.S. line on the article and each post, disclosure paragraph (exemplar wording, before the brand footer) in the kit docx, Read me disclosure in the workbook, compressed P.S. in the document-post caption. A kit PDF exported before its disclosure was added is stale: check the docx, not the PDF, and ask Ane to re-export if the PDF predates the fix. An artifact missing its disclosure does not publish.
+
 ## The calendar (agreed 2026-07-27; ledger's series rules may supersede)
 
 | Slot | What |

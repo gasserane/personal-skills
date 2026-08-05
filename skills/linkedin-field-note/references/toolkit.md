@@ -29,6 +29,7 @@ Content lives in the script (it IS the canonical source for the toolkit, alongsi
 - **Keep-together:** `w:cantSplit` on the row of every single-cell box (the `no_split(cell)` helper in the exemplar script) so no box breaks across pages.
 - **Numbered lists** via manual runs (the exemplar's `numbered()`), not python-docx List Number styles (numbering carries over between lists).
 - **Worked example** somewhere in the kit: one artifact's journey through whatever the kit teaches.
+- **AI-use disclosure paragraph**, exemplar wording from `build_three_agent_kit.py`, placed before the brand footer — on every kit, docx and workbook alike (the workbook carries it on the Read me sheet). This is a checklist item precisely because it once lived only in the exemplar's code and drifted the first time a generator was written from scratch (field note #03, 2026-08-05). A mandatory element belongs here, not in a script someone may not copy.
 - **Footer:** `brand_footer(doc, closing=CTA)` — learning artefacts close with "Try. Measure. Share.", not the motto.
 - **Afternoon-usable test:** a reader with no code, no budget, and no IT ticket can apply the kit the same day. Name the no-tool floor version where one exists.
 
