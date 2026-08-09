@@ -89,7 +89,7 @@ Structure:
 4. **Key empirical findings** — by research question; each attributed to a source.
 5. **Methodological recommendations** — rationale linked to evidence (not asserted).
 6. **Data gaps** — `⚠️ Data gap: [what is missing] — [why it matters] — [recommended action]`.
-7. **Recommended specialist roster for Vi** — names only (Vi owns model choice); include `humanitarian-srhr-specialist` in humanitarian; `intersectionality-analyst` when 2+ intersecting axes.
+7. **Recommended specialist roster for Vi** — names only (Vi owns model choice); include `humanitarian-srhr-specialist` in humanitarian; `intersectionality-analyst` when 2+ intersecting axes. **Then run the mandatory-pairing check before you write the list out**, against the taxonomy below and `domain-standards.md`: `ma-priorities-reviewer` whenever `oecd-dac-reviewer` is rostered AND any IPPF MA is implementer, partner or sub-grantee (citation-ecology entry 27 — it is the counter-balance mechanism, so rostering the one without the other leaves donor-accountability criteria uncontested); `mel-report-writer` whenever the deliverable is a written brief or report rather than an analysis pack. State in one line that the check ran. Rationale: Ann corrected exactly these two omissions on two consecutive runs of the same task shape (Stage 1 pilot, 2026-08-09), which means the brief was recommending a roster that could not carry its own task.
 8. **Source list** — Tier 1/2/3 labelled; full citations.
 9. **Confidence rating** — HIGH / MEDIUM / LOW with explicit rationale.
 
@@ -164,7 +164,7 @@ Spec: `docs/superpowers/specs/2026-05-23-bibliography-zotero-design.md`.
 ## Specialist taxonomy
 In Artifact A "Recommended specialist roster", list only the specialist names the task requires (Vi owns model selection):
 
-`contribution-plausibility-analyst`, `srhr-indicator-designer`, `srhr-scope-verifier` (Guttmacher-Lancet; mandatory for any comprehensive SRHR claim), `political-economy-reviewer`, `toc-architect`, `data-quality-auditor`, `evaluation-design-specialist`, `oecd-dac-reviewer`, `intersectionality-analyst` (mandatory when 2+ axes), `gender-transformative-assessor`, `participatory-methods-designer`, `humanitarian-srhr-specialist` (MISP-aware; mandatory in humanitarian), `mel-framework-architect` (mandatory all MEL), `mel-report-writer`, `qa-reviewer` (mandatory, runs last).
+`contribution-plausibility-analyst`, `srhr-indicator-designer`, `srhr-scope-verifier` (Guttmacher-Lancet; mandatory for any comprehensive SRHR claim), `political-economy-reviewer`, `toc-architect`, `data-quality-auditor`, `evaluation-design-specialist`, `oecd-dac-reviewer`, `ma-priorities-reviewer` (mandatory whenever `oecd-dac-reviewer` is rostered and an IPPF MA is implementer, partner or sub-grantee), `intersectionality-analyst` (mandatory when 2+ axes), `gender-transformative-assessor`, `participatory-methods-designer`, `humanitarian-srhr-specialist` (MISP-aware; mandatory in humanitarian), `mel-framework-architect` (mandatory all MEL), `mel-report-writer` (mandatory when the deliverable is a written brief or report), `qa-reviewer` (mandatory, runs last).
 
 Advisory — Vi may refine or extend.
 
