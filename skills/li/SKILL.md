@@ -349,6 +349,8 @@ If all overlays empty AND `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/me
 ```
 If no diffs qualify: write `No updates ready for consolidation — overlays contain [N] active entries below threshold.` and halt. Do not create the file before this step on first run.
 
+**The halt is conditional on being under the cap.** When no diffs qualify AND an overlay is over the count-10 cap, do NOT halt. That is an archive-only pass, the shape Step 9.5 already names, and it is the common one: an overlay saturates on closed run records far more often than on behaviour patterns needing a skill change. Write the no-diffs line, skip Steps 7 and 8 so nothing is pushed to personal-skills, and continue to Steps 9, 9.5 and 10. Halting here leaves the harness red on the very cap the pass was invoked to clear. Observed 2026-08-14: ann-overlay.md sat at 12 active entries with `check_overlay_active_entry_count` failing, seven closed Stage 2 and Stage 1 pilot run records were the whole overage, and 0 diffs qualified because none of them was a behaviour pattern.
+
 **Step 6 — Surface to Ane:** *"CURATE complete — proposals ready for [N] agents. Review PROPOSED-SKILL-UPDATES.md and reply 'approve' or request changes."*
 
 **Step 7 — On approval, per diff block:**
