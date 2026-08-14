@@ -40,6 +40,10 @@ text = "\n".join(p.extract_text() or "" for p in PdfReader(path).pages)
 
 PDF extraction mangles list numbering and table layout. Before flagging a "broken a)–f) list" or a column mismatch as a document defect, check whether it is an extraction artefact: consistent mid-sentence letters (e.g. "all production b) infrastructure accounts") indicate a genuine broken list; ragged table cells usually indicate extraction.
 
+**Empty extraction is not an empty quote.** Reseller and vendor quotes are frequently generated as page images or as vector text a parser cannot reach, so `extract_text()` returns `""` for every page while the document is perfectly legible on screen. Do not conclude the file is blank, corrupt, or the wrong attachment. Fall back to reading the PDF pages as rendered images (the Read tool's `pages` parameter) and take the figures off the rendering. Two quotes from the same supplier extracted to zero characters across four pages on 2026-08-14; both carried a full line table, totals block, and a page of terms and conditions that decided the review.
+
+Whichever route you use, the totals block and the terms paragraph are the two places that decide an offer, and they usually sit on the LAST page. A first-page-only read is how a one-year minimum clause survives a review.
+
 ## Writing anchored margin comments (OFFER-REVIEW step 8)
 
 Use `scripts/add_offer_comments.py`. It copies the vendor file to `<stem>_COMMENTS.docx`, then anchors each comment to the first paragraph containing a given match string. Requirements:
