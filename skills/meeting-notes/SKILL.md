@@ -38,7 +38,7 @@ Read only the reference file for the selected mode. If the mode is ambiguous, as
 
 **Register and voice.** Tier 1 working record: plain English, active voice, sentences under 25 words, no em-dashes anywhere in the output, numbers and dates explicit. Decisions are numbered so they can be cited later ("T3 decision 2, 16 Jul").
 
-**Word output.** Generate the `.docx` from the `.md` via `ane_package.reporting.word_export.write_word_report(template="general")` when the note shape fits its layout; for table-heavy notes build directly with python-docx using `ane_package.reporting.brand.IPPF_FORMAT_TEMPLATE` constants (Barlow Medium, dream #00313C headings-on-red #EB3300 titles, dream header rows). Never hard-code off-brand colours or fonts.
+**Word output.** Generate the `.docx` from the `.md` via `ane_package.reporting.word_export.write_word_report(template="general")` when the note shape fits its layout; for table-heavy notes build directly with python-docx using `ane_package.reporting.brand.IPPF_FORMAT_TEMPLATE` constants (Barlow Medium, dream #00313C headings-on-red #EB3300 titles, dream header rows). Never hard-code off-brand colours or fonts. Gotcha (proven 2026-09-03): the `IPPF_FORMAT_TEMPLATE` colour constants carry a leading `#`, which is invalid inside OOXML colour attributes (`w:shd` fill, `w:color`) — Word silently drops the shading. Strip the `#` before writing any raw XML colour value; `word_export._hex_to_rgb` already handles it for run colours.
 
 **Edit preservation.** Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists. In particular: once Ane hand-edits a generated `.docx`, that `.docx` becomes authoritative; subsequent changes are targeted python-docx edits, never regeneration from the `.md`.
 
