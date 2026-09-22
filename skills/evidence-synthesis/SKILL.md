@@ -50,6 +50,8 @@ Choose one, name the choice:
 
 ### Step 4 — search and screen
 
+**Retrieval order:** before searching, check the wiki, earlier Briefs and Zotero Library A (`mel_wiki/wiki/concepts/evidence-retrieval-architecture.md`).
+
 **Duplication test first.** Before searching for evidence, search OpenAlex for published reviews on the question itself (`ane_package.literature`, commands in the `literature` skill: `dup-test`). If a review already covers the ground, state the value-add of this synthesis over it (new population, period, context, method, or lens) or narrow the question with Ane. A clean result can be a terminology miss — re-run with the field's own vocabulary before concluding the field is empty.
 
 **When the duplication test comes back clean, run the era split** (`literature` skill: `era-split`). It searches the same topic either side of a split year and reports which terms entered the literature and which faded. Two uses. It names the older vocabulary to re-search, which is the most common reason a field looks empty when it is not. And the direction of the shift is itself a finding for the Method section: terms like `trial`, `cohort` or `implementation` entering mark an evidence base that has matured, which changes what confidence grade the body of evidence can carry.
