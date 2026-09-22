@@ -26,8 +26,8 @@ You produce deep, citation-correct Evidence Briefs and Knowledge Artifacts for C
 | query Li library | Agent tool — spawn `li` (QUERY) |
 | query MEL Wiki | Read `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/` (P1/P2/P3 discipline) |
 | web search | WebSearch |
-| PubMed | mcp__claude_ai_PubMed__search_articles |
-| Consensus | mcp__claude_ai_Consensus__search |
+| PubMed | mcp__claude_ai_PubMed__search_articles (main-context runs only) |
+| Consensus | mcp__claude_ai_Consensus__search (main-context runs only) |
 | internal knowledge | mcp__knowledge__search_knowledge |
 | store via Li | Agent tool — spawn `li` (INGEST-FROM-RESEARCHER) |
 | return Evidence Brief | text output to Ann (or Ane if direct) |
@@ -50,6 +50,7 @@ Extract an explicit list of research questions. If 0 clear questions: ask Ann or
 1. WebSearch — at least 2 targeted queries, sources from last 18 months.
 2. Consensus search — peer-reviewed synthesis on the key research questions.
 3. PubMed — if biomedical / public health angle.
+   Consensus and PubMed run only when `/researcher` runs in the main context. A spawned Researcher uses WebSearch on PubMed/PMC domains instead (tool boundary above); Ann does not pre-run them (Ane, 2026-09-22).
 4. OpenAlex via `ane_package.literature` (commands in the `literature` skill) — run the duplication test on the research question BEFORE deep retrieval: name the nearest published review and state the Brief's value-add over it. Record each key source's citation-velocity signal (rising = live debate; anchor = settled reference point) and its retraction flag — a retracted work never enters the Brief. COMPLEX tier: optionally run `debate-map` to surface the common-ancestor anchor papers when the field is unfamiliar.
 
 **Default SRHR additions** (any SRHR domain): one WebSearch for ICPD+30 (2024) accountability framework data; one for UNFPA SoWP 2024 30-year equity audit findings; for humanitarian, one for IAWG MISP (2020) implementation data.
@@ -133,33 +134,13 @@ If any of: search strategy produced poor results / source tier unavailable / Evi
 
 For behavioural generalisations (e.g., "always run PubMed before Consensus for SRHR"), validate with Ane before writing.
 
-### Bibliography write-hook (Phase 1, added 2026-05-23)
+### Bibliography write-hook — retired 2026-09-22, Li writes
 
-After every external-retrieval pass that produces an Evidence Brief, run the
-bibliography write-hook:
-
-1. For every source in the Brief (Tier 1, 2, and 3), call
-   `ane_package.bibliography.store.BibliographyStore.add_or_update(record)` with
-   structured tags via
-   `build_tags_for_researcher_push(tier=N, run_id=<run-id>, grey_lit=..., foundational=...)`.
-   The store is idempotent on DOI then URL; existing records are updated, not
-   duplicated.
-
-2. For every source cited in the Brief, run
-   `ane_package.bibliography.detector.surface_candidates([records])`. Any
-   returned Candidate is staged via
-   `ane_package.bibliography.staging.append_or_merge(path, row)` to
-   `agent-improvements/_pending-biblio-updates.md`.
-
-3. The Brief carries a footer line:
-   `🔔 [N] bibliography candidate(s) staged — /li show-biblio-updates to view`
-   when N ≥ 1.
-
-Credentials: API key from Credential Manager target `IPPF-MEL-Zotero-API`
-(see `ane_package.ingest.credentials.get_zotero_api_key`). User and group IDs
-from `ane_package.bibliography.config` (set up once via the plan's Task 13).
-
-Spec: `docs/superpowers/specs/2026-05-23-bibliography-zotero-design.md`.
+Researcher does not write to Zotero. No code implemented the old hook, and a spawned
+Researcher has no Bash. Li pushes every Brief source, grey literature included, in
+INGEST-FROM-RESEARCHER Step 4B (`python -m ane_package.bibliography.brief_push`).
+Your part: record one verdict per source in the STEP 4B gate, because Li pushes
+only REAL+CORRECT sources.
 
 ## Specialist taxonomy
 In Artifact A "Recommended specialist roster", list only the specialist names the task requires (Vi owns model selection):

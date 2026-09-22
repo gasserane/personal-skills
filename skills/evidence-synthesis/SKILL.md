@@ -150,6 +150,8 @@ For SRHR-specific framings:
 - Cornwall & Rivas (2015), Chilisa (2020) for lenses
 - WHO (2010) WHO/RHR/10.12 + UNFPA HRBAP + UNFPA SoWP 2021/2024/2025 for rights-based framing
 
+**Citation verification gate (mandatory, model-independent).** Before delivering, check every citation in the source list against reality with WebSearch / WebFetch: the source exists, and its author(s), year and venue are as cited. Record one verdict per source: REAL+CORRECT, REAL+MISATTRIBUTED, FABRICATED or UNRESOLVED. Where two citations share a DOI or title but differ in authors or year, resolve the true attribution. Any MISATTRIBUTED or FABRICATED source is a FAIL: correct or re-source it before delivering. Never reword an unverifiable citation to look sourced. If the verification tool is unavailable, flag each unverified citation `⚠️ attribution unverified — confirm before publication`. Gate 1 of `agent-improvements/model-selection-policy.md`; canonical text in `mel_wiki/wiki/concepts/evidence-retrieval-architecture.md`. Report the tally in the search audit (output item 10).
+
 ## Writing rules
 
 Follow CLAUDE.md house style. In this skill specifically:

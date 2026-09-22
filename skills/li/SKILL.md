@@ -228,6 +228,13 @@ Auto-merge protocol design rationale: Ane authorised auto-merge for Tier-1 verif
 
 **Step 4 — RESOURCES_INDEX.** Add the run folder under a heading derived from the basename of the Research Artifacts path (currently `## CLAUDE MEL new RESOURCES`) in `3. Ane's RESURSE/RESOURCES_INDEX.md`. If the folder is renamed, update both the constant and this heading together.
 
+**Step 4B — Zotero push (added 2026-09-22).** Li is the only writer of Brief sources to Zotero; the Researcher write-hook is retired. Push all tiers, grey literature included (bibliography spec, locked design #4).
+1. Write `sources.json` in the run folder: one object per entry in `sources-list.md`, with `title`, `creators` (`[{"lastName", "firstName"}]`, or `[{"name"}]` for an institution), `year`, `doi`, `url`, `item_type` (`journalArticle`, `report`, `book` or `webpage`), `publication`, `institution`, `tier` (1-3), `grey_lit`, `foundational`, `gate`.
+2. `gate` is the verdict the Brief's citation gate recorded for that source. When the Brief records no per-source verdict, verify the source as in Step 3.2 before writing `REAL+CORRECT`. Never set it by default.
+3. From the work-folder root, dry-run first: `python -m ane_package.bibliography.brief_push "<run folder>/sources.json" --run-id <task-slug> --dry-run`. Read every `SKIPPED` line.
+4. Push with the same command, without `--dry-run`. It uses the write key, merges into existing items without dropping their tags or Extra, and stages supersession candidates to `agent-improvements/_pending-biblio-updates.md`.
+5. Carry its summary line, and any `[bell]` candidate line, into Step 5.
+
 **Step 5 — Confirm.** Return: `✅ Stored: [date]_[slug]/ — [N] files written — [M] insights staged in _pending-ingest.md awaiting Ane's approval — artifact-log updated`.
 
 ### LIST-INGESTS / APPROVE-INGEST / REJECT-INGEST — Manage staged wiki insights
