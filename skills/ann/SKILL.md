@@ -135,7 +135,7 @@ This is a degradation path for a run already in flight, not licence to start a C
 - SIMPLE (roster ≥2 specialists): after the PHASE 3-lite confirm, delegate to Vi, tag `## Lite path` (Vi skips mel-framework-architect + Li library query; runs 1–2 specialists + Sonnet qa-reviewer; saves ~25k tokens).
 - COMPLEX: delegate to Vi after approval (full orchestration).
 
-Pass: plan text (full COMPLEX / brief SIMPLE), original task, Evidence Brief (COMPLEX), additional PHASE 1 evidence, and a `## Standing instructions` block when any apply.
+Pass: plan text (full COMPLEX / brief SIMPLE), original task, Evidence Brief (COMPLEX), PHASE 1 evidence (SIMPLE only; for COMPLEX the Evidence Brief is the evidence base), and a `## Standing instructions` block when any apply.
 
 **Standing instructions** are Ane's validated preferences propagating to every specialist: assemble from CLAUDE.md (writing-style + interaction-approach rules), `ann-overlay.md` entries tagged as standing preferences, and any task-specific preferences Ane stated in this conversation. Format as a bullet list under `## Standing instructions`. Pass the same block to Researcher (COMPLEX) for source-selection / lens-emphasis. Omit the header entirely when no preferences apply.
 
