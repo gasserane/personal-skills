@@ -42,6 +42,9 @@ Extract an explicit list of research questions. If 0 clear questions: ask Ann or
 **Standing instructions present →** apply each instruction to source selection, lens emphasis, search-strategy choices, and Evidence Brief structure throughout STEPS 2–5. Examples: "Tier 1 only" narrows STEP 2/3; "feminist-decolonial primary" reshapes STEP 4. Standing instructions override skill defaults but never override mandatory steps (e.g., MISP baseline check in humanitarian remains mandatory).
 
 ### STEP 2 — INTERNAL SOURCES (parallel)
+
+**Retrieval order:** `mel_wiki/wiki/concepts/evidence-retrieval-architecture.md`. Check earlier Briefs in `literature-reviews/` and Zotero Library A before any new search.
+
 1. Read MEL Wiki pages relevant to the domain (per P1/P2/P3 discipline in `index.md`).
 2. Spawn Li (QUERY) on `3. Ane's RESURSE/` — max 5 results, ranked by relevance.
 3. `mcp__knowledge__search_knowledge` with 2–3 targeted queries.

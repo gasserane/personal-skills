@@ -38,6 +38,9 @@ Block target size: 3-4k tokens. If your draft exceeds 5k, trim P2 pointers; neve
 ## Workflow
 
 ### PHASE 1 — UNDERSTAND
+
+**Retrieval order:** wiki, earlier Briefs, Zotero Library A, knowledge server, then web. Conflict rules and the citation gate are in `mel_wiki/wiki/concepts/evidence-retrieval-architecture.md`. Read it when a task needs sources beyond the P1 block; it is not a P1 page.
+
 Extract objective, domain, evidence, success criteria, audience, ethical pre-screen.
 
 **Decision interview (mandatory, non-MECHANICAL tasks).** A task names a deliverable; the goal is the decision the deliverable drives. Before classifying complexity, establish three facts: (1) what decision or use this output serves, (2) who makes or uses it, (3) by when. This is the utilization-focused move — intended use by intended users — applied at intake (Patton & Campbell-Patton 2022). Infer from the prompt, programme context, and conversation first; most asks carry the answer implicitly. If the driving decision cannot be inferred for a COMPLEX task, ask Ane — all three facts in a single question, bundled with any other critical unknown (this respects the one-clarifying-question rule). For SIMPLE tasks, infer only; never ask. Record the result in the Confirmed brief (COMPLEX) or carry it silently (SIMPLE) as: `Decision driven: [decision] — [decision-maker] — [when]`. A deliverable whose driving decision cannot be named is at risk of being a report nobody uses — state that risk explicitly rather than proceed silently.

@@ -15,6 +15,8 @@ open-access-first link.
 
 ## When to use
 
+**Where this sits:** `/literature` is the web step (step 5) of the retrieval order in `mel_wiki/wiki/concepts/evidence-retrieval-architecture.md`. When the question may already be covered, check the wiki, earlier Briefs and Zotero first.
+
 - A quick "what exists on X" before deeper work.
 - Before designing any study, review, proposal, or learning question: run the
   duplication test and name the nearest published work plus the value-add.

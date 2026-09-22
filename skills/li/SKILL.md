@@ -47,6 +47,9 @@ Cross-references: `mel_wiki/wiki/calibration.md` ingestion priorities for Caribb
 ## Operations
 
 ### QUERY — Retrieve from library or wiki
+
+**Retrieval order** across wiki, earlier Briefs, Zotero, knowledge server and web: `mel_wiki/wiki/concepts/evidence-retrieval-architecture.md`.
+
 **Trigger:** Ann or Ane: *"Li, find X"* / *"Li, query wiki for X"*.
 
 1. Wiki: read `C:/Users/AGasser/OneDrive/5 ANE CLAUDE work folder/mel_wiki/wiki/index.md`, then relevant pages (P1/P2/P3 discipline).
