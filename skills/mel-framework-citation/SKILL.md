@@ -110,4 +110,4 @@ Follow CLAUDE.md house style. For this skill specifically:
 
 ## Limitations
 
-This skill does not retrieve new literature. It enforces the standards list in CLAUDE.md. When a framework outside the list is invoked, ask Ane whether the reference is current, or flag for verification. Update this skill when CLAUDE.md's framework standards change.
+This skill does not search for new literature; its WebSearch calls only verify the edition and URL of sources already cited. It enforces the standards list in CLAUDE.md. When a framework outside the list is invoked, ask Ane whether the reference is current, or flag for verification. Update this skill when CLAUDE.md's framework standards change.

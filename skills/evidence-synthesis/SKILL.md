@@ -138,7 +138,7 @@ Produce an evidence brief with these sections:
 7. **Start here** — the 5 to 7 sources from Step 10, in reading order, each with its one-line contribution and one-line what-to-look-for. Move this section up to sit directly after the executive summary when the brief's purpose is orientation rather than a decision, because a reader entering an unfamiliar field needs the reading order before the findings.
 8. **Evidence gaps** — `⚠️ Evidence gap:` entries
 9. **Sources** — full citations, alphabetical by first author
-10. **Search audit** — the three numbers, never conflated: queries sent, unique results received, results cited. Name the tool used (OpenAlex, Consensus, hand-supplied), any result cap observed, every failed search, and any thin result set. Compute these from the run; never estimate them. A thin result is reported, never topped up from training knowledge.
+10. **Search audit** — the three numbers, never conflated: queries sent, unique results received, results cited. Name the tool used (OpenAlex, Consensus, hand-supplied), any result cap observed, every failed search, and any thin result set. Compute these from the run; never estimate them. A thin result is reported, never topped up from training knowledge. Close the audit with the citation-gate tally in exactly this form: `**Citation verification gate:** N sources checked: a REAL+CORRECT, b REAL+MISATTRIBUTED, c FABRICATED, d UNRESOLVED. Verdict: PASS|FAIL.`
 
 ## Citation requirements
 
