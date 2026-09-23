@@ -55,6 +55,17 @@ The workbook has slicers, charts, protection, structured references and spill fo
 
 **Why COM and not openpyxl.** Not preference. Slicers, sheet protection and ListObject geometry have no openpyxl equivalent Excel then honours. The COM path costs an Excel launch and about a minute; an openpyxl write costs a workbook.
 
+**Writing a date through COM: assign the serial, not a date object.** COM refuses a `datetime.date` outright (`TypeError: must be a pywintypes time object`), and the obvious fix, passing a `datetime`, is the one that corrupts quietly: the value is converted through UTC, so on a UTC+2 machine `16.09.2026 00:00` is stored as `15.09.2026 22:00` and a `dd.mm.yyyy` cell renders **the day before**. Nothing raises, the write reports success, and the column looks plausible. Write the Excel date serial to `.Value2` instead, then restore the cell's `NumberFormat`, because assigning a bare number drops the date format:
+
+```python
+EXCEL_EPOCH = datetime.date(1899, 12, 30)    # day 0 of the 1900 date system
+fmt = ws.Cells(r, c).NumberFormat
+ws.Cells(r, c).Value2 = (the_date - EXCEL_EPOCH).days
+ws.Cells(r, c).NumberFormat = fmt
+```
+
+A serial carries no timezone, so what is written is what is stored. **Verify by reopening the saved file and comparing the dates, never by the write returning without error** — the off-by-one is invisible in the COM session that produced it and visible only on the round trip (proven 2026-09-23, IPPF Wave 1 scoring, 27 completion dates all a day early).
+
 ## canonical mode
 
 Ane has edited a generated file in Word, PowerPoint or Excel. From now on her file is the source and the generator is the stale copy. The job is to make that true in the file system, not just in the conversation.
