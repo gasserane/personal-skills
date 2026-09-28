@@ -34,6 +34,8 @@ def _bootstrap_ane_package() -> None:
     if env_root:
         candidates.append(Path(env_root))
     candidates.extend(Path(__file__).resolve().parents)
+    # Same machine-default fallback as office-review-pass/scripts/review_pass.py.
+    candidates.append(Path.home() / "OneDrive" / "5 ANE CLAUDE work folder")
 
     for candidate in candidates:
         if (candidate / "ane_package" / "reporting" / "brand.py").is_file():
