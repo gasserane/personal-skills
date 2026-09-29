@@ -62,7 +62,7 @@ If a data file was supplied and she approved in Step 0: `DD recompute <run> --ap
 
 1. `DD validate <run>`: any schema problem sends that checker back. Never delete a malformed finding by hand.
 2. `DD merge <run>`: merges restatements (shared claim and shared reason, within one checker) into one finding with `locations`.
-3. Spawn the **challenger** (sonnet, `checkers.md` § challenger) on `merged.json` → `challenger.json`.
+3. Spawn the **challenger** (sonnet, `checkers.md` § challenger) on `merged.json` → `challenger.json`. Errors and coherence findings with `kind: "tension"` skip it, and `finalise` ships them without a verdict (a tension skips it in code: Ane, 2026-09-29, after the challenger twice dropped a true trajectory tension as taste).
 4. `DD finalise <run>` sorts each finding into commented, not commented (optional or over the cap), held (web evidence not verified in this run) or dropped (noise control, reason kept), and resolves anchors. It also runs the **accounting gate**: every claim in the source queue must end as a source finding or a cleared record in `cleared_source.json` with a found passage (and, for a law, the version date of the text read). Anything else is listed as `UNACCOUNTED` and exits non-zero. Send those claims back to the source checker once; if they are still unaccounted, name them to Ane. Anchor problems also exit non-zero. Fix each quote by copying the exact span from `document.md` into `merged.json`, then re-run `finalise`. Never loosen a quote.
 
 Order matters. The challenger runs on merged findings (fewer calls), and the verified-source gate runs last, so a held finding has already survived the challenger.
