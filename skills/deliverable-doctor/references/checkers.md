@@ -69,7 +69,7 @@ Read `document.md` end to end, Background and closing sections included: the oth
    Synthetic example: "the counselling service has operated across the district for a decade" and, later, "counselling will be introduced in three new health centres". The suggestion asks whether the new centres extend the existing service or restart it after a closure. When the document states the link ("after the two-district pilot, the service opens in four new centres"), write nothing.
 2. **Unquantified result** (`kind: "unquantified"`). An evaluative word for a result the programme could count ("remarkably strong attendance", "a sharp rise in referrals", "surprisingly high demand") with no figure for it anywhere in the document. Search the whole document before you report: a figure in an annex or a table counts. The suggestion asks for the figure, or for the comparison the word implies.
 
-Every finding is `status: "warning"`, `severity: "should"`, `category: "substance"`, with `kind` set. The schema refuses anything else, and the challenger tests every one.
+Every finding is `status: "warning"`, `severity: "should"`, `category: "substance"`, with `kind` set. The schema refuses anything else, and the challenger tests every one except a `tension`, which skips it. A tension therefore reaches the author unchallenged: when the document states the link, write nothing.
 
 **Out of scope, never report:**
 - Any demand for outside evidence. That belongs to the source checker.
@@ -175,8 +175,6 @@ You receive `merged.json`. For every finding with `status: "warning"`, try to re
 - `taste`: a preference, not an error. Another careful reviewer would leave the text as it is.
 - `keep`: it survives both questions.
 
-A grammar or style finding that does not name a real rule is `wrong`. Do not re-check facts on the web; judge the finding as written. Write a JSON object `{"<finding id>": {"verdict": "keep|taste|wrong", "note": "one sentence"}}` covering every warning, and nothing else. Ignore `error` findings. They skip this pass.
-
-A tension between two passages that the text does not resolve is not `taste`: the reader cannot tell which passage holds. Reject it only as `wrong`, and only when the text itself resolves it, for example with a stated link between the two passages.
+A grammar or style finding that does not name a real rule is `wrong`. Do not re-check facts on the web; judge the finding as written. Write a JSON object `{"<finding id>": {"verdict": "keep|taste|wrong", "note": "one sentence"}}` covering every warning, and nothing else. Ignore `error` findings and coherence findings with `kind: "tension"`. Both skip this pass (a tension skips it by Ane's decision, 2026-09-29).
 
 **Do not over-tune.** Every rejection can delete a true finding. When in doubt, `keep`. The trial's value came from six substantive points that a cautious challenger would have kept.
