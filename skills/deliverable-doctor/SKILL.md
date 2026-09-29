@@ -55,13 +55,15 @@ In the same turn, the main session itself runs:
 
 In ONE message, one agent per non-empty queue: number, source, framework, cause, equity, recommendation, and prior (research mode). Same model and prompt build as Step 2, plus the queue from `route.json`. The source and prior agents must fill `verified` for web evidence (contract rule 9). Sensitive run: tell source and prior agents to check only against sources in scope, with no web search of claim text.
 
+As each checker agent returns, record its agent ID: `DD record-agent <run> <checker> <agentId>`, with `agentId` copied from that Agent result (for example `DD record-agent <run> source a1b2c3d4e5f6a7b8c`). The search audit in Step 6 reads that checker's transcript by this ID.
+
 ## Step 5 — L3 recompute (only with Ane's yes)
 
 If a data file was supplied and she approved in Step 0: `DD recompute <run> --approved`. The number checker wrote `recompute.json`, and the script evaluates it. Mismatches become `error` / `must` findings, and every figure's result goes to `recompute_log.json`. Without her yes the script refuses (exit 2), and that refusal is correct.
 
 ## Step 6 — validate, merge, challenge, finalise
 
-1. `DD validate <run>`: any schema problem sends that checker back. Never delete a malformed finding by hand. It also checks `recompute.json`: a file that does not parse (for example a Windows backslash path, which is an invalid JSON escape) or a spec outside the shapes `recompute.py` accepts is reported as a problem that goes back to the `number` checker. When a `recompute.json` exists, run `validate` before Step 5 as well, so a bad file goes back to the checker before `recompute --approved` reads it.
+1. `DD search-audit <run>`, then `DD validate <run>`. The audit reads each checker's WebSearch calls from its transcript and writes over the checker's own log the mode each search actually ran in and whether it ran at all. It exits 1 on a logged search that never ran (send that checker back once) and 2 when an agent ID or transcript is missing (record it; never skip the audit). Once `run.json` records agent IDs, `validate` refuses an unaudited `not_found`. `names_body` stays a judgement the audit cannot check. `validate`: any schema problem sends that checker back. Never delete a malformed finding by hand. It also checks `recompute.json`: a file that does not parse (for example a Windows backslash path, which is an invalid JSON escape) or a spec outside the shapes `recompute.py` accepts is reported as a problem that goes back to the `number` checker. When a `recompute.json` exists, run `validate` before Step 5 as well, so a bad file goes back to the checker before `recompute --approved` reads it.
 2. `DD merge <run>`: merges restatements (shared claim and shared reason, within one checker) into one finding with `locations`.
 3. Spawn the **challenger** (sonnet, `checkers.md` § challenger) on `merged.json` → `challenger.json`. Errors and coherence findings with `kind: "tension"` skip it, and `finalise` ships them without a verdict (a tension skips it in code: Ane, 2026-09-29, after the challenger twice dropped a true trajectory tension as taste).
 4. `DD finalise <run>` sorts each finding into commented, not commented (optional or over the cap), held (web evidence not verified in this run) or dropped (noise control, reason kept), and resolves anchors. It also runs the **accounting gate**: every claim in the source queue must end as a source finding or a cleared record in `cleared_source.json` with a found passage (and, for a law, the version date of the text read). A `legal_status` claim counts only once the legal text itself was read: a cleared law record, a finding quoting the law with its version date, or a `not_found` that searched for the legal text. Anything else is listed as `UNACCOUNTED` and exits non-zero. Send those claims back to the source checker once; if they are still unaccounted, name them to Ane. Anchor problems also exit non-zero. Fix each quote by copying the exact span from `document.md` into `merged.json`, then re-run `finalise`. Never loosen a quote.
@@ -70,7 +72,7 @@ Order matters. The challenger runs on merged findings (fewer calls), and the ver
 
 ## Step 7 — present, then render
 
-Tell Ane, BLUF first: the verdict in one sentence (for example "three must-fix errors, two of them figures"), then counts per bucket, then every **held** finding by name. Held findings are often the valuable ones. The trial's femicide finding was right on substance and wrong in three details. They reach the author only after she or a re-run verifies them.
+Tell Ane, BLUF first: the verdict in one sentence (for example "three must-fix errors, two of them figures"), then counts per bucket, then every **held** finding by name. Held findings are often the valuable ones. In the trial, one legal-status finding was right on substance and wrong in three details. They reach the author only after she or a re-run verifies them.
 
 Also tell her how many source claims were **cleared**, and that the report lists each with its passage. A wrong clearance is overturned there, not in the comments.
 
