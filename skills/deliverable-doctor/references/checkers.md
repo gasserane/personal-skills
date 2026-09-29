@@ -16,9 +16,11 @@ Read `document.md` end to end. List every **checkable claim**: a sentence that c
 ```
 
 - **type** (what evidence settles it): `number` (a figure, percentage, count, trend), `source` (the text says a named source says something), `framework` (names or applies a MEL framework, standard or method), `cause` (the programme caused, contributed to, or led to a change), `equity` (a claim about who benefited or was left out, or about disaggregation), `recommendation` (a proposed action), `fact_about_context` (a date, law, name, status or event outside the document).
-- **role** (what the sentence does in this genre): `outcome`, `contribution`, `figure`, `outside_fact`, `framework_ref`, `recommendation`, `method`, `award_criterion` (proposal mode only: a claim written to score against a named criterion), `motive` (the author's own stated reason or intent), `narrative` (description or characterisation in the author's voice), `reflection` (closing lesson or self-assessment), `other`.
+- **role** (what the sentence does in this genre): `outcome`, `contribution`, `figure`, `outside_fact`, `framework_ref`, `recommendation`, `method`, `award_criterion` (proposal mode only: a claim written to score against a named criterion), `general_claim` (a statement about how the world works, true or false whoever says it: "prevention costs less than response"; "adolescents trust peers more than teachers"), `motive` (the author's own stated reason or intent), `narrative` (description or characterisation in the author's voice), `reflection` (closing lesson or self-assessment), `other`.
 - Tag role honestly. The genre profile exempts `motive`, `narrative` and `reflection` in a case study. Tagging an outcome claim as narrative would hide it from the checkers, and tagging a reflection as an outcome would bring back the trial's largest noise group.
 - One sentence can hold two claims ("63% of the 240 participants, a rise the programme drove"): list both.
+- **A motive that rests on a general claim is two claims.** "We chose peer educators because young people trust peers more than teachers" holds a motive (we chose peer educators) and a general claim (young people trust peers more than teachers). List the motive with role `motive` and the general claim, quoted on its own, with role `general_claim` and type `cause` or `source`. The same holds for narrative and reflection. Do not split a sentence that only states intent ("we wanted every session to feel safe").
+- **`cited_source`**: fill it whenever the text names who said or published the fact ("according to the health ministry", "the national survey shows"), whatever the claim's type. The router sends such claims to the source checker too.
 - Quote exactly, curly apostrophes included.
 
 ---
@@ -43,6 +45,25 @@ The main session runs `python <office-review-pass>/scripts/review_pass.py verify
 
 ---
 
+## coherence → `check_coherence.json` (L1, whole document)
+
+Read `document.md` end to end, Background and closing sections included: the other half of a tension often sits in a passage no claim checker sees. Report only two kinds of finding.
+
+1. **Tension** (`kind: "tension"`). Two passages a reader cannot hold together without a link the document does not give. Numeric or not. Quote the first passage in `quote` and the second in `locations`. The suggestion names the missing link. Synthetic example: "The clinic ran at full capacity all year" in one section and "many booked appointments went unused" in another. The suggestion asks the author to say which period or service each sentence describes.
+2. **Unquantified result** (`kind: "unquantified"`). An evaluative word for a result the programme could count ("remarkably strong attendance", "a sharp rise in referrals", "surprisingly high demand") with no figure for it anywhere in the document. Search the whole document before you report: a figure in an annex or a table counts. The suggestion asks for the figure, or for the comparison the word implies.
+
+Every finding is `status: "warning"`, `severity: "should"`, `category: "substance"`, with `kind` set. The schema refuses anything else, and the challenger tests every one.
+
+**Out of scope, never report:**
+- Any demand for outside evidence. That belongs to the source checker.
+- Motives, narrative or reflection, unless the sentence states a countable result.
+- Style, wording or structure. That belongs to voice.
+- A restatement of the same point in several places. Report it once, with the other quotes in `locations`.
+
+When two passages can be read together without strain, write nothing. An empty list is a good result on a coherent document.
+
+---
+
 ## number → `check_numbers.json` (L2)
 
 For each claim in your queue:
@@ -56,10 +77,28 @@ If a data file is listed in `run.json` → `data_files`, ALSO write `recompute.j
 
 ## source → `check_sources.json` (L2)
 
-For each claim: does the cited source say what the text says it says? Fetch the source in this run. Record `verified` with the passage you found (contract rule 9). Findings:
-- Source says something different: `error`, `must` (misattribution), only when you have the passage.
-- Source cannot be found or opened: `warning`, `should`, and say so plainly.
+Your queue holds `source` and `fact_about_context` claims, and also claims of other types whose text names a source (`cited_source` is filled). For each claim, fetch the source in this run and record `verified` with the passage you found (contract rule 9). Check three things separately: **the fact, the date, and the body that issued it.**
+
+Every claim in your queue must end in exactly one of two places. A claim that ends in neither is listed as unaccounted in the report and sent back to you.
+1. **A finding** in `check_sources.json`.
+2. **A cleared record** in `cleared_source.json`, when the source confirms the claim. One record per claim:
+   ```json
+   {"claim_id": "cl-004", "quote": "exact claim quote", "checked": "fact, date and issuing body",
+    "source_kind": "law | report | dataset | web | other",
+    "verified": {"url": "...", "fetched_in_run": true, "passage_found": true,
+                 "passage": "the sentence you found", "source_version_date": "YYYY-MM-DD or null"}}
+   ```
+   A cleared record without a found passage does not count. Cleared records never reach the author. Ane reads them in the report and can overturn a wrong clearance.
+
+**Outcomes.**
+- **Confirmed**: the passage supports the claim as written. A paraphrase that keeps the same status (same fact, date and body) is confirmed. Write a cleared record, not a finding.
+- **Misattributed**: the passage contradicts the attribution or the fact. `error`, `must`, `kind: "attribution"` when the problem is who said it. Only when you have the passage.
+- **Imprecise** (`kind: "imprecise"`): the source supports a reading that changes the status the text implies: whether something exists or not, a date, the issuing body, or a number. `warning`, `should`. Quote the text and the passage, and suggest precise wording. Synthetic example: the text says a scheme "started in 2021"; the passage says it was announced in 2021 and began in 2022. Another: the text says "there is no national guideline"; the passage shows guidance exists as one section of a wider national plan. Both are imprecise, not confirmed.
+- **Named body not found** (`kind: "attribution"`): the passage names a different originating body, and you cannot find the body the text names. `warning`, `should`. Warning is the default because a relaying body and an originating body can both be right: a statistics office's bulletin republished in a regional health board's yearbook is on record with both bodies. Synthetic wording: "We found this figure in the national statistics office's yearly bulletin. If the health ministry also published it, name that document."
+- **Source cannot be found or opened**: `warning`, `should`, and say so plainly.
 - `fact_about_context` claims with no source in the document: check them against a canonical source (issuing body, official gazette, publisher). If you cannot confirm the fact, write a `warning` that asks the author to verify it, and name what to check.
+
+**Laws, codes and regulations.** Record the version date of the text you read in `source_version_date` and set `source_kind: "law"`. Before you clear the claim, search for amendments after that date. A cleared law record without a version date counts as unaccounted. Check the legal category too: an act can be covered as a named offence, as a qualified form of another offence, or as an aggravating circumstance, and these are different claims.
 
 Canonical sources first: the publisher, issuing institution or official repository. Never cite an aggregator alone.
 
@@ -80,6 +119,7 @@ For each outcome or contribution claim: does the text claim attribution ("caused
 - Attribution claimed without a design that could support it: `warning`, `should`. The suggestion rewords to contribution and names the rival explanation to address.
 - Contribution claimed with no evidence of the programme's part at all: `warning`, `should`.
 - Skip claims the profile exempted. In a case study the author's stated intent is not a causal claim.
+- **`general_claim` in the case-study profile** (a statement about how the world works, such as "prevention costs less than response"): `warning`, `should`. The suggestion asks the author to state the basis, or to present it as the organisation's own view ("in our experience…"). Never ask for a study or an evaluation design. The same rule applies when the source checker receives a `general_claim`.
 
 ---
 

@@ -10,7 +10,7 @@ You are one checker in a review pipeline. You review ONE document for ONE kind o
 
 - `document.md`: the clean text. **Quote from this file only.**
 - `document.numbered.md`: the same text with `[block]` markers (and `p.N` for a PDF), for locating. Never copy a marker into a quote.
-- Your queue: the claims routed to you (`route.json` → `queues.<checker>`), each with `id`, `type`, `role` and `quote`. L1 checkers (voice, references, brand) get the whole document instead.
+- Your queue: the claims routed to you (`route.json` → `queues.<checker>`), each with `id`, `type`, `role` and `quote`. L1 checkers (voice, references, brand, coherence) get the whole document instead.
 - `run.json`: the mode and the genre profile.
 
 ## Output
@@ -34,9 +34,12 @@ Write a JSON list to `check_<checker>.json` in the run folder, and nothing else.
   "severity": "must | should | optional",
   "rule": null,
   "locations": [],
-  "verified": null
+  "verified": null,
+  "kind": null
 }
 ```
+
+`kind` stays null unless your brief names one (source: `imprecise`, `attribution`; coherence: `tension`, `unquantified`). A kind your checker does not own fails the schema.
 
 Write an empty list `[]` when you find nothing. An empty list is a valid result, not a failure.
 
@@ -48,7 +51,7 @@ Write an empty list `[]` when you find nothing. An empty list is a valid result,
    - `must`: factual error, internal contradiction, misattribution.
    - `should`: unsupported claim, missing source.
    - `optional`: everything else.
-4. **No style from claim checkers.** If you are number, source, framework, cause, equity, recommendation or prior, never report wording preferences. Style belongs to voice alone, and a style finding from you is dropped.
+4. **No style from claim checkers.** If you are number, source, framework, cause, equity, recommendation, prior or coherence, never report wording preferences. Style belongs to voice alone, and a style finding from you is dropped.
 5. **Grammar and style findings name the rule** in `rule` ("subject-verb agreement", "em-dash in body prose", "substitution table: utilise → use"). A finding without a named rule is dropped. A grammar error that changes meaning is in scope ("is deliberately has not been").
 6. **Respect the genre profile.** You receive only claims the profile says need evidence. Do not widen the demand. A case study's closing reflection does not need a citation.
 7. **One point, one finding.** When the same problem recurs, report it once and put the other exact quotes in `locations`.
