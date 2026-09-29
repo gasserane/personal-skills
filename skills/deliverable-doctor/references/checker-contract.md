@@ -15,7 +15,7 @@ You are one checker in a review pipeline. You review ONE document for ONE kind o
 
 ## Output
 
-Write a JSON list to `check_<checker>.json` in the run folder, and nothing else. Each finding:
+Write a JSON list to `check_<checker>.json` in the run folder, and nothing else. Every file you write is UTF-8 JSON: set the encoding to UTF-8 explicitly, because a Windows default such as cp1252 fails `validate` and the file comes back to you. Each finding:
 
 ```json
 {
