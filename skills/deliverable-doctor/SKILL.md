@@ -41,13 +41,14 @@ In ONE message, spawn `general-purpose` agents on `model: sonnet` (the trial's r
 - **voice** → `check_voice.json`
 - **coherence** → `check_coherence.json` (whole document: tensions between passages, and evaluative words with no figure anywhere)
 
+- **references** → `check_references.json`, on `model: sonnet` like the others, with `checkers.md` § references. Skip it when the document cites nothing. Do not call the saved `citation-verification` workflow here: it takes no model argument, so its agents would not run on a pinned model, and other callers share it, so it is not edited for this skill. Haiku is not allowed for this step: judging whether a citation is real is a verdict on the citation chain, and `agent_registry.md` § Routing tiers keeps the Haiku tier to non-citation steps after a logged pilot (Run A fixes spec, Fix 6).
+
 In the same turn, the main session itself runs:
-- **references**: the saved `citation-verification` workflow on `<run>/document.md`, flags converted per `checkers.md` → `check_references.json`. Skip it when the document cites nothing.
 - **brand** (.docx only): `review_pass.py verify --expect-branded`, converted per `checkers.md` → `check_brand.json`.
 
 ## Step 3 — route
 
-`DD route <run>`. It prints per-checker queue sizes, hand-offs, the claims the profile exempted, the exempted claims flagged for review (`skipped_review`: a motive, narrative or reflection whose wording generalises, such as "cheaper than" or "always"), and the claims also sent to source because their text names a source (`also_routed`). A claim goes to every checker that owns part of its evidence. The review flag is audit only: never move a flagged claim into a queue by hand. If one is a general claim, the fix is to re-run extract-claims, which should have split it out as `general_claim`. Invalid claims make it exit non-zero: send them back to extract-claims, and never hand-edit claims into shape. In proposal mode, pass `handoffs.donor-proposal-scoring` to that skill. Tell Ane in one line; do not score them here.
+`DD route <run>`. It prints per-checker queue sizes, hand-offs, the claims the profile exempted, the exempted claims flagged for review (`skipped_review`: a motive, narrative or reflection whose wording generalises, such as "cheaper than" or "always"), and the claims also sent to source because their text names a source (`also_routed`), and the `own_record` claims routed anyway because the quote holds a number or a generalising word (`own_record_override`). A claim goes to every checker that owns part of its evidence. The review flag is audit only: never move a flagged claim into a queue by hand. If one is a general claim, the fix is to re-run extract-claims, which should have split it out as `general_claim`. Invalid claims make it exit non-zero: send them back to extract-claims, and never hand-edit claims into shape. In proposal mode, pass `handoffs.donor-proposal-scoring` to that skill. Tell Ane in one line; do not score them here.
 
 ## Step 4 — L2 checkers (parallel)
 
@@ -60,7 +61,7 @@ If a data file was supplied and she approved in Step 0: `DD recompute <run> --ap
 ## Step 6 — validate, merge, challenge, finalise
 
 1. `DD validate <run>`: any schema problem sends that checker back. Never delete a malformed finding by hand.
-2. `DD merge <run>`: merges restatements (shared claim and shared reason) into one finding with `locations`.
+2. `DD merge <run>`: merges restatements (shared claim and shared reason, within one checker) into one finding with `locations`.
 3. Spawn the **challenger** (sonnet, `checkers.md` § challenger) on `merged.json` → `challenger.json`.
 4. `DD finalise <run>` sorts each finding into commented, not commented (optional or over the cap), held (web evidence not verified in this run) or dropped (noise control, reason kept), and resolves anchors. It also runs the **accounting gate**: every claim in the source queue must end as a source finding or a cleared record in `cleared_source.json` with a found passage (and, for a law, the version date of the text read). Anything else is listed as `UNACCOUNTED` and exits non-zero. Send those claims back to the source checker once; if they are still unaccounted, name them to Ane. Anchor problems also exit non-zero. Fix each quote by copying the exact span from `document.md` into `merged.json`, then re-run `finalise`. Never loosen a quote.
 
@@ -88,7 +89,7 @@ The harness fixture (`tests/fixtures/deliverable_doctor/`) holds a document with
 
 ## Noise controls, and the warning against over-tuning
 
-Phase 2 (`agent-improvements/deliverable-doctor-phase2-spec.md`, work folder) adds the `general_claim` role, routing on `cited_source`, cleared records with the accounting gate, the `imprecise` source outcome, and the L1 `coherence` checker. Controls 1 to 6 in the spec are built in: genre profiles (Step 3), style only in voice, the challenger, merging, severity drives the default view, and the verified-source gate. The trial accepted 27 of its 41 findings. A control that halves the noise but loses one of the six substantive points (C08, C23, C25, C32, C33, C35) is worse than no control. The pre-registered regression test for exactly that: `agent-improvements/deliverable-doctor-regression-run-prompt.md` (work folder).
+Phase 2 (`agent-improvements/deliverable-doctor-phase2-spec.md`, work folder) adds the `general_claim` role, routing on `cited_source`, cleared records with the accounting gate, the `imprecise` source outcome, and the L1 `coherence` checker. The Run A fixes (`agent-improvements/deliverable-doctor-runA-fixes-spec.md`) add the `own_record` role (exempt in a case study, listed as not checked), the fact-only search with the `not_found` outcome, the trajectory move in coherence, and the references step on Sonnet. Findings from different checkers are never merged: the author sees each checker's reason (Ane, 2026-09-29). The one exception is a numeric tension that coherence and number both found. Controls 1 to 6 in the spec are built in: genre profiles (Step 3), style only in voice, the challenger, merging, severity drives the default view, and the verified-source gate. The trial accepted 27 of its 41 findings. A control that halves the noise but loses one of the six substantive points (C08, C23, C25, C32, C33, C35) is worse than no control. The pre-registered regression test for exactly that: `agent-improvements/deliverable-doctor-regression-run-prompt.md` (work folder).
 
 ## Safeguards
 

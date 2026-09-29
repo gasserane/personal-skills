@@ -39,7 +39,9 @@ Write a JSON list to `check_<checker>.json` in the run folder, and nothing else.
 }
 ```
 
-`kind` stays null unless your brief names one (source: `imprecise`, `attribution`; coherence: `tension`, `unquantified`). A kind your checker does not own fails the schema.
+`kind` stays null unless your brief names one (source: `imprecise`, `attribution`, `not_found`; coherence: `tension`, `unquantified`). A kind your checker does not own fails the schema.
+
+Every `locations` item is an exact quote string. An object such as `{"block": 3, "quote": "..."}` fails the schema, and the finding comes back to you.
 
 Write an empty list `[]` when you find nothing. An empty list is a valid result, not a failure.
 
