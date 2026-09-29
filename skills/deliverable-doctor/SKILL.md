@@ -26,12 +26,13 @@ Ask in ONE message, recommending an answer for each:
 3. **Comment author string**: default "Ane Gasser". Attribution is her call. A document that leaves IPPF after this pass is AI-assisted work (`mel_wiki/wiki/concepts/ai-use-in-publications.md`).
 4. **Sensitive?** SOGIESC, GBV or service-seeker identifiers mean no HTML report. Comments go only into her local copy, and no web search is run on claim text.
 5. **Data file** (.xlsx/.csv): if one is supplied, ask whether she **approves recompute (L3)** for this run. Never assume a yes.
+6. **Sources' language** (ISO 639-1 code): the language the document's outside sources are published in, which is not always the language it is written in. An English case study about Serbia takes `sr`. The source checker's fact-only searches must run in this language and in English, and `validate` refuses a `not_found` that skipped either.
 
 Run folder: `<source folder>/_doctor/<source stem>-<YYYY-MM-DD>/`. Pass Windows paths (`C:/Users/...`) to every script, not Git Bash paths.
 
 ## Step 1 — prepare (local only)
 
-`DD prepare <source> <run> --mode M --profile P [--sensitive] [--data <file>]`, then `DD prepass <run>`.
+`DD prepare <source> <run> --mode M --profile P --source-lang XX [--sensitive] [--data <file>]`, then `DD prepass <run>`.
 Local conversion only. **Never** upload to Mathpix, MinerU or any parsing service. Accepts .docx, .pdf, .md and .txt. Comments need a .docx; a PDF gets the HTML report only.
 
 ## Step 2 — L1 screen and claim extraction (parallel)
@@ -63,7 +64,7 @@ If a data file was supplied and she approved in Step 0: `DD recompute <run> --ap
 1. `DD validate <run>`: any schema problem sends that checker back. Never delete a malformed finding by hand. It also checks `recompute.json`: a file that does not parse (for example a Windows backslash path, which is an invalid JSON escape) or a spec outside the shapes `recompute.py` accepts is reported as a problem that goes back to the `number` checker. When a `recompute.json` exists, run `validate` before Step 5 as well, so a bad file goes back to the checker before `recompute --approved` reads it.
 2. `DD merge <run>`: merges restatements (shared claim and shared reason, within one checker) into one finding with `locations`.
 3. Spawn the **challenger** (sonnet, `checkers.md` § challenger) on `merged.json` → `challenger.json`. Errors and coherence findings with `kind: "tension"` skip it, and `finalise` ships them without a verdict (a tension skips it in code: Ane, 2026-09-29, after the challenger twice dropped a true trajectory tension as taste).
-4. `DD finalise <run>` sorts each finding into commented, not commented (optional or over the cap), held (web evidence not verified in this run) or dropped (noise control, reason kept), and resolves anchors. It also runs the **accounting gate**: every claim in the source queue must end as a source finding or a cleared record in `cleared_source.json` with a found passage (and, for a law, the version date of the text read). Anything else is listed as `UNACCOUNTED` and exits non-zero. Send those claims back to the source checker once; if they are still unaccounted, name them to Ane. Anchor problems also exit non-zero. Fix each quote by copying the exact span from `document.md` into `merged.json`, then re-run `finalise`. Never loosen a quote.
+4. `DD finalise <run>` sorts each finding into commented, not commented (optional or over the cap), held (web evidence not verified in this run) or dropped (noise control, reason kept), and resolves anchors. It also runs the **accounting gate**: every claim in the source queue must end as a source finding or a cleared record in `cleared_source.json` with a found passage (and, for a law, the version date of the text read). A `legal_status` claim counts only once the legal text itself was read: a cleared law record, a finding quoting the law with its version date, or a `not_found` that searched for the legal text. Anything else is listed as `UNACCOUNTED` and exits non-zero. Send those claims back to the source checker once; if they are still unaccounted, name them to Ane. Anchor problems also exit non-zero. Fix each quote by copying the exact span from `document.md` into `merged.json`, then re-run `finalise`. Never loosen a quote.
 
 Order matters. The challenger runs on merged findings (fewer calls), and the verified-source gate runs last, so a held finding has already survived the challenger.
 
