@@ -177,4 +177,6 @@ You receive `merged.json`. For every finding with `status: "warning"`, try to re
 
 A grammar or style finding that does not name a real rule is `wrong`. Do not re-check facts on the web; judge the finding as written. Write a JSON object `{"<finding id>": {"verdict": "keep|taste|wrong", "note": "one sentence"}}` covering every warning, and nothing else. Ignore `error` findings. They skip this pass.
 
+A tension between two passages that the text does not resolve is not `taste`: the reader cannot tell which passage holds. Reject it only as `wrong`, and only when the text itself resolves it, for example with a stated link between the two passages.
+
 **Do not over-tune.** Every rejection can delete a true finding. When in doubt, `keep`. The trial's value came from six substantive points that a cautious challenger would have kept.
