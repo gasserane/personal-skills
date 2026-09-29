@@ -39,6 +39,7 @@ Local conversion only. **Never** upload to Mathpix, MinerU or any parsing servic
 In ONE message, spawn `general-purpose` agents on `model: sonnet` (the trial's reviewers ran on Sonnet; Haiku stays pilot-gated). Build each prompt from `references/checker-contract.md` plus the checker's section of `references/checkers.md`:
 - **extract-claims** → `claims.json`
 - **voice** → `check_voice.json`
+- **coherence** → `check_coherence.json` (whole document: tensions between passages, and evaluative words with no figure anywhere)
 
 In the same turn, the main session itself runs:
 - **references**: the saved `citation-verification` workflow on `<run>/document.md`, flags converted per `checkers.md` → `check_references.json`. Skip it when the document cites nothing.
@@ -46,7 +47,7 @@ In the same turn, the main session itself runs:
 
 ## Step 3 — route
 
-`DD route <run>`. It prints per-checker queue sizes, hand-offs and the claims the profile exempted. Invalid claims make it exit non-zero: send them back to extract-claims, and never hand-edit claims into shape. In proposal mode, pass `handoffs.donor-proposal-scoring` to that skill. Tell Ane in one line; do not score them here.
+`DD route <run>`. It prints per-checker queue sizes, hand-offs, the claims the profile exempted, the exempted claims flagged for review (`skipped_review`: a motive, narrative or reflection whose wording generalises, such as "cheaper than" or "always"), and the claims also sent to source because their text names a source (`also_routed`). A claim goes to every checker that owns part of its evidence. The review flag is audit only: never move a flagged claim into a queue by hand. If one is a general claim, the fix is to re-run extract-claims, which should have split it out as `general_claim`. Invalid claims make it exit non-zero: send them back to extract-claims, and never hand-edit claims into shape. In proposal mode, pass `handoffs.donor-proposal-scoring` to that skill. Tell Ane in one line; do not score them here.
 
 ## Step 4 — L2 checkers (parallel)
 
@@ -61,13 +62,15 @@ If a data file was supplied and she approved in Step 0: `DD recompute <run> --ap
 1. `DD validate <run>`: any schema problem sends that checker back. Never delete a malformed finding by hand.
 2. `DD merge <run>`: merges restatements (shared claim and shared reason) into one finding with `locations`.
 3. Spawn the **challenger** (sonnet, `checkers.md` § challenger) on `merged.json` → `challenger.json`.
-4. `DD finalise <run>` sorts each finding into commented, not commented (optional or over the cap), held (web evidence not verified in this run) or dropped (noise control, reason kept), and resolves anchors. Anchor problems exit non-zero. Fix each quote by copying the exact span from `document.md` into `merged.json`, then re-run `finalise`. Never loosen a quote.
+4. `DD finalise <run>` sorts each finding into commented, not commented (optional or over the cap), held (web evidence not verified in this run) or dropped (noise control, reason kept), and resolves anchors. It also runs the **accounting gate**: every claim in the source queue must end as a source finding or a cleared record in `cleared_source.json` with a found passage (and, for a law, the version date of the text read). Anything else is listed as `UNACCOUNTED` and exits non-zero. Send those claims back to the source checker once; if they are still unaccounted, name them to Ane. Anchor problems also exit non-zero. Fix each quote by copying the exact span from `document.md` into `merged.json`, then re-run `finalise`. Never loosen a quote.
 
 Order matters. The challenger runs on merged findings (fewer calls), and the verified-source gate runs last, so a held finding has already survived the challenger.
 
 ## Step 7 — present, then render
 
 Tell Ane, BLUF first: the verdict in one sentence (for example "three must-fix errors, two of them figures"), then counts per bucket, then every **held** finding by name. Held findings are often the valuable ones. The trial's femicide finding was right on substance and wrong in three details. They reach the author only after she or a re-run verifies them.
+
+Also tell her how many source claims were **cleared**, and that the report lists each with its passage. A wrong clearance is overturned there, not in the comments.
 
 Then:
 - `DD comments <run> --author "<string>"` writes the commented COPY `<stem>_DOCTOR_COMMENTS.docx` beside the source. The original is never written.
@@ -85,7 +88,7 @@ The harness fixture (`tests/fixtures/deliverable_doctor/`) holds a document with
 
 ## Noise controls, and the warning against over-tuning
 
-Controls 1 to 6 in the spec are built in: genre profiles (Step 3), style only in voice, the challenger, merging, severity drives the default view, and the verified-source gate. The trial accepted 27 of its 41 findings. A control that halves the noise but loses one of the six substantive points (C08, C23, C25, C32, C33, C35) is worse than no control. The pre-registered regression test for exactly that: `agent-improvements/deliverable-doctor-regression-run-prompt.md` (work folder).
+Phase 2 (`agent-improvements/deliverable-doctor-phase2-spec.md`, work folder) adds the `general_claim` role, routing on `cited_source`, cleared records with the accounting gate, the `imprecise` source outcome, and the L1 `coherence` checker. Controls 1 to 6 in the spec are built in: genre profiles (Step 3), style only in voice, the challenger, merging, severity drives the default view, and the verified-source gate. The trial accepted 27 of its 41 findings. A control that halves the noise but loses one of the six substantive points (C08, C23, C25, C32, C33, C35) is worse than no control. The pre-registered regression test for exactly that: `agent-improvements/deliverable-doctor-regression-run-prompt.md` (work folder).
 
 ## Safeguards
 
