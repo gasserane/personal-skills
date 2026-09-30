@@ -42,11 +42,14 @@ Runs on Sonnet (Run A fixes, Fix 6). The brief follows the saved `citation-verif
 1. Read `document.md` in full. List every citation and hyperlink: inline citations, evidence-base lines, footnotes, bare linked sources. One entry per source per distinct claim.
 2. If there are more than 12, check the 12 that matter most: those a reader would act on first, then sources you do not recognise, then order of appearance. Name every citation you did not check in one `optional` finding, so none is silently dropped.
 3. For each citation, assume it is wrong and try to show it. Test four things:
-   - **Exists and attributed.** Do the author, year and title match a real source? Search the web.
+   - **Exists and attributed.** Do the author, year and title match a real source? Search with the WebSearch tool.
    - **Current.** Does a newer edition or a superseding document exist? Read `mel_wiki/wiki/domain-standards.md` (work folder) first, then search.
    - **Link.** Does the URL open, this run, on the canonical source (the publisher, the issuing institution or an official repository)? A link only to an aggregator (ResearchGate, academia.edu, Wikipedia) fails this test.
-   - **Forbidden.** Is it on the citation-errors list in `domain-standards.md`?
+   - **Forbidden.** Is it on the citation-errors list in `mel_wiki/wiki/domain-standards.md` (work folder)?
+
+   A citation passes "Exists" and "Link" only on a WebSearch or WebFetch call made in this run, not `curl` or any other shell fetch: the run reads your tool calls from your transcript. Knowing the source is not evidence.
 4. Write a finding only when a test fails: `category: "citation"`, `checker: "references"`, with the page you fetched in `verified` (contract rule 9). A citation you cannot confirm exists is a `warning` that says so plainly. Never guess a citation into existence. When all four tests pass, write nothing.
+5. **A failed fetch ends held, never passed from memory.** When WebSearch finds nothing or WebFetch cannot open the page (a 403, a timeout, a bot check such as Cloudflare's), write a `warning` finding that names the source and the error, with `"verified": {"url": "...", "fetched_in_run": false, "passage_found": false}`. Contract rule 9 then holds it back from the author for Ane to check by hand. Never write nothing for a citation you could not open, even one you are sure is real: silence is how a citation passes. Synthetic example: the link goes to a publisher page that answers every automated request with a bot check; the finding says the page could not be opened this run and asks for a manual check.
 
 ---
 
