@@ -44,6 +44,8 @@ In ONE message, spawn `general-purpose` agents on `model: sonnet` (the trial's r
 
 - **references** → `check_references.json`, on `model: sonnet` like the others, with `checkers.md` § references. Skip it when the document cites nothing. Do not call the saved `citation-verification` workflow here: it takes no model argument, so its agents would not run on a pinned model, and other callers share it, so it is not edited for this skill. Haiku is not allowed for this step: judging whether a citation is real is a verdict on the citation chain, and `agent_registry.md` § Routing tiers keeps the Haiku tier to non-citation steps after a logged pilot (Run A fixes spec, Fix 6).
 
+As each checker agent returns (voice, coherence, references), record its agent ID: `DD record-agent <run> <checker> <agentId>`, as in Step 4 (for example `DD record-agent <run> voice a1b2c3d4e5f6a7b8c`). The search audit in Step 6 reads every checker's transcript, L1 included, and exits 2 on a checker with no recorded ID. extract-claims writes no `check_*.json` and needs no ID; brand runs in the main session and needs none.
+
 In the same turn, the main session itself runs:
 - **brand** (.docx only): `review_pass.py verify --expect-branded`, converted per `checkers.md` → `check_brand.json`.
 
