@@ -52,7 +52,7 @@ Runs on Sonnet (Run A fixes, Fix 6). The brief follows the saved `citation-verif
 
 ## brand → `check_brand.json` (L1, .docx only)
 
-The main session runs `python <office-review-pass>/scripts/review_pass.py verify <source.docx> --expect-branded` and converts each failed assertion to a finding: `category: "layout"`, `checker: "brand"`, quote = the first five words of the document's first body paragraph. Severity: `should` in `own` and `proposal` mode. In `others` mode use `optional`, unless Ane says the document will be published under IPPF branding, because a partner's own document is not bound by IPPF Visual Identity 2025.
+The main session runs `python <office-review-pass>/scripts/review_pass.py verify <source.docx> --expect-branded` and converts each failed assertion to a finding: `category: "layout"`, `checker: "brand"`, quote = the first five words of the document's first body paragraph. Severity: `should` in `own` and `proposal` mode. In `others` mode use `optional`, unless Ane says the document will be published under IPPF branding, because a partner's own document is not bound by IPPF Visual Identity 2025. Status: `warning` always. A missing brand element is a layout gap, not a content error; `validate` rejects a brand finding with any other status.
 
 ---
 
