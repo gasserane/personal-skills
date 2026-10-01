@@ -78,6 +78,8 @@ Tell Ane, BLUF first: the verdict in one sentence (for example "three must-fix e
 
 Also tell her how many source claims were **cleared**, and that the report lists each with its passage. A wrong clearance is overturned there, not in the comments. Name separately how many the source checker marked as the author's own record without searching; the report lists each under "not checked: author's own record".
 
+Read the **dropped** list in the report before you present, and name any dropped coherence or source finding. The challenger can still drop a true finding on its first pass, and a dropped finding may be the most valuable one.
+
 Then:
 - `DD comments <run> --author "<string>"` writes the commented COPY `<stem>_DOCTOR_COMMENTS.docx` beside the source. The original is never written.
 - `DD html <run>` writes `report.html` in the run folder. It is refused for a sensitive run, and it is never published as an Artifact.
@@ -96,14 +98,13 @@ The harness fixture (`tests/fixtures/deliverable_doctor/`) holds a document with
 
 Phase 2 (`agent-improvements/deliverable-doctor-phase2-spec.md`, work folder) adds the `general_claim` role, routing on `cited_source`, cleared records with the accounting gate, the `imprecise` source outcome, and the L1 `coherence` checker. The Run A fixes (`agent-improvements/deliverable-doctor-runA-fixes-spec.md`) add the `own_record` role (exempt in a case study, listed as not checked), the fact-only search with the `not_found` outcome, the trajectory move in coherence, and the references step on Sonnet. Findings from different checkers are never merged: the author sees each checker's reason (Ane, 2026-09-29). The one exception is a numeric tension that coherence and number both found. Controls 1 to 6 in the spec are built in: genre profiles (Step 3), style only in voice, the challenger, merging, severity drives the default view, and the verified-source gate. The trial accepted 27 of its 41 findings. A control that halves the noise but loses one of the six substantive points (C08, C23, C25, C32, C33, C35) is worse than no control. The pre-registered regression test for exactly that: `agent-improvements/deliverable-doctor-regression-run-prompt.md` (work folder).
 
-## Known limitations (v1)
+## Known limitations (v1.1)
 
-v1 shipped on 2026-09-30 under a locked finish line: one fix cycle, one final regression run, then ship whatever the result. The final run failed: noise 20% against a 15% threshold, and one of the five substantive points was lost. Record: § Re-run 5 result in `agent-improvements/deliverable-doctor-c25-fix-spec.md` (work folder). Run every review with these four limits in mind. The fixes wait in `agent-improvements/deliverable-doctor-v1.1-backlog.md`.
+v1.1 passed its pre-registered regression on 2026-10-01: three full runs on one case study, each under the 15% noise threshold, with all five substantive points present and the C08 guard green. The result holds for one document ("hera: v1.1"), not as a general pass. Record: § Stage C result in `agent-improvements/deliverable-doctor-v1.1-fix-spec.md` (work folder). v1.1 fixes three v1 limits: the challenger dropping a kept finding on a later pass, `general_claim` firing on the author's own reasoning, and a restated own-meeting outcome read as an outside fact. It also fixes the own-judgement half of the fourth. Run every review with these three narrower limits in mind:
 
-1. **The challenger varies between runs and can drop a true finding.** The same unquantified-result finding was kept by one challenger pass and dropped as taste by the next. Before you present, read the dropped list in the HTML report: a dropped coherence or source finding may be the most valuable one.
-2. **`general_claim` over-fires in a case study.** It flags the author's own strategic reasoning ("an open approach risked more resistance") and the closing reflection as general claims. Expect some of these to be noise. The challenger does not drop them reliably.
-3. **The source checker asks outside sources to confirm the author's own judgements and actions**, such as how severe the author rates an event, or when its own response came. It also asks for the legal text itself when secondary sources already agree with the sentence. Reject these at review.
-4. **A restated own-meeting outcome can be extracted as an outside fact.** The extract-claims rule for a later status sentence that restates an agreed outcome ("the pilot continues" after "it was agreed that the pilot would continue") did not take hold in the final run. The source checker may then ask for public proof of the author's own agreement.
+1. **A lesson set inside advice to peers can still be tagged `general_claim`.** When the author's lesson sits in a recommendation paragraph with a sentence after it, extraction may read it as a general truth, and the cause checker then asks for evidence. It held in all three regression runs but failed two of three brief replays. Reject these at review.
+2. **The source checker asks for the legal text itself when secondary sources already agree with the sentence.** Reject these at review.
+3. **Two kinds of the author's own words can still reach the source checker as outside facts:** a superlative judgement that compares across a whole sector ("the most significant backlash seen in the sector"), and the timing of the author's own response when the sentence names another actor ("prompting an immediate response from civil society"). The regression runs cleared the first downstream every time. The second produced one noise finding in three runs. Reject either at review.
 
 ## Safeguards
 
