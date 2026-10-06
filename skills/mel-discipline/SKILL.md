@@ -74,4 +74,4 @@ Run this checklist on the finished draft. **Perform each check physically; never
 
 ## Maintenance note
 
-Two condensed variants of this skill exist for claude.ai surfaces (uploaded skill zip; personal-preferences block). When this file changes, regenerate both from this file — see `portables/` in this skill directory. Version parity is a `/system-audit` check item.
+Three variants of this skill exist for claude.ai surfaces (uploaded skill zip; personal-preferences block; team version in `portables/mel-discipline-team/SKILL.md`, shipped to colleagues as `mel-discipline.zip` with release notes). When this file changes, regenerate all three from this file — see `portables/` in this skill directory. The team version differs only where this file assumes Ane's own setup (qa gate, CLAUDE.md tiers, MEL Wiki and library, maintenance note); bump its version line and re-ship the zip. Version parity is not yet automated: `/system-audit` has no portables check as of 2026-10-06.
