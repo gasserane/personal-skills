@@ -9,6 +9,10 @@ All notable changes to the Ann / Vi / Li / Researcher skill set are documented h
 ### mel-discipline
 - **New portable `portables/mel-discipline-team/SKILL.md`.** Team release v1.0 for IPPF colleagues, shipped as `mel-discipline.zip` with `RELEASE-NOTES.md` (claude.ai upload via Customize > Skills). Differs from `SKILL.md` in 7 lines: the qa-gate, CLAUDE.md-tier, and MEL Wiki / library references became generic wording, the register rule is spelled out in Gate 1 and Gate 4 check 6, and the maintenance note became a version line. The five gates are unchanged.
 - **Maintenance note updated** to name the third variant and to correct the parity claim: `/system-audit` has no portables check, so the 2026-07-07 entry's "version parity is a `/system-audit` check item" was not true. Parity stays manual until a check is added.
+- **Personal claude.ai zip retired** (`portables/mel-discipline-claude-ai.zip` removed). claude.ai cannot reach CLAUDE.md, the MEL Wiki or the library, so the team version is the better upload for Ane too; it is now her claude.ai copy as well as the colleagues'. Maintenance note updated to two variants.
+
+### system-audit
+- **New Step 7 axis: portables parity** via `scripts/check_portables_parity.py`. Zips under `portables/` must match `SKILL.md`; a `*-team` copy may differ only on personal-setup lines. Tested red on a seeded stale zip and a seeded gate edit, green on the repo.
 
 ## [2026-07-07] — New skill: mel-discipline (five-gate working discipline, pre-Fable-sunset extraction)
 
