@@ -7,7 +7,7 @@ description: Use when producing any MEL/SRHR analytical deliverable (brief, eval
 
 ## Overview
 
-Rigour is a procedure, not a talent. This skill encodes the working discipline that top-tier models apply by default, so any model produces deliverables that survive Ane's qa gate. Every analytical deliverable passes five gates, in order. Skipping a gate under deadline pressure is the failure mode this skill exists to prevent: a wrong citation in front of a Director costs more than the two minutes verification takes.
+Rigour is a procedure, not a talent. This skill encodes the working discipline that top-tier models apply by default, so any model produces deliverables that survive a demanding peer review. Every analytical deliverable passes five gates, in order. Skipping a gate under deadline pressure is the failure mode this skill exists to prevent: a wrong citation in front of a Director costs more than the two minutes verification takes.
 
 **Violating the letter of a gate is violating its spirit.**
 
@@ -15,13 +15,13 @@ Rigour is a procedure, not a talent. This skill encodes the working discipline t
 
 State in your first lines of work (not in the deliverable):
 1. The task in one sentence, and the decision it drives.
-2. Audience tier and register (default Tier 1 working brief per CLAUDE.md).
+2. Audience and register. Default: a working brief for colleagues who are not MEL specialists, 500–2500 words, with sources listed in an `**Evidence base:**` line at the end of each section rather than inside sentences. Use a publication register only when the task names a publication, journal article, or externally released report.
 3. **Verification plan** — one line: which facts, citations, or numbers you will check, and how.
 4. **Pre-mortem** — the single most likely way this deliverable misleads its named reader.
 
 ## Gate 2 — EVIDENCE before reasoning
 
-- Provided materials, MEL Wiki, and Ane's library BEFORE web search.
+- Materials you were given, and your team's own documents and knowledge sources, BEFORE web search.
 - Search-effort ladder: 1 search for a single fact; 3–5 for a medium task; 5–10 for deep research or comparison. State when you stop and why.
 - **Citation rule: no source enters the deliverable unless you opened it this session.** A citation you recall but did not open is either deleted or flagged `⚠️ URL unverified — confirm before publication`. Partial recognition from training is not current knowledge.
 - Every kept citation: author + year + title + venue, plus a canonical link (publisher, institution, repository — never an aggregator as sole link).
@@ -44,7 +44,7 @@ Run this checklist on the finished draft. **Perform each check physically; never
 | 3 | BLUF: sentence 1 is the verdict or answer | Read sentence 1 |
 | 4 | Data gaps flagged in the standard format, never papered over | Scan for asserted-but-unsourced claims |
 | 5 | Numbers recomputed once from source, not carried forward on trust | Recompute and state both values |
-| 6 | Tier register: length 500–2500 (Tier 1), citations off the running prose, acronyms spelled on first use, plain-English verbs | Scan |
+| 6 | Register: length 500–2500 words for a working brief, citations in the Evidence base line rather than the running prose, acronyms spelled on first use, plain-English verbs | Scan |
 
 ## Gate 5 — REPORT faithfully
 
@@ -56,7 +56,7 @@ Run this checklist on the finished draft. **Perform each check physically; never
 
 | Excuse | Reality |
 |---|---|
-| "No time to verify, she needs it in 20 minutes" | Gate 4 takes 2 minutes. A fabricated citation in a management meeting costs the deliverable's credibility entirely. |
+| "No time to verify, they need it in 20 minutes" | Gate 4 takes 2 minutes. A fabricated citation in a management meeting costs the deliverable's credibility entirely. |
 | "I remember this source, the link looks right" | Plausible-but-unchecked is the signature failure. Open it or flag it. |
 | "It's only a working brief, not a publication" | Rigour is constant across tiers; only citation placement moves. |
 | "The draft is clearly good, checks are overkill" | The baseline test for this skill produced a good-looking brief with a likely-fabricated citation and four em-dashes. Good-looking is not verified. |
@@ -72,6 +72,6 @@ Run this checklist on the finished draft. **Perform each check physically; never
 - Starting to draft before writing the verification plan line.
 - Reporting a Gate 4 ✅ for a check you did not physically perform on the finished draft.
 
-## Maintenance note
+## Version
 
-Three variants of this skill exist for claude.ai surfaces (uploaded skill zip; personal-preferences block; team version in `portables/mel-discipline-team/SKILL.md`, shipped to colleagues as `mel-discipline.zip` with release notes). When this file changes, regenerate all three from this file — see `portables/` in this skill directory. The team version differs only where this file assumes Ane's own setup (qa gate, CLAUDE.md tiers, MEL Wiki and library, maintenance note); bump its version line and re-ship the zip. Version parity is not yet automated: `/system-audit` has no portables check as of 2026-10-06.
+Team release v1.0 (2026-10-06). Adapted for colleagues from Ane Gasser's personal version of this skill: references to her own setup were replaced with generic equivalents; the five gates are unchanged.
