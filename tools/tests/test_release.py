@@ -200,3 +200,24 @@ def test_commit_and_push_refuses_an_empty_commit(env):
     from skillpub.gitops import commit_and_push
     with pytest.raises(PublishError, match="nothing staged"):
         commit_and_push(env, ["CHANGELOG.md"], "noop", push=False)
+
+
+def test_changelog_add_is_idempotent(env):
+    day = date(2026, 10, 9)
+    release.changelog_add(env, day, "toc-lite", "rewrite", "why", "better: clearer")
+    release.changelog_add(env, day, "toc-lite", "rewrite", "why", "better: clearer")
+    assert (env.repo / "CHANGELOG.md").read_text(encoding="utf-8").count("publish: toc-lite") == 1
+
+
+def test_publish_rerun_after_refused_commit_writes_one_entry(env):
+    run, key = _compared(env)
+    _fill(run, key["draft"], "pass")
+    day = date(2026, 10, 9)
+    write(env.repo / "stray.txt", "stray\n")
+    git(env.repo, "add", "stray.txt")
+    with pytest.raises(PublishError, match="outside this publish"):
+        release.publish(env, "toc-lite", "rewrite", "why", day=day)
+    assert "publish: toc-lite" not in (env.repo / "CHANGELOG.md").read_text(encoding="utf-8")
+    git(env.repo, "restore", "--staged", "stray.txt")
+    release.publish(env, "toc-lite", "rewrite", "why", day=day)
+    assert (env.repo / "CHANGELOG.md").read_text(encoding="utf-8").count("publish: toc-lite") == 1
