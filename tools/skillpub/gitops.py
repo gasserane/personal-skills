@@ -44,8 +44,14 @@ def files_at(env: Env, rev: str, name: str) -> dict[str, bytes] | None:
 def commit_and_push(env: Env, paths: list[str], message: str, push: bool = True) -> str:
     """Add, commit and push in one process: OneDrive can revert a file between tool calls."""
     git(env, "add", "-A", "--", *paths)
-    if not git(env, "diff", "--cached", "--name-only").strip():
+    staged = [s for s in git(env, "diff", "--cached", "--name-only", "-z").split("\0") if s]
+    if not staged:
         raise PublishError("nothing staged: OneDrive may have reverted the files; inspect them on disk, not the index")
+    roots = [p.replace("\\", "/").rstrip("/") for p in paths]
+    stray = [s for s in staged if not any(s == r or s.startswith(r + "/") for r in roots)]
+    if stray:
+        raise PublishError("files already staged outside this publish would be committed and pushed: "
+                           + ", ".join(stray) + "; unstage them with `git restore --staged <file>` and run again")
     git(env, "commit", "-q", "-m", message)
     if push:
         git(env, "push", "-q")
