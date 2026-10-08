@@ -46,7 +46,7 @@ def build_env(tmp: Path) -> Env:
         {"oauthAccount": {"organizationUuid": "org1", "accountUuid": "acc1"}}))
     work = tmp / "work"
     write(work / "ane_package" / "citation_rules.py",
-          'FORBIDDEN_PATTERNS = [(r"15[-\s]component", "G-L 15-component")]\n\n'
+          'FORBIDDEN_PATTERNS = [(r"15[-\\s]component", "G-L 15-component")]\n\n'
           'def line_has_hedge(line):\n    return "wrong" in line.lower()\n')
     return Env(repo=repo, claude_skills=skills, claude_json=claude_json, work_folder=work)
 
