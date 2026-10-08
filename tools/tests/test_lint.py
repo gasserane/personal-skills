@@ -97,6 +97,11 @@ def test_trigger_overlap_warns_and_never_blocks(env):
     assert "trigger-overlap" in rules(found, blocking=False) and rules(found) == set()
 
 
+def test_malformed_frontmatter_reported_not_raised(env):
+    write(env.repo / "org" / "broken" / "SKILL.md", "No frontmatter block here.\n")
+    assert "frontmatter" in rules(lint.check_skill(env, "broken"))
+
+
 def test_missing_citation_rules_is_an_error(env, tmp_path):
     make_skill(env, "org", "toc-lite")
     broken = Env(env.repo, env.claude_skills, env.claude_json, tmp_path / "nowhere")

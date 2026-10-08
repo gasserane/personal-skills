@@ -149,7 +149,10 @@ def _quoted(text: str) -> set[str]:
 
 def overlap_warnings(env: Env, skill_dir: Path) -> list[Finding]:
     """Warn, never block, when another visible skill shares trigger phrases."""
-    desc = str(parse((skill_dir / "SKILL.md").read_text(encoding="utf-8")).get("description", ""))
+    try:
+        desc = str(parse((skill_dir / "SKILL.md").read_text(encoding="utf-8")).get("description", ""))
+    except PublishError:
+        return []  # frontmatter_findings already reports the malformed block as a blocking finding
     mine_w, mine_q = _words(desc), _quoted(desc)
     own = {skill_dir.name, f"{skill_dir.name}-draft", f"{skill_dir.name}-before"}
     out: list[Finding] = []
