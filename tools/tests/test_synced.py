@@ -78,3 +78,15 @@ def test_freshness_names_a_missing_active_account(env):
     make_skill(env, "account", "helper")
     env.claude_json.write_text("{}", encoding="utf-8")
     assert "no synced folder" in synced.freshness_message(env)
+
+
+def test_dupes_ignores_an_identical_project_copy(env):
+    write(env.claude_skills / "ann" / "SKILL.md", skill_text("ann"))
+    write(env.work_folder / ".claude" / "skills" / "ann" / "SKILL.md", skill_text("ann").replace("\n", "\r\n"))
+    assert synced.dupes(env) == []
+
+
+def test_dupes_flags_a_differing_project_copy(env):
+    write(env.claude_skills / "ann" / "SKILL.md", skill_text("ann"))
+    write(env.work_folder / ".claude" / "skills" / "ann" / "SKILL.md", skill_text("ann", body="Edited.\n"))
+    assert synced.dupes(env) == ["ann: local, project (project copy differs)"]

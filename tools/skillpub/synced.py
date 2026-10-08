@@ -113,12 +113,35 @@ def verify(env: Env, name: str, all_accounts: bool = False) -> list[VerifyRow]:
             for acct in account_dirs(env) if all_accounts or acct == active]
 
 
+def _same_skill_text(a: Path, b: Path) -> bool:
+    try:
+        return (normalise((a / "SKILL.md").read_text(encoding="utf-8"))
+                == normalise((b / "SKILL.md").read_text(encoding="utf-8")))
+    except OSError:
+        return False
+
+
 def dupes(env: Env, all_accounts: bool = False) -> list[str]:
     """Names Claude Code would list twice, including <name> against claude.ai's <name>-2."""
-    seen: dict[str, list[str]] = {}
+    found: dict[str, list[tuple[str, Path]]] = {}
     for where, d in visible_skill_dirs(env, all_accounts):
-        seen.setdefault(d.name, []).append(where)
-    lines = [f"{n}: {', '.join(w)}" for n, w in sorted(seen.items()) if len(w) > 1]
+        found.setdefault(d.name, []).append((where, d))
+    seen: dict[str, list[str]] = {}
+    differs: set[str] = set()
+    for n, entries in found.items():
+        where = [w for w, _ in entries]
+        if "local" in where and "project" in where:
+            local = next(d for w, d in entries if w == "local")
+            project = next(d for w, d in entries if w == "project")
+            if _same_skill_text(local, project):
+                entries = [e for e in entries if e[0] != "project"]  # a mirror, not a second skill
+            else:
+                differs.add(n)
+        seen[n] = [w for w, _ in entries]
+    lines = []
+    for n, w in sorted(seen.items()):
+        if len(w) > 1:
+            lines.append(f"{n}: {', '.join(w)}" + (" (project copy differs)" if n in differs else ""))
     for n in sorted(seen):
         m = VARIANT_RE.match(n)
         if m and m["base"] in seen:
