@@ -113,3 +113,90 @@ def test_compare_refuses_crlf_copy_of_committed_lf(env):
     p.write_bytes(p.read_bytes().replace(b"\n", b"\r\n"))
     with pytest.raises(PublishError, match="nothing to compare"):
         release.compare(env, "toc-lite", runner=fake_runner([]))
+
+
+def _fill(run, preferred, colleague=None):
+    write(run / "verdict.md", f"preferred: {preferred}\nreason: clearer steps\n")
+    if colleague:
+        write(run / "colleague.md", f"colleague-condition: {colleague}\nnote: works without the wiki\n")
+
+
+def _compared(env, tier="org"):
+    _committed_skill_with_edit(env, tier)
+    run = release.compare(env, "toc-lite", runner=fake_runner([]), rng=random.Random(1))
+    return run, json.loads((run / "key.json").read_text(encoding="utf-8"))
+
+
+def test_publish_blocks_worse(env):
+    run, key = _compared(env)
+    _fill(run, key["before"], "pass")
+    with pytest.raises(PublishError, match="worse"):
+        release.publish(env, "toc-lite", "rewrite", "one text for all")
+
+
+def test_publish_blocks_stale_verdict(env):
+    run, key = _compared(env)
+    _fill(run, key["draft"], "pass")
+    p = env.repo / "org" / "toc-lite" / "SKILL.md"
+    write(p, p.read_text(encoding="utf-8") + "One more line.\n")
+    with pytest.raises(PublishError, match="changed after the compare run"):
+        release.publish(env, "toc-lite", "rewrite", "why")
+
+
+def test_publish_blocks_unfilled_verdict(env):
+    _compared(env)
+    with pytest.raises(PublishError, match="not filled in"):
+        release.publish(env, "toc-lite", "rewrite", "why")
+
+
+def test_publish_org_needs_colleague_test(env):
+    run, _ = _compared(env)
+    _fill(run, "same")
+    with pytest.raises(PublishError, match="colleague-condition"):
+        release.publish(env, "toc-lite", "rewrite", "why")
+
+
+def test_publish_org_blocks_failed_colleague_test(env):
+    run, key = _compared(env)
+    _fill(run, key["draft"], "fail")
+    with pytest.raises(PublishError, match="colleague-condition test failed"):
+        release.publish(env, "toc-lite", "rewrite", "why")
+
+
+def test_publish_org_refuses_trivial(env):
+    _committed_skill_with_edit(env)
+    with pytest.raises(PublishError, match="refused for org/"):
+        release.publish(env, "toc-lite", "typo", "typo", trivial=True)
+
+
+def test_publish_account_trivial_records_the_skip(env):
+    make_skill(env, "account", "helper")
+    release.publish(env, "helper", "narrow description", "trigger collision", trivial=True, push=False)
+    assert "trivial, no compare" in (env.repo / "CHANGELOG.md").read_text(encoding="utf-8")
+
+
+def test_publish_success_commits_pushes_and_logs(env):
+    run, key = _compared(env)
+    _fill(run, key["draft"], "pass")
+    msg = release.publish(env, "toc-lite", "rewrite to one text", "decision 6", day=date(2026, 10, 9))
+    assert git(env.repo, "log", "-1", "--format=%s").strip() == "publish(toc-lite): rewrite to one text"
+    assert git(env.repo, "rev-parse", "HEAD") == git(env.repo, "rev-parse", "origin/main")
+    changelog = (env.repo / "CHANGELOG.md").read_text(encoding="utf-8")
+    assert changelog.index("publish: toc-lite") < changelog.index("old entry")
+    assert "better: clearer steps" in changelog
+    assert (env.dist / "toc-lite.zip").exists() and (env.dist / "toc-lite-review-note.md").exists()
+    assert not (env.claude_skills / "toc-lite-draft").exists()
+    assert not (env.claude_skills / "toc-lite-before").exists()
+    assert "Upload a skill" in msg
+
+
+def test_publish_requires_what_and_why(env):
+    make_skill(env, "skills", "code-only")
+    with pytest.raises(PublishError, match="--what and --why"):
+        release.publish(env, "code-only", "", "why")
+
+
+def test_commit_and_push_refuses_an_empty_commit(env):
+    from skillpub.gitops import commit_and_push
+    with pytest.raises(PublishError, match="nothing staged"):
+        commit_and_push(env, ["CHANGELOG.md"], "noop", push=False)

@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import random
+import re
 import shutil
 import subprocess
 import zipfile
@@ -12,8 +13,9 @@ from pathlib import Path
 from typing import Callable
 
 from .frontmatter import parse, set_field
-from .gitops import files_at, git, last_publish
-from .paths import Env, PublishError, resolve, tier_of
+from .gitops import commit_and_push, files_at, git, last_publish
+from .lint import check_skill
+from .paths import PORTABLE_FOLDERS, Env, PublishError, resolve, tier_of
 
 SKIP_PARTS = {"__pycache__", ".DS_Store"}
 
@@ -184,3 +186,116 @@ def compare(env: Env, name: str, runner: Runner | None = None, day: date | None 
     if tier_of(src) == "org":
         (run / "colleague.md").write_text(COLLEAGUE_TEMPLATE.format(name=name), encoding="utf-8")
     return run
+
+
+def latest_run(env: Env, name: str) -> Path | None:
+    base = env.repo / "evals" / name / "runs"
+
+    def order(p: Path) -> tuple[str, int]:
+        m = re.match(r"^(\d{4}-\d{2}-\d{2})(?:-(\d+))?$", p.name)
+        return (m.group(1), int(m.group(2) or 1)) if m else ("", 0)
+
+    runs = [p for p in base.iterdir() if p.is_dir() and order(p)[0]] if base.is_dir() else []
+    return max(runs, key=order) if runs else None
+
+
+def read_verdict(run: Path) -> tuple[str, str]:
+    """Map Ane's blind letter to better, same or worse through key.json (plan decision D)."""
+    key = json.loads((run / "key.json").read_text(encoding="utf-8"))
+    text = (run / "verdict.md").read_text(encoding="utf-8") if (run / "verdict.md").is_file() else ""
+    m = re.search(r"^preferred:[ \t]*(A|B|same)[ \t]*$", text, re.M | re.I)
+    if not m:
+        raise PublishError(f"{run.name}/verdict.md is not filled in: "
+                           "write 'preferred: A', 'preferred: B' or 'preferred: same'")
+    reason = re.search(r"^reason:[ \t]*(\S.*)$", text, re.M)
+    if not reason:
+        raise PublishError(f"{run.name}/verdict.md needs one line of reasons after 'reason:'")
+    choice = m.group(1)
+    if choice.lower() == "same":
+        return "same", reason.group(1).strip()
+    return ("better" if choice.upper() == key["draft"] else "worse"), reason.group(1).strip()
+
+
+def read_colleague(run: Path) -> str:
+    text = (run / "colleague.md").read_text(encoding="utf-8") if (run / "colleague.md").is_file() else ""
+    m = re.search(r"^colleague-condition:[ \t]*(pass|fail)[ \t]*$", text, re.M | re.I)
+    if not m:
+        raise PublishError(f"{run.name}/colleague.md is not filled in: "
+                           "the colleague-condition test is mandatory for org/")
+    if m.group(1).lower() != "pass":
+        raise PublishError("colleague-condition test failed: the release is blocked")
+    note = re.search(r"^note:[ \t]*(\S.*)$", text, re.M)
+    return note.group(1).strip() if note else ""
+
+
+def changelog_add(env: Env, day: date, name: str, what: str, why: str, verdict_line: str) -> None:
+    path = env.repo / "CHANGELOG.md"
+    text = path.read_text(encoding="utf-8", newline="")
+    nl = "\r\n" if "\r\n" in text else "\n"
+    entry = (f"## [{day.isoformat()}] — publish: {name}\n\n**Skills affected:** {name}\n\n### {name}\n"
+             f"- **What changed:** {what}\n- **Why:** {why}\n- **Before/after verdict:** {verdict_line}\n\n"
+             ).replace("\n", nl)
+    idx = text.find(nl + "## [")
+    text = text + nl + entry if idx < 0 else text[: idx + len(nl)] + entry + text[idx + len(nl):]
+    path.write_text(text, encoding="utf-8", newline="")
+
+
+def publish(env: Env, name: str, what: str, why: str, trivial: bool = False,
+            push: bool = True, day: date | None = None) -> str:
+    day = day or date.today()
+    if not what.strip() or not why.strip():
+        raise PublishError("--what and --why are required: the CHANGELOG records both")
+    src = resolve(env, name)
+    tier = tier_of(src)
+    blocking = [f for f in check_skill(env, name) if f.blocking and f.rule != "installed-locally"]
+    if blocking:
+        raise PublishError("check failed:\n" + "\n".join(str(f) for f in blocking))
+    colleague = ""
+    if tier not in PORTABLE_FOLDERS:
+        verdict_line = "Tier B (Code-only): no compare"
+    elif trivial:
+        if tier == "org":
+            raise PublishError("--trivial is refused for org/: the before/after verdict and the "
+                               "colleague-condition test are mandatory for every org/ publish "
+                               "(decisions file, Spec review)")
+        verdict_line = "trivial, no compare"
+    else:
+        run = latest_run(env, name)
+        if run is None:
+            raise PublishError(f"run compare first: python tools/publish.py compare {name}")
+        key = json.loads((run / "key.json").read_text(encoding="utf-8"))
+        if key["draft_sha256"] != tree_hash(read_dir(src)):
+            raise PublishError(f"{name} changed after the compare run {run.name}; run compare again")
+        verdict, reason = read_verdict(run)
+        if verdict == "worse":
+            raise PublishError(f"verdict is 'worse' ({reason}): the release is blocked (decision 6)")
+        if tier == "org":
+            colleague = read_colleague(run)
+        verdict_line = f"{verdict}: {reason} (run {run.name})"
+    for variant in (f"{name}-draft", f"{name}-before"):
+        shutil.rmtree(env.claude_skills / variant, ignore_errors=True)
+    steps: list[str] = []
+    if tier in PORTABLE_FOLDERS:
+        zip_path = build_zip(src, env.dist, name)
+        steps.append(f"claude.ai > Customize > Skills: delete the old '{name}' (open it, switch it off, "
+                     f"... > Delete), then + > Create skill > Upload a skill > {zip_path}. "
+                     "A shared skill is edited in place instead (spec 3.4 step 6).")
+        if tier == "org":
+            note = env.dist / f"{name}-review-note.md"
+            note.write_text(f"# Review note: {name} ({day.isoformat()})\n\n- What changed: {what}\n"
+                            f"- Why: {why}\n- Before/after verdict: {verdict_line}\n"
+                            f"- Colleague-condition test: pass. {colleague}\n- Upload: {zip_path.name}\n",
+                            encoding="utf-8")
+            steps.append(f"Review note: {note}")
+        if (env.claude_skills / name / "SKILL.md").is_file():
+            steps.append("After the upload syncs and verify says match: "
+                         f"npx skills remove {name} --global --agent claude-code -y")
+        steps.append(f"Next session: python tools/publish.py verify {name}")
+    else:
+        steps.append("The SessionStart installer picks it up in the next session.")
+    changelog_add(env, day, name, what, why, verdict_line)
+    paths = [src.relative_to(env.repo).as_posix(), "CHANGELOG.md"]
+    if (env.repo / "evals" / name).is_dir():
+        paths.append(f"evals/{name}")
+    sha = commit_and_push(env, paths, f"publish({name}): {what}", push=push)
+    return f"Published {name} at {sha[:8]}.\n" + "\n".join(f"- {s}" for s in steps)
