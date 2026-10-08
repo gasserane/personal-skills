@@ -2,6 +2,13 @@
 
 All notable changes to the Ann / Vi / Li / Researcher skill set are documented here.
 
+## [2026-10-08] — Vendor six mattpocock skills
+
+**Skills affected:** wayfinder, grilling, grill-me, grill-with-docs, domain-modeling, setup-matt-pocock-skills (new here)
+
+- Copied from Ane's laptop copies, which match no single upstream commit (local wayfinder rule, local disable-model-invocation flips). Each folder carries the MIT LICENSE and an UPSTREAM.md with its base commit.
+- Effect: the SessionStart installer now restores them on the laptop, on a migrated device and in web sessions.
+
 ## [2026-10-06] — mel-discipline: team portable v1.0
 
 **Skills affected:** mel-discipline
