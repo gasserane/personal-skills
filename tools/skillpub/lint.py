@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Callable
 
 from . import synced
-from .frontmatter import parse
+from .frontmatter import parse, split
 from .paths import PORTABLE_FOLDERS, Env, PublishError, all_skill_dirs, find_skill, tier_of
 
 NAME_RE = re.compile(r"^[a-z0-9-]{1,64}$")
@@ -187,3 +187,67 @@ def check_skill(env: Env, name: str, forbidden: Forbidden | None = None) -> list
         else:
             out += [Finding(f.rule, f.detail, blocking=False) for f in frontmatter_findings(skill_dir)]
     return out
+
+
+@dataclass(frozen=True)
+class ClassRow:
+    name: str
+    tier: str     # "B" (Code-only) or "portable"
+    reasons: str
+
+
+def _outside_if_available(skill_dir: Path) -> str:
+    parts = []
+    for md in sorted(skill_dir.rglob("*.md")):
+        text = md.read_text(encoding="utf-8")
+        if md.name == "SKILL.md":
+            # Ruling C9: the description is a trigger hint, not an instruction, so a
+            # negation such as "Not for /orchestrator." must not make a skill Code-only.
+            try:
+                text = split(text)[1]
+            except PublishError:
+                pass
+        lines = text.splitlines()
+        parts += [line for line, inside in zip(lines, if_available_mask(lines)) if not inside]
+    return "\n".join(parts)
+
+
+def classify(env: Env) -> list[ClassRow]:
+    """Apply the spec § 3.2 tier rule to every skill in skills/ (spec § 3.6 step 1)."""
+    dirs = all_skill_dirs(env, ("skills",))
+    texts = {d.name: _outside_if_available(d) for d in dirs}
+    reasons: dict[str, list[str]] = {}
+    for d in dirs:
+        r = []
+        if (d / "scripts").is_dir():
+            r.append("ships scripts/")
+        if AGENT_RE.search(texts[d.name]):
+            r.append("calls subagents")
+        if MCP_RE.search(texts[d.name]):
+            r.append("needs an MCP server")
+        if HARD_PATH_RE.search(texts[d.name]):
+            r.append("uses a local path")
+        reasons[d.name] = r
+    code_only = {n for n, r in reasons.items() if r}
+    changed = True
+    while changed:
+        changed = False
+        for d in dirs:
+            if d.name in code_only:
+                continue
+            hits = sorted(n for n in code_only
+                          if re.search(rf"(?<![\w-])/{re.escape(n)}(?![\w-])", texts[d.name]))
+            if hits:
+                reasons[d.name].append("calls Code-only skill " + ", ".join(f"/{n}" for n in hits))
+                code_only.add(d.name)
+                changed = True
+    return [ClassRow(d.name, "B" if reasons[d.name] else "portable",
+                     "; ".join(reasons[d.name]) or "none of the tier-rule conditions") for d in dirs]
+
+
+def format_classify(rows: list[ClassRow]) -> str:
+    out = ["| Skill | Suggested tier | Reasons |", "|---|---|---|"]
+    for r in rows:
+        tier = "B (Code-only)" if r.tier == "B" else "portable: Ane picks org/, account/ or skills/"
+        out.append(f"| {r.name} | {tier} | {r.reasons} |")
+    return "\n".join(out)

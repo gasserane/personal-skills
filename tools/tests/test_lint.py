@@ -107,3 +107,29 @@ def test_missing_citation_rules_is_an_error(env, tmp_path):
     broken = Env(env.repo, env.claude_skills, env.claude_json, tmp_path / "nowhere")
     with pytest.raises(PublishError, match="forbidden-citation list not found"):
         lint.check_skill(broken, "toc-lite")
+
+
+def test_classify_tier_rule(env):
+    make_skill(env, "skills", "orchestrator", body="Spawn the specialist subagents.\n")
+    make_skill(env, "skills", "plain", body="Write the brief.\n")
+    make_skill(env, "skills", "caller", body="First run /orchestrator, then format.\n")
+    make_skill(env, "skills", "caller2", body="Run /caller.\n")
+    make_skill(env, "skills", "soft", body="Main steps.\n\n## If available\n\nRun /orchestrator.\n")
+    d = make_skill(env, "skills", "scripted")
+    write(d / "scripts" / "x.py", "")
+    rows = {r.name: r for r in lint.classify(env)}
+    assert rows["orchestrator"].tier == "B"
+    assert rows["plain"].tier == "portable"
+    assert rows["caller"].tier == "B" and "/orchestrator" in rows["caller"].reasons
+    assert rows["caller2"].tier == "B"
+    assert rows["soft"].tier == "portable"
+    assert rows["scripted"].tier == "B"
+    assert "| plain |" in lint.format_classify(list(rows.values()))
+
+
+def test_classify_ignores_the_description(env):
+    make_skill(env, "skills", "orchestrator", body="Spawn the specialist subagents.\n")
+    make_skill(env, "skills", "negated", description="Not for /orchestrator.", body="Write the brief.\n")
+    rows = {r.name: r for r in lint.classify(env)}
+    assert rows["negated"].tier == "portable"
+    assert rows["orchestrator"].tier == "B"
