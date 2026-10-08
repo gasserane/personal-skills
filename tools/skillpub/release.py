@@ -235,6 +235,8 @@ def changelog_add(env: Env, day: date, name: str, what: str, why: str, verdict_l
     entry = (f"## [{day.isoformat()}] — publish: {name}\n\n**Skills affected:** {name}\n\n### {name}\n"
              f"- **What changed:** {what}\n- **Why:** {why}\n- **Before/after verdict:** {verdict_line}\n\n"
              ).replace("\n", nl)
+    if entry in text:
+        return
     idx = text.find(nl + "## [")
     text = text + nl + entry if idx < 0 else text[: idx + len(nl)] + entry + text[idx + len(nl):]
     path.write_text(text, encoding="utf-8", newline="")
@@ -293,9 +295,17 @@ def publish(env: Env, name: str, what: str, why: str, trivial: bool = False,
         steps.append(f"Next session: python tools/publish.py verify {name}")
     else:
         steps.append("The SessionStart installer picks it up in the next session.")
+    changelog_path = env.repo / "CHANGELOG.md"
+    changelog_before = changelog_path.read_bytes()
+    head_before = git(env, "rev-parse", "HEAD").strip()
     changelog_add(env, day, name, what, why, verdict_line)
     paths = [src.relative_to(env.repo).as_posix(), "CHANGELOG.md"]
     if (env.repo / "evals" / name).is_dir():
         paths.append(f"evals/{name}")
-    sha = commit_and_push(env, paths, f"publish({name}): {what}", push=push)
+    try:
+        sha = commit_and_push(env, paths, f"publish({name}): {what}", push=push)
+    except PublishError:
+        if git(env, "rev-parse", "HEAD").strip() == head_before:
+            changelog_path.write_bytes(changelog_before)
+        raise
     return f"Published {name} at {sha[:8]}.\n" + "\n".join(f"- {s}" for s in steps)
