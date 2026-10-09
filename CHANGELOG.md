@@ -2,6 +2,15 @@
 
 All notable changes to the Ann / Vi / Li / Researcher skill set are documented here.
 
+## [2026-10-09] — publish: tech-proposal-review-general
+
+**Skills affected:** tech-proposal-review-general
+
+### tech-proposal-review-general
+- **What changed:** narrowed description
+- **Why:** trigger collision with selection-toolkit and procurement-offer-review
+- **Before/after verdict:** trivial, no compare
+
 ## [2026-10-09] — publish: tech-contract-development-general
 
 **Skills affected:** tech-contract-development-general
