@@ -90,3 +90,25 @@ def test_dupes_flags_a_differing_project_copy(env):
     write(env.claude_skills / "ann" / "SKILL.md", skill_text("ann"))
     write(env.work_folder / ".claude" / "skills" / "ann" / "SKILL.md", skill_text("ann", body="Edited.\n"))
     assert synced.dupes(env) == ["ann: local, project (project copy differs)"]
+
+
+def test_naive_manifest_time_is_treated_as_utc(env):
+    make_skill(env, "org", "toc-lite")
+    git(env.repo, "add", "-A")
+    git(env.repo, "commit", "-q", "-m", "publish(toc-lite): first")
+    synced_copy(env, "org1_acc1", "toc-lite", skill_text("toc-lite", body="Old.\n"),
+                updated="2000-01-01T00:00:00")  # no Z, no offset
+    assert synced.verify(env, "toc-lite")[0].status == "not-synced-yet"
+    assert synced._parse_time("2000-01-01T00:00:00").tzinfo is not None
+
+
+def test_freshness_skips_a_skill_it_cannot_read(env):
+    make_skill(env, "account", "helper")
+    synced_copy(env, "org1_acc1", "helper", skill_text("helper", body="Old.\n"))
+    make_skill(env, "org", "twin")
+    make_skill(env, "account", "twin")  # same name in two folders: resolve() refuses
+    (env.repo / "org" / "binary" ).mkdir()
+    (env.repo / "org" / "binary" / "SKILL.md").write_bytes(b"\xff\xfe\x00bad")
+    msg = synced.freshness_message(env)
+    assert "helper (mismatch)" in msg
+    assert "twin" not in msg and "binary" not in msg

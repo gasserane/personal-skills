@@ -37,3 +37,19 @@ def test_dupes_none(env, capsys):
 def test_unknown_skill_is_a_clean_error(env, capsys):
     assert publish.main(["draft", "nope"], env=env) == 1
     assert "no skill 'nope'" in capsys.readouterr().err
+
+
+def test_verify_hook_never_crashes_or_prints_when_env_fails(monkeypatch, capsys):
+    def boom():
+        raise RuntimeError("no env")
+    monkeypatch.setattr(publish.Env, "default", staticmethod(boom))
+    assert publish.main(["verify", "--hook"]) == 0
+    captured = capsys.readouterr()
+    assert captured.out == "" and captured.err == ""
+
+
+def test_verify_hook_is_silent_even_if_the_check_raises(env, monkeypatch, capsys):
+    monkeypatch.setattr(publish.synced, "freshness_message",
+                        lambda e: (_ for _ in ()).throw(OSError("disk")))
+    assert publish.main(["verify", "--hook"], env=env) == 0
+    assert capsys.readouterr().out == ""

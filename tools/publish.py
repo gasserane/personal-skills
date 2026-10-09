@@ -50,15 +50,20 @@ def _cmd_publish(env: Env, a) -> int:
     return 0
 
 
-def _cmd_verify(env: Env, a) -> int:
-    if a.hook:
-        try:
-            msg = synced.freshness_message(env)
-        except Exception as exc:  # a hook must report, never crash
-            msg = f"⚠️ Upload-freshness check failed: {exc}"
+def _run_hook(env: Env | None) -> int:
+    """SessionStart mode: a systemMessage or nothing; exit 0 and stay silent on any failure."""
+    try:
+        msg = synced.freshness_message(env or Env.default())
         if msg:
             print(json.dumps({"systemMessage": msg}))
-        return 0
+    except Exception:
+        pass
+    return 0
+
+
+def _cmd_verify(env: Env, a) -> int:
+    if a.hook:
+        return _run_hook(env)
     if a.all:
         names = [d.name for d in all_skill_dirs(env, PORTABLE_FOLDERS)]
     elif a.name:
@@ -128,6 +133,8 @@ def main(argv: list[str] | None = None, env: Env | None = None) -> int:
     except Exception:
         pass
     a = build_parser().parse_args(argv)
+    if getattr(a, "hook", False):
+        return _run_hook(env)  # before Env.default(): the hook must never crash a session start
     env = env or Env.default()
     try:
         return a.fn(env, a)
