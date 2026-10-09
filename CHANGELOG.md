@@ -2,6 +2,15 @@
 
 All notable changes to the Ann / Vi / Li / Researcher skill set are documented here.
 
+## [2026-10-09] — publish: rfp-digital-services
+
+**Skills affected:** rfp-digital-services
+
+### rfp-digital-services
+- **What changed:** narrowed description
+- **Why:** trigger collision with tor-procurement and selection-toolkit
+- **Before/after verdict:** trivial, no compare
+
 ## [2026-10-09] — publish: mel-discipline
 
 **Skills affected:** mel-discipline
