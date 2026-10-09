@@ -2,6 +2,14 @@
 
 All notable changes to the Ann / Vi / Li / Researcher skill set are documented here.
 
+## [2026-10-09] — system-audit: retire the portables-parity axis
+
+**Skills affected:** system-audit
+
+### system-audit
+- **What changed:** Step 7 no longer runs `scripts/check_portables_parity.py`, and `portables-drift` is gone from the axis list. The script is deleted.
+- **Why:** mel-discipline's `portables/` folder was removed when it moved to `org/` (skills-distribution Task 15), so no skill has one. The script printed `PASS (0 finding(s))` over an empty set and could never fail. claude.ai copies are now checked by `python tools/publish.py verify <name>` and the SessionStart freshness hook.
+
 ## [2026-10-09] — publish: tech-proposal-review-general
 
 **Skills affected:** tech-proposal-review-general
