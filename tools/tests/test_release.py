@@ -92,7 +92,7 @@ def test_compare_first_version_uses_bare_model(env):
     write(env.repo / "evals" / "helper" / "prompt.md", "Task.\n")
     calls = []
     run = release.compare(env, "helper", runner=fake_runner(calls), rng=random.Random(2))
-    assert "Task." in calls
+    assert any(c.startswith("Task.") and c.endswith(release.HARNESS_SUFFIX) for c in calls)
     assert json.loads((run / "key.json").read_text(encoding="utf-8"))["before_rev"].startswith("none")
     assert not (run / "colleague.md").exists()
 
@@ -113,6 +113,82 @@ def test_compare_refuses_crlf_copy_of_committed_lf(env):
     p.write_bytes(p.read_bytes().replace(b"\n", b"\r\n"))
     with pytest.raises(PublishError, match="nothing to compare"):
         release.compare(env, "toc-lite", runner=fake_runner([]))
+
+
+def test_both_arms_get_suffix_canary_does_not_with_before(env):
+    _committed_skill_with_edit(env)
+    calls = []
+    release.compare(env, "toc-lite", runner=fake_runner(calls), rng=random.Random(1))
+    assert calls[0] == "/publish-canary"
+    arms = calls[1:]
+    assert len(arms) == 2
+    assert all(c.endswith("\n\n" + release.HARNESS_SUFFIX) for c in arms)
+    assert arms[0].startswith("/toc-lite-before ") and arms[1].startswith("/toc-lite-draft ")
+
+
+def test_first_version_arms_get_suffix(env):
+    make_skill(env, "account", "helper")
+    write(env.repo / "evals" / "helper" / "prompt.md", "Task.\n")
+    calls = []
+    release.compare(env, "helper", runner=fake_runner(calls), rng=random.Random(2))
+    assert calls[0] == "/publish-canary"
+    assert calls[1:] == ["Task.\n\n" + release.HARNESS_SUFFIX, "/helper-draft Task.\n\n" + release.HARNESS_SUFFIX]
+
+
+def test_key_json_records_harness_suffix(env):
+    _committed_skill_with_edit(env)
+    run = release.compare(env, "toc-lite", runner=fake_runner([]), rng=random.Random(1))
+    key = json.loads((run / "key.json").read_text(encoding="utf-8"))
+    assert key["harness_suffix"] == release.HARNESS_SUFFIX
+
+
+def test_run_claude_restricts_tools_and_resets_output_style(env, monkeypatch):
+    seen = {}
+
+    class Stub:
+        returncode = 0
+        stdout = "x"
+        stderr = ""
+
+    def fake_run(argv, **kw):
+        seen["argv"] = argv
+        return Stub()
+
+    monkeypatch.setattr(release.subprocess, "run", fake_run)
+    assert release.run_claude(env, "hi") == "x"
+    argv = seen["argv"]
+    assert argv[argv.index("--disallowedTools") + 1] == "Write,Edit,NotebookEdit"
+    assert argv[argv.index("--allowedTools") + 1] == "Read,Grep,Glob"
+    assert json.loads(argv[argv.index("--settings") + 1])["outputStyle"] == "default"
+
+
+def test_harness_check_flags_insight_box():
+    out = release.harness_check("clean text", "x\n\u2605 Insight \u2500\u2500\ny")
+    assert "B.md" in out and "A.md" not in out
+    assert "Read this before the blind read." in out
+
+
+@pytest.mark.parametrize("path", [
+    r"C:\Users\x\AppData\Local\Temp\claude\proj\sess\scratchpad\brief.md",
+    "C:/Users/x/AppData/Local/Temp/claude/proj/sess/scratchpad/brief.md",
+])
+def test_harness_check_flags_scratchpad_file(path):
+    out = release.harness_check(f"Saved to {path}", "clean")
+    assert "A.md" in out and "B.md" not in out and "scratchpad" in out
+
+
+def test_harness_check_clean_and_never_names_arms():
+    assert release.harness_check("fine", "also fine") == "both outputs clean\n"
+    flagged = release.harness_check("\u2605 Insight", "scratchpad/a.md")
+    # the mandated note line ("Read this before the blind read.") legitimately holds the word before
+    flagged = flagged.replace("Read this before the blind read.", "").lower()
+    assert "draft" not in flagged and "before" not in flagged
+
+
+def test_compare_writes_harness_check_file(env):
+    _committed_skill_with_edit(env)
+    run = release.compare(env, "toc-lite", runner=fake_runner([]), rng=random.Random(1))
+    assert (run / "harness-check.md").read_text(encoding="utf-8") == "both outputs clean\n"
 
 
 def _fill(run, preferred, colleague=None):

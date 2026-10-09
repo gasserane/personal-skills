@@ -100,11 +100,32 @@ COLLEAGUE_TEMPLATE = (
 def run_claude(env: Env, prompt: str) -> str:
     """One headless run in the work folder with read-only tools, so the wiki is reachable (Ane's condition)."""
     exe = shutil.which("claude") or "claude"
-    r = subprocess.run([exe, "-p", prompt, "--allowedTools", "Read,Grep,Glob"],
+    # Write/Edit are denied so a run cannot save its deliverable to a file; the default output
+    # style stops Ane's user setting (Explanatory) adding an Insight box to one arm only.
+    r = subprocess.run([exe, "-p", prompt, "--allowedTools", "Read,Grep,Glob",
+                        "--disallowedTools", "Write,Edit,NotebookEdit",
+                        "--settings", json.dumps({"outputStyle": "default"})],
                        cwd=env.work_folder, capture_output=True, text=True, encoding="utf-8", timeout=1800)
     if r.returncode != 0:
         raise PublishError(f"claude -p failed ({r.returncode}): {r.stderr.strip()[-400:]}")
     return r.stdout
+
+
+HARNESS_SUFFIX = "Return the complete deliverable in this reply. Do not save it to a file."
+_SAVED_FILE = re.compile(r"scratchpad[\\/][^\s\"'`]*\.md")
+
+
+def harness_check(out_a: str, out_b: str) -> str:
+    """Flag harness artefacts that would unblind the read. Names letters only, never the arms."""
+    lines = []
+    for letter, text in (("A", out_a), ("B", out_b)):
+        if "★ Insight" in text:
+            lines.append(f'{letter}.md: contains "★ Insight"')
+        if _SAVED_FILE.search(text):
+            lines.append(f"{letter}.md: names a saved file under a scratchpad folder")
+    if not lines:
+        return "both outputs clean\n"
+    return "\n".join(lines) + "\nRead this before the blind read.\n"
 
 
 def canary(env: Env, runner: Runner) -> None:
@@ -166,14 +187,15 @@ def compare(env: Env, name: str, runner: Runner | None = None, day: date | None 
         raise PublishError(f"the draft equals {before_rev}; nothing to compare "
                            "(edit first, and commit nothing between the edit and publish)")
     canary(env, runner)
+    arm_prompt = f"{prompt}\n\n{HARNESS_SUFFIX}"
     install_variant(env, draft_files, f"{name}-draft")
     if before_files is None:
         before_rev = "none (bare model, first version)"
-        out_before = runner(env, prompt)
+        out_before = runner(env, arm_prompt)
     else:
         install_variant(env, before_files, f"{name}-before")
-        out_before = runner(env, f"/{name}-before {prompt}")
-    out_draft = runner(env, f"/{name}-draft {prompt}")
+        out_before = runner(env, f"/{name}-before {arm_prompt}")
+    out_draft = runner(env, f"/{name}-draft {arm_prompt}")
     run = _new_run_dir(env, name, day)
     draft_letter = rng.choice("AB")
     before_letter = "B" if draft_letter == "A" else "A"
@@ -181,7 +203,10 @@ def compare(env: Env, name: str, runner: Runner | None = None, day: date | None 
     (run / f"{before_letter}.md").write_text(out_before, encoding="utf-8")
     (run / "key.json").write_text(json.dumps({
         "draft": draft_letter, "before": before_letter, "before_rev": before_rev,
-        "draft_sha256": tree_hash(draft_files)}, indent=2), encoding="utf-8")
+        "draft_sha256": tree_hash(draft_files), "harness_suffix": HARNESS_SUFFIX}, indent=2),
+        encoding="utf-8")
+    out_a, out_b = (out_draft, out_before) if draft_letter == "A" else (out_before, out_draft)
+    (run / "harness-check.md").write_text(harness_check(out_a, out_b), encoding="utf-8")
     (run / "verdict.md").write_text(VERDICT_TEMPLATE, encoding="utf-8")
     if tier_of(src) == "org":
         (run / "colleague.md").write_text(COLLEAGUE_TEMPLATE.format(name=name), encoding="utf-8")
