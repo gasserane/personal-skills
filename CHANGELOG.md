@@ -2,6 +2,15 @@
 
 All notable changes to the Ann / Vi / Li / Researcher skill set are documented here.
 
+## [2026-10-09] — publish: mel-discipline
+
+**Skills affected:** mel-discipline
+
+### mel-discipline
+- **What changed:** one text for all surfaces
+- **Why:** decision 6; Release 1
+- **Before/after verdict:** better: comprehensive, well structured, clear and actionable language (run 2026-10-09-2)
+
 ## [2026-10-08] — Vendor six mattpocock skills
 
 **Skills affected:** wayfinder, grilling, grill-me, grill-with-docs, domain-modeling, setup-matt-pocock-skills (new here)
