@@ -84,9 +84,10 @@ class VerifyRow:
 
 def _parse_time(value: str) -> datetime | None:
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+        t = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
         return None
+    return t if t.tzinfo else t.replace(tzinfo=timezone.utc)  # no offset: treat as UTC
 
 
 def verify_account(source_text: str, name: str, acct: Path, active: bool,
@@ -160,12 +161,15 @@ def freshness_message(env: Env, now: datetime | None = None) -> str | None:
     now = now or datetime.now(timezone.utc)
     stale = []
     for n in names:
-        row = verify(env, n)[0]
-        if row.status == "match":
-            continue
-        published = last_publish(env, n)
-        if published and now - published[1] < timedelta(hours=1):
-            continue  # account sync runs about every 10 minutes (fact 2)
+        try:
+            row = verify(env, n)[0]
+            if row.status == "match":
+                continue
+            published = last_publish(env, n)
+            if published and now - published[1] < timedelta(hours=1):
+                continue  # account sync runs about every 10 minutes (fact 2)
+        except Exception:
+            continue  # an unreadable or ambiguous skill must not break the session-start check
         stale.append(f"{n} ({row.status})")
     if not stale:
         return None
