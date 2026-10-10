@@ -2,6 +2,15 @@
 
 All notable changes to the Ann / Vi / Li / Researcher skill set are documented here.
 
+## [2026-10-10] — publish: indicator-designer
+
+**Skills affected:** indicator-designer
+
+### indicator-designer
+- **What changed:** rev3: web verification default, cite only what an indicator rests on, limits section, mechanism table, AI-use line
+- **Why:** Task 20 Release 2: blind read preferred the draft, colleague test passed on claude.ai
+- **Before/after verdict:** better: comprehensive (run 2026-10-09-2)
+
 ## [2026-10-09] — system-audit: retire the portables-parity axis
 
 **Skills affected:** system-audit
