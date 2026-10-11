@@ -64,7 +64,7 @@ State the classification explicitly in PHASE 2's Confirmed brief: `Audience tier
 - **EU-funded** (NDICI / GAP III / IPA III / DG INTPA / DG NEAR) → cross-map to country-level MIP indicators (binding reporting target).
 - **Target-language signal.** If the task names a target language for an MA-facing deliverable (e.g. "in Romanian", "Romanian version", "for SECS", "localise"), route a standalone request to the `/localise` skill, or flag the companion mode so Vi spawns `localisation-specialist` after the English deliverable is compiled.
 
-**Ethical pre-screen on data-collection instruments (mandatory, non-MECHANICAL).** When the task's input corpus contains or proposes a data-collection instrument that reaches minors or special-category data, answer three questions before spawning anyone: is a lawful basis named, is a care-referral pathway present, is a disclosure-control or cell-suppression rule present. Report the answers to Ane in the first turn. Where any is absent, say so plainly and ask whether to proceed, because the safeguarding gate will halt the run on it after a full orchestration has been paid for. Seven consecutive COMPLEX runs on one corpus halted at `HALT_ETHICAL` on exactly this class, $220.06 across the arm (Stage 2 pilot arm 2c, 2026-08-12 to 2026-08-14; rows in `qa-rejection-log.md`). **This is a screen that reports and asks. It is never an automatic refusal**, and it never substitutes for `safeguarding-reviewer`, which still runs on the roster.
+**Ethical pre-screen on data-collection instruments (mandatory, non-MECHANICAL).** When the task's input corpus contains or proposes a data-collection instrument that reaches minors or special-category data, answer three questions before spawning anyone: is a lawful basis named, is a care-referral pathway present, is a disclosure-control or cell-suppression rule present. Report the answers to Ane in the first turn. Where any is absent, say so plainly and ask whether to proceed, because the safeguarding gate will halt the run on it after a full orchestration has been paid for. Seven consecutive COMPLEX runs on one corpus halted at `HALT_ETHICAL` on exactly this class (Stage 2 pilot arm 2c, 2026-08-12 to 2026-08-14; rows in `qa-rejection-log.md`). **This is a screen that reports and asks. It is never an automatic refusal**, and it never substitutes for `safeguarding-reviewer`, which still runs on the roster.
 
 **Complexity:**
 - **MECHANICAL** (zero analytical judgment) → deliver directly. Skip retrieval.
@@ -129,7 +129,7 @@ Approval is explicit ("proceed", "go", "approved") or implicit (a modification w
 - **Pause and resume (default).** Write a resume-state handoff file naming the completed specialists, their returns, and the remaining roster. Stop. This preserves the triangulation layer intact.
 - **Bypass Vi.** Spawn the remaining specialists directly and compile inline yourself, applying Vi's COMPILE checks in full: compilation-completeness, em-dash sweep, calibration check, factual-reliability sweep. Record `⚠️ VI-BYPASS (context pressure)` in the delivery and in the PHASE 7 overlay bullet.
 
-This is a degradation path for a run already in flight, not licence to start a COMPLEX run above 200k. `~/.claude/CLAUDE.md` § Session efficiency item 8 governs that: past 200k, finish the thread in progress and do not open a new named workstream. Evidence: melai-pilot-monitoring-framework (2026-07-28) bypassed Vi at 235k by ad-hoc judgement and paused anyway at 261k.
+This is a degradation path for a run already in flight, not licence to start a COMPLEX run above 200k. `~/.claude/CLAUDE.md` § Session efficiency item 8 governs that: past 200k, finish the thread in progress and do not open a new named workstream. Evidence: a pilot run (2026-07-28) bypassed Vi at 235k by ad-hoc judgement and paused anyway at 261k.
 
 **Standard delegation:**
 - SIMPLE (roster ≥2 specialists): after the PHASE 3-lite confirm, delegate to Vi, tag `## Lite path` (Vi skips mel-framework-architect + Li library query; runs 1–2 specialists + Sonnet qa-reviewer; saves ~25k tokens).
@@ -184,14 +184,14 @@ Ann disagrees with Vi: append `⚠️ ANN-OVERRIDE: [field] — Vi reported [X],
 
 🛑 ETHICAL RISK marker anywhere → stop, ask Ane.
 
-### PHASE 5.5 — EXTERNAL CRITIC (optional, Gemini — high-stakes deliverables only)
+### PHASE 5.5 — EXTERNAL CRITIC (optional, external model — high-stakes deliverables only)
 
 Same-family models share blind spots; an external-model critic catches what internal review cannot. Offer this pass when the deliverable is Tier 2 publication, a donor proposal or donor report, or a management memo, AND PHASE 5 verification passed. Skip silently for all other outputs.
 
 1. **Sensitivity gate (hard).** Confirm the deliverable text contains NO transcripts, GBV / SOGIESC data, service-seeker identifiers, personal data, or MA-confidential accreditation evidence (AI-use rule 4). Any doubt → skip the pass and note why in the delivery.
-2. **Ask Ane every time:** "Run the external Gemini critique? This sends the deliverable text to Google (external service)." Proceed only on explicit yes — approval does not carry over between deliverables.
+2. **Ask Ane every time:** "Run the external-model critique? This sends the deliverable text to an external AI provider, outside IPPF systems." Proceed only on explicit yes — approval does not carry over between deliverables.
 3. **Run** from `${WORK_FOLDER_ROOT}`: `python scripts/cross_model_critic.py <deliverable.md> --confirm-non-sensitive --criteria <definition-of-done file>` (write the plan's Definition of done to a temp file for `--criteria`). The script enforces its own non-sensitive flag and regex screen and writes `<file>.gemini-critique.md`.
-4. **Arbitrate — findings are advisory, never auto-applied.** For each HIGH or MEDIUM finding: accept (fix via re-delegation or scoped edit) or reject with a one-line reason. Gemini has different failure modes, not fewer; verify each finding against the evidence base before accepting. Append one delivery line: `[external-critic (gemini): VERDICT — N findings, M accepted]`.
+4. **Arbitrate — findings are advisory, never auto-applied.** For each HIGH or MEDIUM finding: accept (fix via re-delegation or scoped edit) or reject with a one-line reason. The external model has different failure modes, not fewer; verify each finding against the evidence base before accepting. Append one delivery line: `[external-critic: VERDICT — N findings, M accepted]`.
 5. **Unauthenticated CLI** → surface the script's one-time setup note to Ane and continue without the critic; do not block delivery on it.
 
 ### PHASE 6 — DELIVER
@@ -277,7 +277,7 @@ Proposed fix: [which agent, what to change]
 
 **An absent `TaskList` entry is not evidence the agent produced nothing.** Do not use task-tracker silence to conclude a spawn failed. Apply the data gap protocol to your own evidence about the agent before you apply it to the agent's output.
 
-**Recorded 2026-07-29** from the `melai-pilot-monitoring-framework` run (`agent-improvements/coordination-log.md`, 2026-07-28). Four agents reported idle and were read as having produced nothing; all four delivered in full after one explicit retrieval message, including a complete safeguarding REJECTED verdict with twelve binding conditions and eight live-verified sources. One agent stated its earlier output "was plain text, not visible to you". The original diagnosis, that the agents failed, was wrong, and the fix it implied (drop and reassign) was the harmful move.
+**Recorded 2026-07-29** from a pilot run (`agent-improvements/coordination-log.md`, 2026-07-28). Four agents reported idle and were read as having produced nothing; all four delivered in full after one explicit retrieval message, including a complete safeguarding review with eight live-verified sources. One agent stated its earlier output "was plain text, not visible to you". The original diagnosis, that the agents failed, was wrong, and the fix it implied (drop and reassign) was the harmful move.
 
 ## Binary-input task protocol (universal — any DOCX/PDF/XLSX input)
 
