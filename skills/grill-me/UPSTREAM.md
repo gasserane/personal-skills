@@ -4,6 +4,6 @@ Vendored from [mattpocock/skills](https://github.com/mattpocock/skills) under th
 
 - Base commit: `755611effd107b63d9477e3aa6bf6fbb6ece3d87` (2026-08-15), path `skills/productivity/grill-me/`
 - Local changes: none.
-- Vendored: 2026-10-08, from Ane's laptop copy (agent-improvements/skills-distribution-decisions.md in anework-package, "Plan-writing decisions").
+- Vendored: 2026-10-08, from the maintainer's local copy.
 
 Updating: diff the upstream folder against this one by hand and keep the local changes. Never overwrite this folder with a fresh upstream copy.
