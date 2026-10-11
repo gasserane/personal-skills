@@ -2,6 +2,15 @@
 
 All notable changes to the Ann / Vi / Li / Researcher skill set are documented here.
 
+## [2026-10-11] — publish: toc-builder
+
+**Skills affected:** toc-builder
+
+### toc-builder
+- **What changed:** rev2: corrected Mayne 2019 and van Eerdewijk 2017 citations; failure-response column in the evidence plan; Mermaid pathway plus plain-text reading; gatekeeper backlash risk; month-1 power mapping milestone
+- **Why:** Blind read 2026-10-11 preferred the draft over the original (BETTER); colleague test on claude.ai ran toc-builder-draft and passed
+- **Before/after verdict:** better: Comprehensive; but make sure that the output is also provided in a word format with IPPF visual identity and a user friendly rendering of mermaide chart (run 2026-10-11)
+
 ## [2026-10-10] — publish: indicator-designer
 
 **Skills affected:** indicator-designer
