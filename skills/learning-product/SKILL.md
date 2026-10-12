@@ -29,7 +29,7 @@ Do not trigger for:
 
 Ask in one batch. First two are required.
 
-1. **Evidence Brief slug** (required): the directory name under `literature-reviews/`, e.g. `2026-05-10_cse-anti-gender-opposition-eca`. The skill reads `literature-reviews/<slug>/evidence-brief.md`.
+1. **Evidence Brief slug** (required): the directory name under `literature-reviews/`, e.g. `2026-01-15_example-topic-region`. The skill reads `literature-reviews/<slug>/evidence-brief.md`.
 2. **Output type** (required): one of `ma-brief` (v1), `workshop-cop-pack` (v2), `regional-learning-brief` (v3), `donor-management-memo` (v4).
 3. **Recipient** (required for v4 only): one of `donor-programme-officer`, `donor-senior`, `ippf-en-management`, `ippf-central-management`, `mp-or-policy`. Used to calibrate voice register and the decision-asked framing.
 4. **Audience focus** (optional): MA cluster, sub-region, country list. Defaults derive from the Evidence Brief's geography metadata.
@@ -201,7 +201,7 @@ For v1, v3, v4: return as markdown body in the assistant turn. Ane converts to W
    - **Mixed confidence — varies by approach.** The findings inside this bullet sit at different levels. The body of the brief preserves the differences.
 3. **Executive summary** — 5 bullets exact. Bullets carry the regional pattern, not just findings restated.
 4. **Why this brief** — 2–3 paragraphs. Includes the CoP-cultivation framing (the brief is itself a CoP practice artefact).
-5. **The regional landscape** — 3 sub-headers naming the structural shifts that frame the analysis (e.g., for ECA: opposition convergence; EU candidate-status pressure; improved adolescent SRHR data). Each shift cites Evidence Brief sources verbatim.
+5. **The regional landscape** — 3 sub-headers naming the structural shifts that frame the analysis (e.g., for one region: a policy shift; a funding shift; a change in the data available). Each shift cites Evidence Brief sources verbatim.
 6. **Four findings with cross-MA evidence** — pulled from the Evidence Brief RQ1 findings; each finding adds a "Cross-MA evidence" sentence naming the sub-region pattern. Closes with `**Evidence base:**` line.
 7. **Country snapshots — N MA contexts** — fixed sub-structure per snapshot: Context (1 paragraph) → Lever applied (1 line) → What worked (2–3 bullets) → What did not work (1–2 bullets) → Lesson (1 sentence). Skip a row only when the Evidence Brief does not cover it.
 8. **Cross-cutting strategy — what the snapshots share** — the brief's analytical contribution. Names the pattern across snapshots (e.g., lever-fit follows existing relational capital). One paragraph plus a short list. This is the section where the regional brief earns its keep relative to v1.

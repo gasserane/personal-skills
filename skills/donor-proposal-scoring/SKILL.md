@@ -69,7 +69,7 @@ Two passes, in this order. The order is the single most consequential instructio
 
 **Pass B, document mechanics.** Internal consistency, arithmetic, section placement, literal compliance with checklists, missing annexes, undocumented budget lines.
 
-Both passes produce real findings. But donor evaluators write about Pass A, and Pass A is what decides funding. Pass B findings are cheap to generate, feel rigorous, and were the bulk of what a real run got wrong (see `references/cerv-2026-worked-example.md`).
+Both passes produce real findings. But donor evaluators write about Pass A, and Pass A is what decides funding. Pass B findings are cheap to generate, feel rigorous, and were the bulk of what a real run got wrong. See the calibration record: use the private calibration record if present, `${WORK_FOLDER_ROOT}/agent-improvements/private-calibration/donor-proposal-scoring/cerv-2026-worked-example.md`, else the synthetic one, `references/worked-example-synthetic.md`.
 
 **Balance check before delivery.** Count your findings. If more than half sit in Pass B, you scored the document rather than the programme. Go back to Pass A. This check takes thirty seconds and is the highest-yield thing in the skill.
 
@@ -248,4 +248,4 @@ For a large or high-stakes proposal, run the coverage pass and the lens test as 
 - This skill does not submit anything, does not decide funding, and does not sign off finance or legal positions.
 - It does not predict the donor score, and any output that reads as a prediction has overstated itself. It predicts where the points are, which is a different and more useful claim.
 
-**Evidence base:** `references/cerv-2026-worked-example.md` (the calibration record this method is built on), `references/rights-holder-coverage.md`, `references/word-export.md`.
+**Evidence base:** the calibration record this method is built on (use the private calibration record if present, `${WORK_FOLDER_ROOT}/agent-improvements/private-calibration/donor-proposal-scoring/cerv-2026-worked-example.md`, else the synthetic one, `references/worked-example-synthetic.md`), `references/rights-holder-coverage.md`, `references/word-export.md`.

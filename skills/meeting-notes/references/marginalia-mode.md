@@ -28,7 +28,7 @@ What makes this mode different from transcript mode is the anchor. Every comment
 
    Threads matter here: a proposal with a reply agreeing to it is a decision; the same proposal with no reply is an open question. Do not promote an unanswered comment to a decision because it sounds confident.
 
-5. **Confirm every flagged date with Ane. Never correct one silently.** The extract flags each date it finds and calls out any naming a month earlier than the comment itself. That specific shape is the 2026-07-24 slip: a comment reading "14-15 July" meant September, and a note that had quietly carried the July date would have been wrong and unremarkable. The script deliberately does not resolve the date or guess the year, because a plausible wrong date in a sent note is worse than a question.
+5. **Confirm every flagged date with Ane. Never correct one silently.** The extract flags each date it finds and calls out any naming a month earlier than the comment itself. That specific shape is the slip this guard was built for: a comment written in September that names a July date may mean September, and a note that quietly carried the July date would be wrong and unremarkable. The script deliberately does not resolve the date or guess the year, because a plausible wrong date in a sent note is worse than a question.
 
    The guard reads English, French, Spanish and Romanian month names. It is a prompt to look, not a verdict.
 

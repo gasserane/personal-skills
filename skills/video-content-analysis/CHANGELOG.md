@@ -70,7 +70,7 @@ Versioning: Semantic Versioning (https://semver.org/).
 - Idempotency confirmed: re-run skips all install steps and only runs smoke test.
 - Pester tests pass (11/11 for InstallDetect.psm1 covering version-comparison fast/fallback paths).
 - pytest passes (2/2 for smoke-test.py).
-- Baseline state captured in setup/baseline-install-2026-05-08.txt.
+- Baseline install state captured at install time (the snapshot file is not kept in the public repo).
 - No admin rights required (PIM for Python; winget --scope user for ffmpeg).
 
 ### Hot-fixes during stage
@@ -120,7 +120,7 @@ Versioning: Semantic Versioning (https://semver.org/).
 - 3 new static checks in `tests/run_tests.py` (105/105 total).
 
 ### Changed
-- `extract_frames` defaults flipped from `scene_change=True` to `scene_change=False`. Reasoning: 64.5-min IPPF launch recording produced 848 frames with the Stage 2 default; the I-frame clause in the Stage 2.7 deviation matches every encoder keyframe regardless of `scene_threshold`. Interval-only is the safer default for real Teams / webinar content. Callers wanting scene detection pass `scene_change=True` explicitly.
+- `extract_frames` defaults flipped from `scene_change=True` to `scene_change=False`. Reasoning: a 64.5-min real event recording produced 848 frames with the Stage 2 default; the I-frame clause in the Stage 2.7 deviation matches every encoder keyframe regardless of `scene_threshold`. Interval-only is the safer default for real Teams / webinar content. Callers wanting scene detection pass `scene_change=True` explicitly.
 - `extract_frames` adds `max_frames: int | None = None` parameter with uniform downsampling. Pruned PNGs are deleted from disk.
 
 ### Deferred to later stages

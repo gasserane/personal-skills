@@ -199,18 +199,18 @@ def _fixture(tmp: Path) -> Path:
     from docx import Document
 
     document = Document()
-    document.add_heading("Plan de mise en œuvre", level=1)
-    document.add_paragraph("L'atelier se tiendra à Chișinău en septembre.")
-    document.add_heading("Suivi", level=1)
-    document.add_paragraph("Le financement de suivi reste à confirmer.")
+    document.add_heading("Rapport annuel du chœur", level=1)
+    document.add_paragraph("Le chœur chante à Chișinău chaque mardi.")
+    document.add_heading("Salle", level=1)
+    document.add_paragraph("La salle de répétition reste à réserver.")
     plain = tmp / "plan.docx"
     document.save(str(plain))
 
     return add_comments(plain, [
-        CommentRequest(match="L'atelier se tiendra à Chișinău",
+        CommentRequest(match="Le chœur chante à Chișinău",
                        text="confirmer les dates, peut-être 14-15 July",
                        author="Ane Gasser"),
-        CommentRequest(match="Le financement de suivi reste",
+        CommentRequest(match="La salle de répétition reste",
                        text="Reviewer A to discuss with Reviewer D", author="Ane Gasser"),
     ], out_path=tmp / "plan_reviewed.docx")
 
@@ -222,7 +222,7 @@ def test_real_document(checks: Checks, tmp: Path) -> None:
     checks.check(data["thread_count"] == 2,
                  f"document: both comments are read back (got {data['thread_count']})")
     sections = {item["section"] for item in data["comments"]}
-    checks.check(sections == {"Plan de mise en œuvre", "Suivi"},
+    checks.check(sections == {"Rapport annuel du chœur", "Salle"},
                  f"document: each comment lands under its own heading (got {sections})")
     checks.check(any("Chișinău" in item["anchor"] for item in data["comments"]),
                  "document: the anchor keeps its diacritics")

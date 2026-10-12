@@ -7,8 +7,8 @@ logic over objects officeops already returned — no zip, no XML, no COM — whi
 is why they live here rather than in the module. A capability that has to open
 the file belongs in officeops, with its own test.
 
-Why the mode exists at all: on 2026-07-24 twelve decisions sat in
-``word/comments.xml`` of an implementation plan and were pulled out by hand.
+Why the mode exists at all: in an earlier review cycle, the decisions sat in
+``word/comments.xml`` of a reviewed document and were pulled out by hand.
 Every step was improvised, and the two things that went wrong then are the two
 things this script exists to prevent.
 
@@ -16,8 +16,8 @@ things this script exists to prevent.
        discuss with Reviewer D" only parses against the Follow-up-funding bullet
        it hangs on. So the anchor is never optional here, nor is the heading the
        anchor sits under.
-    2. Dates spoken into a comment slip. One reading "14-15 July" meant
-       September. The script cannot know which is right, so it flags every date
+    2. Dates spoken into a comment slip: a comment can name one month and
+       mean another. The script cannot tell which, so it flags every date
        for confirmation rather than quietly carrying one into a note that then
        gets sent.
 

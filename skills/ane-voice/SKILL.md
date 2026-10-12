@@ -32,7 +32,7 @@ If a public humanizer pattern would add any of the above, do the opposite.
 
 ## Ane's signature — protect, never strip
 
-Distilled 2026-07-26 from Ane's own writing (2016 Romanian LinkedIn article on learning project management; 2020 IPPF EN COVID survey overview). Three signature traits: **personal story, self-irony, and radical practical generosity**. The passes strip AI slop; they must never strip these. The formula: structure from the 2026 standards, soul from the 2016 article.
+Distilled 2026-07-26 from Ane's own writing (a 2016 article and a 2020 survey overview). Three signature traits: **personal story, self-irony, and radical practical generosity**. The passes strip AI slop; they must never strip these. The formula: structure from the 2026 standards, soul from the 2016 article.
 
 - **Story opening (engagement register only).** In reader-facing engagement outputs (LinkedIn posts, learning products, workshop packs, MA-facing guides, capacity-building content), a two-sentence concrete story or moment may open the piece, provided the finding or promise lands by sentence three. Do not flag it as a BLUF violation or an abstract opening. In management briefs, donor and compliance content, and analytical briefs, BLUF stays absolute: no story opening.
 - **Direct address.** "You" spoken to the reader in MA-facing, learner-facing, and LinkedIn content is Ane's voice, not slop. Keep it. Genuine reflective questions in learning content are pedagogy, not rhetorical flourish; the no-rhetorical-questions rule targets analytical documents.

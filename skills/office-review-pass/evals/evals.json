@@ -15,7 +15,7 @@
     },
     {
       "id": 3,
-      "prompt": "I've hand-edited the meeting note and I want three fixes applied without breaking my formatting: 'Director of Risk' should be 'Director of Risk & Assurance' everywhere including the header, the date needs to be 31 July not 30 July, and drop the sentence about the pilot budget. Then I need the PDF again.",
+      "prompt": "I've hand-edited the meeting note and I want three fixes applied without breaking my formatting: 'Head of Learning' should be 'Head of Learning & Evaluation' everywhere including the header, the date needs to be 12 March not 11 March, and drop the sentence about the travel budget. Then I need the PDF again.",
       "expected_output": "revise mode. Edit-preservation protocol acknowledged and Ane's file treated as baseline; confirms the file is closed in Word; wordcom.find_replace with include_headers for the header occurrence; counts read back from Word and reported, with any zero raised. Verifies the written file (branding, stranded hyperlinks). Does NOT produce the PDF - explains the ExportAsFixedFormat hang and hands the export back to Ane.",
       "files": []
     },

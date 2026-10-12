@@ -10,10 +10,10 @@ From a fresh PowerShell or Git Bash terminal:
 
 ```powershell
 $env:PYTHONIOENCODING = "utf-8"
-cd "C:\Users\AGasser\.claude\plugins\cache\claude-plugins-official\skill-creator\unknown\skills\skill-creator"
+cd "$env:USERPROFILE\.claude\plugins\cache\claude-plugins-official\skill-creator\unknown\skills\skill-creator"
 python -m scripts.run_loop `
-  --eval-set "C:\Users\AGasser\OneDrive\GitHub\personal-skills\skills\system-audit\evals\trigger-eval.json" `
-  --skill-path "C:\Users\AGasser\OneDrive\GitHub\personal-skills\skills\system-audit" `
+  --eval-set "<your personal-skills clone>\skills\system-audit\evals\trigger-eval.json" `
+  --skill-path "<your personal-skills clone>\skills\system-audit" `
   --model claude-opus-4-7 `
   --max-iterations 3 `
   --verbose

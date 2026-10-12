@@ -4,7 +4,7 @@ Derive a 1-2 page shareable, plain-English learning document from a finished mee
 
 Exemplar (build to this standard): `1. Ane's PROJECTS/AI in IPPF EN 2026/Rutgers model/Learning document - Rutgers AI exchange - IPPF EN (July 2026).docx`.
 
-## Rules (proven 2026-07-13, Rutgers exchange)
+## Rules (proven 2026-07-13 on a partner exchange)
 
 **Page cap by measurement, not word count.** The brand template runs ~300 effective words per page, so word counts under-predict pages. After each build, measure real pages via Word COM `ComputeStatistics(2)`. To shrink: trade the glossary block for inline glosses; strip the writer's spacer paragraphs; set `keep_with_next` on headings. Render page previews (Word → PDF → PyMuPDF) for a visual pass before declaring the cap met.
 

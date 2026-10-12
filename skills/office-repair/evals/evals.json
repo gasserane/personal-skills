@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "The 2027 planning tool is throwing a circular reference warning every time I open it and two of the budget columns show #REF!. Can you find what's broken? Do NOT touch the slicers, I spent hours on those.",
+      "prompt": "The annual planning tool is throwing a circular reference warning every time I open it and two of the budget columns show #REF!. Can you find what's broken? Do NOT touch the slicers, I spent hours on those.",
       "expected_output": "repair mode, diagnosis first. scripts/office_repair.py scan with --com, because a circular reference is not visible in the stored XML and needs Excel. Reports cached errors with the formula behind each, ListObject coverage, fragmented validation ranges and the feature inventory. Nothing written. Fix list agreed with Ane naming each cell and its current value before any COM apply.",
       "files": []
     },

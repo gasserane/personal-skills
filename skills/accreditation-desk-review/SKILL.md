@@ -67,7 +67,7 @@ Run `scripts/deskreview.py` for the mechanical steps; do the judgement yourself.
    questions** lists, each item tagged by check and by type (NC = non-compliance/gap; CL =
    clarification).
 9. **Clear the quality floor.** Before delivering anything, re-read it against
-   `references/quality-bar.md` — the acceptance criteria and worked exemplars distilled from
+   the acceptance criteria and worked exemplars in the private exemplar file `${WORK_FOLDER_ROOT}/agent-improvements/private-calibration/accreditation-desk-review/quality-bar.md` if present, else in `references/quality-bar.md` (synthetic, same shape), all distilled from
    known-good outputs. Every output must be at least as good as those. Revise if it is not.
 
 When you re-run on a template Ane has already reviewed, **treat her current text as
@@ -144,7 +144,7 @@ These are why the skill is trustworthy. Full detail and worked fixes in
   vocabulary, and the desk-review template anatomy.
 - `references/reliability-playbook.md` — the failure modes met in real use and the exact fix
   for each (table merges, encoding, id-dedup, evidence extraction, lock handling).
-- `references/quality-bar.md` — the acceptance floor: an output checklist plus worked exemplars
+- `references/quality-bar.md` — the acceptance floor: an output checklist plus synthetic worked exemplars. If the private exemplar file `${WORK_FOLDER_ROOT}/agent-improvements/private-calibration/accreditation-desk-review/quality-bar.md` is present, use it instead; it holds the real exemplars
   from known-good deliverables. Read it before delivering; outputs must meet or beat it.
 
 When a task needs SRHR/MEL framework citations or a lens applied with rigour, defer to the

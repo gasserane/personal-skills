@@ -64,7 +64,7 @@ ws.Cells(r, c).Value2 = (the_date - EXCEL_EPOCH).days
 ws.Cells(r, c).NumberFormat = fmt
 ```
 
-A serial carries no timezone, so what is written is what is stored. **Verify by reopening the saved file and comparing the dates, never by the write returning without error** — the off-by-one is invisible in the COM session that produced it and visible only on the round trip (proven 2026-09-23, IPPF Wave 1 scoring, 27 completion dates all a day early).
+A serial carries no timezone, so what is written is what is stored. **Verify by reopening the saved file and comparing the dates, never by the write returning without error** — the off-by-one is invisible in the COM session that produced it and visible only on the round trip (proven 2026-09-23 on a real scoring workbook, where every completion date came out a day early).
 
 ## canonical mode
 

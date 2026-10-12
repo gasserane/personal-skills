@@ -242,7 +242,7 @@ six ToR versions shipped with the palette but no logo, and each run exited clean
    python-docx does not expose their runs. After heading renames, do an XML pass
    over every `w:t` in the document part for the old string, and tell Ane to
    refresh the TOC in Word (Ctrl+A, F9) so pagination regenerates. Proven
-   2026-08-04 on the MELA framework five-CLQ alignment.
+   2026-08-04 on a framework document after a round of heading renames.
 
 7. **.odt input: convert through Word COM first.** `Documents.Open` on the .odt
    then `SaveAs2(dst, 16)` yields a .docx that keeps formatting AND carries ODT

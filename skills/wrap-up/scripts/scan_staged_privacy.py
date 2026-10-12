@@ -16,7 +16,7 @@ embedded birth date, so precision is available without guesswork:
   CNP     weighted control digit (key 279146358279) plus a valid birth date
 
 A bare "13-digit run" regex would match every epoch-millisecond timestamp
-written between 2001 and 2286, which is most machine-generated data Ane handles.
+written between 2001 and 2286, which is most machine-generated data a repo holds.
 That version of this check would be noise.
 
 Findings are always masked. Printing a full national-register number into the
@@ -256,7 +256,7 @@ def scan_image_names(paths: list[str]) -> list[Finding]:
 def privacy_conventions(repo: str) -> list[str]:
     """Read the repo's own privacy convention out of .gitignore.
 
-    Ane's repos mark sensitive files with a `.local.` infix or a `private`
+    Repos that use this convention mark sensitive files with a `.local.` infix or a `private`
     segment and gitignore that family. A file carrying personal data without the
     marker is not just a risk, it is a break in the convention the repo already
     declares -- which makes the rename the natural fix rather than a new rule.

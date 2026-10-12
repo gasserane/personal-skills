@@ -28,7 +28,7 @@ SCANNER = os.path.join(HERE, "scan_staged_privacy.py")
 
 # Synthetic, checksum-valid, belonging to no one.
 FAKE_RRN = "00.01.01-001.73"  # built from the invented birth date 1900-01-01; checksum valid
-FAKE_IBAN = "BE68 5390 0754 7034"
+FAKE_IBAN = "BE68 5390 0754 7034"  # the SWIFT IBAN registry example for Belgium
 FAKE_CNP = "1000101010014"  # built from the invented birth date 1900-01-01, county 01; checksum valid
 
 
@@ -84,7 +84,7 @@ def main() -> int:
         # --- 1. The 2026-07-03 scenario: ordinary filename, public remote -----
         repo = make_repo(tmp, "public-with-pii", "https://github.com/example/notes.git", GITIGNORE)
         stage(repo, "notes/meeting-notes.md",
-              f"Buyer registration\n\nrijksregister {FAKE_RRN}\naccount {FAKE_IBAN}\n")
+              f"Contact record\n\nrijksregister {FAKE_RRN}\naccount {FAKE_IBAN}\n")
         code, out = scan(repo)
         check(code == 2, "public remote + personal data exits 2 (HOLD)")
         check(out["status"] == "HOLD", "status is HOLD")
@@ -115,7 +115,7 @@ def main() -> int:
 
         # --- 3. Same data, private/non-forge remote -> advisory, not HOLD -----
         repo = make_repo(tmp, "local-remote", "/srv/git/mirror.git", GITIGNORE)
-        stage(repo, "notes/buyers.md", f"CNP {FAKE_CNP}\n")
+        stage(repo, "notes/contacts.md", f"CNP {FAKE_CNP}\n")
         code, out = scan(repo)
         check(code == 1, "non-forge remote + personal data exits 1 (advisory)")
         check(out["status"] == "ADVISORY", "status is ADVISORY, commit not blocked")
@@ -127,7 +127,7 @@ def main() -> int:
         # check recommends the rename: renaming does not just label the file, it
         # removes it from the commit entirely.
         repo = make_repo(tmp, "marked", "https://github.com/example/marked.git", GITIGNORE)
-        stage(repo, "data/buyers.local.md", f"CNP {FAKE_CNP}\n")
+        stage(repo, "data/contacts.local.md", f"CNP {FAKE_CNP}\n")
         code, out = scan(repo)
         check(code == 0, "a .local.-marked file is gitignored and never staged")
 
