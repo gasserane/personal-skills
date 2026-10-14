@@ -89,6 +89,8 @@ Adapt the 2019 six-criteria framework to the system context:
 
 ### Step 5 — Three concrete risks
 
+**Before naming a defect as a risk, open the surface the defect would live on and confirm it is still there.** A log row, an overlay ruling, or a qa_block records the incident that MOTIVATED a fix, not current state; the fix may already be live. Evidence (2026-10-14, pass 9): risk 3 asserted the `word_count.writer` null defect as open from the 2026-08-14 qa-rejection-log row, while `qa-block-schema.md` had carried the fix since 2026-08-10, propagated to Ann step 11, the Vi skill and the qa-reviewer agent on 2026-08-14, with a harness check guarding the branch. One schema read would have caught it before the brief, and the misgrading also read the affected dimension grades about half a grade too harsh. A case register is history; grade state from the surface.
+
 Three honest risks, ranked by impact. Each has:
 - Description (one sentence)
 - Why it matters (one sentence)
