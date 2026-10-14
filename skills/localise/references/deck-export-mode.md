@@ -84,6 +84,15 @@ reports those collisions before anything is written; those findings go to the
 sheet only. Do not work around it by matching a longer string that happens to be
 unique, because the comment then lands on a paragraph the reader is not looking at.
 
+There is one legitimate re-anchor: a finding on a *layer* whose anchor collides
+(Storyline exports name layers `1 (Slide Layer)`, `2.1. (Slide Layer)` and repeat
+those names across slides) is assigned to its **base slide's** image index, with
+the layer named in the finding text (`(capa 2.1)`). The reviewer opening the base
+slide's balloon is looking at the right slide — the layer is one click away —
+which is exactly what the longer-string workaround fails to guarantee. Used
+throughout the 2026-10 RBM ES review (~15 findings across 3 modules) with every
+comment landing visibly.
+
 **Slide numbers come from the deck's own labels, in the language under review.**
 `Diapositive 7`, `Diapozitiv 7`, `Diapositiva 7`, `Слайд 7` and `Folie 7` all key
 slide 7. Where a slide carries no label the manifest falls back to image order
