@@ -71,6 +71,24 @@ slide merge into one balloon, because Word stacks separate comments on the same
 paragraph into an unreadable pile. Every finding that could not be anchored is
 printed to stderr with its reason, and it still reaches the sheet.
 
+**Balloon format v2 — rewrite after commenting (until the script emits it).**
+`comment` writes each balloon as one run-together paragraph per finding
+(`Type. « current » → « proposed » why`). Ane's reviewed format (2026-10 RBM ES
+review, decision 4) is richer: a bold `Slide N` header paragraph, a blank
+paragraph, then one paragraph per finding — bold `Type.`, plain ` current → `,
+bold `proposed`, plain ` why` — with a blank paragraph between findings. Two
+sessions paid a post-processing pass for this, so until `extract_deck.py` grows
+a `--format v2` option, rewrite the balloons right after `comment`: rebuild
+`word/comments.xml` from the findings JSON (group commentable findings by slide,
+ascending; the comments sit in document order, so they zip with the sorted slide
+groups one to one), and before touching anything assert that each existing
+balloon's text contains its group's first `why` fragment — a mismatch means the
+order assumption broke, so stop. Repack the zip replacing only that part, then
+re-run the full verification (balloon count, package parts, original hash):
+the rewrite is a second write and earns its own check. A worked script is
+`rewrite_v2.py` in the 2026-10-14 RBM ES session-4 record; ~40 lines of
+ElementTree, no dependencies.
+
 The sheet is IPPF-branded via `ane_package.reporting.excel_templates.build_review_worklist`:
 Slide · EN page · Type · EN source · Current · Proposed · Why · Severity, frozen
 header, autofilter, severity colour-coded.
