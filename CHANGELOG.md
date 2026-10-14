@@ -2,6 +2,15 @@
 
 All notable changes to the Ann / Vi / Li / Researcher skill set are documented here.
 
+## [2026-10-14] — publish: rfp-digital-services
+
+**Skills affected:** rfp-digital-services
+
+### rfp-digital-services
+- **What changed:** reword dangling cross-skill pointers to name Claude Code as where the four procurement skills run
+- **Why:** on claude.ai the pointed-at skills do not exist; found by the Desktop MEL project 2026-10-14
+- **Before/after verdict:** trivial, no compare
+
 ## [2026-10-11] — publish: toc-builder
 
 **Skills affected:** toc-builder
