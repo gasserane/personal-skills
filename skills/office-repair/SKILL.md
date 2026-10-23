@@ -66,6 +66,17 @@ ws.Cells(r, c).NumberFormat = fmt
 
 A serial carries no timezone, so what is written is what is stored. **Verify by reopening the saved file and comparing the dates, never by the write returning without error** — the off-by-one is invisible in the COM session that produced it and visible only on the round trip (proven 2026-09-23 on a real scoring workbook, where every completion date came out a day early).
 
+### Excel Tables and layout via COM — gotchas
+
+Six traps met converting ranges to Tables on a finished results workbook (2026-10-23, evidence in `agent-improvements/handoffs/2025-en-results-excel-tables-spec.md`, 13:53 and 14:40 updates). Each one passed silently; each fix is one line.
+
+1. **`ListObjects.Add` auto-fits column widths and turns header wrap off.** Fix: record every column width before the call, restore them after, and set `WrapText = True` on the header row again.
+2. **A one-character font-size write does not take.** Setting size on a single character read back as 11 pt. Fix: set size per run with `cell.GetCharacters(start, length).Font.Size = 10`, covering the whole run.
+3. **`Font.Size` reading `None` does not mean mixed sizes.** A cell reports `None` when its runs differ in any way, yet every run can still be 9 pt. Fix: read the size run by run with `GetCharacters`, never from the cell.
+4. **`AutoFit` ignores merged cells.** A merged, wrapped source line keeps its old row height. Fix: copy the text into a spare helper column set to the merged width, AutoFit that row, take the height, then clear the helper.
+5. **Text sorts above every number in a descending Table sort.** Numbers stored as text, and text values such as `17 of 58`, land at the top. Fix: convert them to real numbers (moving the words to a label or note) before converting the range to a Table.
+6. **A verify that cannot fail proves nothing.** Fix: run every verify script once on the unchanged file and confirm it FAILS before you trust a PASS.
+
 ## canonical mode
 
 Ane has edited a generated file in Word, PowerPoint or Excel. From now on her file is the source and the generator is the stale copy. The job is to make that true in the file system, not just in the conversation.
