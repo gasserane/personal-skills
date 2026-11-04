@@ -268,7 +268,7 @@ def changelog_add(env: Env, day: date, name: str, what: str, why: str, verdict_l
 
 
 def publish(env: Env, name: str, what: str, why: str, trivial: bool = False,
-            push: bool = True, day: date | None = None) -> str:
+            push: bool = True, day: date | None = None, skip_colleague: str = "") -> str:
     day = day or date.today()
     if not what.strip() or not why.strip():
         raise PublishError("--what and --why are required: the CHANGELOG records both")
@@ -277,7 +277,7 @@ def publish(env: Env, name: str, what: str, why: str, trivial: bool = False,
     blocking = [f for f in check_skill(env, name) if f.blocking and f.rule != "installed-locally"]
     if blocking:
         raise PublishError("check failed:\n" + "\n".join(str(f) for f in blocking))
-    colleague = ""
+    colleague_status = ""
     if tier not in PORTABLE_FOLDERS:
         verdict_line = "Tier B (Code-only): no compare"
     elif trivial:
@@ -296,9 +296,14 @@ def publish(env: Env, name: str, what: str, why: str, trivial: bool = False,
         verdict, reason = read_verdict(run)
         if verdict == "worse":
             raise PublishError(f"verdict is 'worse' ({reason}): the release is blocked (decision 6)")
-        if tier == "org":
-            colleague = read_colleague(run)
         verdict_line = f"{verdict}: {reason} (run {run.name})"
+        if tier == "org":
+            if skip_colleague.strip():
+                # Owner override: the skip is written into the CHANGELOG and the review note, never hidden.
+                colleague_status = f"NOT RUN, skipped by the owner: {skip_colleague.strip()}"
+                verdict_line += f"; colleague-condition test {colleague_status}"
+            else:
+                colleague_status = "pass. " + read_colleague(run)
     for variant in (f"{name}-draft", f"{name}-before"):
         shutil.rmtree(env.claude_skills / variant, ignore_errors=True)
     steps: list[str] = []
@@ -311,7 +316,7 @@ def publish(env: Env, name: str, what: str, why: str, trivial: bool = False,
             note = env.dist / f"{name}-review-note.md"
             note.write_text(f"# Review note: {name} ({day.isoformat()})\n\n- What changed: {what}\n"
                             f"- Why: {why}\n- Before/after verdict: {verdict_line}\n"
-                            f"- Colleague-condition test: pass. {colleague}\n- Upload: {zip_path.name}\n",
+                            f"- Colleague-condition test: {colleague_status}\n- Upload: {zip_path.name}\n",
                             encoding="utf-8")
             steps.append(f"Review note: {note}")
         if (env.claude_skills / name / "SKILL.md").is_file():

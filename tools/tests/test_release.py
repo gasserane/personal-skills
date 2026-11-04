@@ -239,6 +239,17 @@ def test_publish_org_blocks_failed_colleague_test(env):
         release.publish(env, "toc-lite", "rewrite", "why")
 
 
+def test_publish_org_skip_colleague_records_the_skip(env):
+    run, key = _compared(env)
+    _fill(run, key["draft"])
+    release.publish(env, "toc-lite", "rewrite", "why", push=False, skip_colleague="owner closed the thread")
+    expected = "colleague-condition test NOT RUN, skipped by the owner: owner closed the thread"
+    assert expected in (env.repo / "CHANGELOG.md").read_text(encoding="utf-8")
+    note = (env.dist / "toc-lite-review-note.md").read_text(encoding="utf-8")
+    assert "Colleague-condition test: NOT RUN, skipped by the owner: owner closed the thread" in note
+    assert "Colleague-condition test: pass" not in note
+
+
 def test_publish_org_refuses_trivial(env):
     _committed_skill_with_edit(env)
     with pytest.raises(PublishError, match="refused for org/"):

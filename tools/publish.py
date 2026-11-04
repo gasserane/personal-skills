@@ -46,7 +46,8 @@ def _cmd_compare(env: Env, a) -> int:
 
 
 def _cmd_publish(env: Env, a) -> int:
-    print(release.publish(env, a.name, a.what, a.why, trivial=a.trivial, push=not a.no_push))
+    print(release.publish(env, a.name, a.what, a.why, trivial=a.trivial, push=not a.no_push,
+                          skip_colleague=a.skip_colleague or ""))
     return 0
 
 
@@ -112,6 +113,8 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--why", required=True)
     c.add_argument("--trivial", action="store_true", help="skip compare (refused for org/)")
     c.add_argument("--no-push", action="store_true")
+    c.add_argument("--skip-colleague", metavar="REASON",
+                   help="org/ only: publish without the colleague-condition test; the reason is recorded")
     c.set_defaults(fn=_cmd_publish)
     c = sub.add_parser("verify", help="compare sources with synced claude.ai copies")
     c.add_argument("name", nargs="?")
