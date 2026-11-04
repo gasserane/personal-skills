@@ -149,6 +149,21 @@ FAILs on any framework-page DOI absent from the Zotero cache (proven
 2026-07-22, pleasure-based-srhr INGEST: 293/294 until the sync ran). The
 sync is idempotent; it needs the Zotero write key.
 
+**The gate also reads DOIs inside publisher URLs (added 2026-11-04).** A link
+such as `utrechtlawreview.org/articles/10.36633/ulr.1080` counts as a DOI
+citation, so the gate fails until a Zotero record carries that DOI in its
+`DOI` field. Brief sources pushed without a DOI are the usual cause: the
+record exists, the field is empty. Fill the one field on the existing record
+(read the item, set `data['DOI']`, `update_item`, re-read and assert only
+`DOI` changed), then refresh the cache with `sync.write_cache`. Do NOT route a
+one-field fix on an existing book or report through `add_or_update` or
+`_record_to_data`: they rebuild the whole payload and can overwrite title,
+creators and type. The full `sync` rewrites every wiki DOI from CrossRef, so
+it is the wrong tool for one missing field. Any write to the shared group
+library needs Ane's explicit approval; the auto-mode classifier blocks it
+otherwise. Evidence (2026-11-04, srhr-opposition-cee-eap APPROVE-INGEST):
+harness 419/421 until the Peroni (2024) record received its DOI.
+
 Sub-commands:
 
 - `/li biblio sync` — one-shot push current wiki citations → Zotero. Walks
