@@ -2,6 +2,15 @@
 
 All notable changes to the Ann / Vi / Li / Researcher skill set are documented here.
 
+## [2026-11-04] — publish: session-wrap-up
+
+**Skills affected:** session-wrap-up
+
+### session-wrap-up
+- **What changed:** new organisation skill: one handoff note to close a chat or Claude Code session and continue in a new one (v3, headings and tables)
+- **Why:** colleagues stay in long, slow chats to keep the thread; this replaces /clear in chat: wrap up, open a new chat, paste the note
+- **Before/after verdict:** better: MORE COMPREHENSIVE (very close to B) (run 2026-11-04-3); colleague-condition test NOT RUN, skipped by the owner: owner chose to publish on 2026-11-04 to close the thread; v3 won the third blind read, closely, and that read was partly unblinded by the (new) marker only the skill writes
+
 ## [2026-10-14] — publish: tech-proposal-review-general
 
 **Skills affected:** tech-proposal-review-general
