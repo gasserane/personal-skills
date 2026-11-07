@@ -156,14 +156,33 @@ def main():
             record("unknown_rule_refused", True, str(e)[:80])
 
     # --- the public repository holds no country name, currency or local path ---
+    # A missing country list FAILS (a silent skip let the check look green while checking nothing);
+    # SRHR_PUBLIC_CHECK=skip is the one deliberate way out, and it is printed. When SRHR_MAP_ROOT holds
+    # the organisation's config folder, stream keys, labels, ledger names and organisation codes and
+    # names are searched for too.
     master = os.environ.get("SRHR_MASTER_COUNTRIES")
-    if not master or not Path(master).exists():
+    if os.environ.get("SRHR_PUBLIC_CHECK") == "skip":
         skipped.append("public_repo_clean")
-        print("SKIP public_repo_clean: SRHR_MASTER_COUNTRIES not set")
+        print("SKIP public_repo_clean: SRHR_PUBLIC_CHECK=skip set by the person running the tests")
+    elif not master or not Path(master).exists():
+        record("public_repo_clean", False, "SRHR_MASTER_COUNTRIES not set or not found: the check cannot run "
+               "(set it, or SRHR_PUBLIC_CHECK=skip on purpose)")
     else:
         with open(master, encoding="utf-8", newline="") as f:
             names = [r["country"] for r in csv.DictReader(f) if r.get("country")]
-        pats = [re.compile(r"\b" + re.escape(n) + r"\b") for n in names]
+        cfg = Path(os.environ.get("SRHR_MAP_ROOT", "")) / "config" if os.environ.get("SRHR_MAP_ROOT") else None
+        if cfg and (cfg / "streams.csv").exists():
+            with open(cfg / "streams.csv", encoding="utf-8-sig", newline="") as f:
+                for r in csv.DictReader(f):
+                    names += [r.get("key", ""), r.get("label", "")] + (r.get("ledger_names") or "").split(";")
+        if cfg and (cfg / "ma_codes.csv").exists():
+            with open(cfg / "ma_codes.csv", encoding="utf-8-sig", newline="") as f:
+                for r in csv.DictReader(f):
+                    names += [r.get("ma_code", ""), r.get("org_name", "")]
+        if not cfg or not (cfg / "streams.csv").exists():
+            print("note public_repo_clean: SRHR_MAP_ROOT config not found; stream and organisation names not checked")
+        names = sorted({n.strip() for n in names if len(n.strip()) >= 3})
+        pats = [re.compile(r"(?<![\w])" + re.escape(n) + r"(?![\w])") for n in names]
         pats += [re.compile(r"\bUSD\b"), re.compile(r"\bEUR\b"), re.compile(r"[A-Za-z]:[\\/]")]
         hits = []
         for path in SKILL.rglob("*"):
