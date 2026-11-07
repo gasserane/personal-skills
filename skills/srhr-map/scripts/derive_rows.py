@@ -49,13 +49,21 @@ def _num(text):
 
 
 # ---------------------------------------------------------------- DHIS2 services
-PREFIX = re.compile(r"([A-Z]{2})\d{3}[A-Z]?(?:-\d{4})?\)?\s*$")
+def _sibling_country(code, codes):
+    """The country of a ticked code with the same three digits (901B -> 901), else None.
+
+    The two letters before a code in an org unit (CL, OU, CB ...) name a service channel, never a
+    country, so they are not used.
+    """
+    base = code[:3]
+    owners = {iso for c, iso in codes.items() if c[:3] == base}
+    return owners.pop() if len(owners) == 1 else None
 
 
-def from_dhis2(path, year, codes, iso2=None, unknown_out=None):
+def from_dhis2(path, year, codes, unknown_out=None):
     """HIV service counts per country from dataValueSets.csv. codes = {ma_code: iso3} (ticked only).
 
-    iso2 = {iso2: iso3}; an unticked code whose org unit starts with a country's iso2 is added to
+    An unticked code that shares its digits with a ticked code (a letter sub-unit) is added to
     unknown_out[iso3], so the review line for that country can say its total leaves the code out.
     """
     path = Path(path)
@@ -68,8 +76,7 @@ def from_dhis2(path, year, codes, iso2=None, unknown_out=None):
         if code is None:
             continue  # dropin_check reports it
         if code not in codes:
-            m = PREFIX.search(r.get("orgunit", "") or "")
-            owner = (iso2 or {}).get(m.group(1)) if m else None
+            owner = _sibling_country(code, codes)
             if owner is not None and unknown_out is not None and code not in unknown_out.get(owner, []):
                 unknown_out.setdefault(owner, []).append(code)
             if code not in unknown:
@@ -318,12 +325,8 @@ def derive(map_root, year, topic, baseline, edition=None):
     if want("ippf_hiv_services"):
         p = checked("ippf_dhis2_annual.v1.json", "services", "dataValueSets.csv", year)
         if p:
-            mc, iso2, unknown = it / "master_countries.csv", {}, {}
-            if mc.exists():
-                with open(mc, encoding="utf-8-sig", newline="") as f:
-                    iso2 = {r["iso2"].strip().upper(): r["iso3"].strip() for r in csv.DictReader(f)
-                            if (r.get("iso2") or "").strip()}
-            new, pr = from_dhis2(p, year, codes, iso2, unknown)
+            unknown = {}
+            new, pr = from_dhis2(p, year, codes, unknown)
             problems.extend(pr)
             cover(new, "ippf_hiv_services", year)
             if unknown:

@@ -183,12 +183,14 @@ def test_unknown_code_with_country_prefix_reaches_that_country():
                   [["901", "XAA", "Org One", "R", "2026-11-08"]])
         write_csv(root / "intelligence_tool" / "master_countries.csv", ["country", "iso3", "iso2"],
                   [["Country A", "XAA", "XA"]])
+        # The two letters before a code name a service channel (clinic, outreach ...), never a country:
+        # 'XA' below equals the master iso2 on purpose, and must NOT attach 777 to XAA.
         dhis2_file(root / "drop_in" / str(YEAR), [
             ["SRV-HIV and AIDS - a", "2025", "Org One (XA901-0000)", "0 - 24", "5"],
-            ["SRV-HIV and AIDS - a", "2025", "Org One sub (XA901B-0000)", "0 - 24", "4"],
-            ["SRV-HIV and AIDS - a", "2025", "Lost org (QQ777-0000)", "0 - 24", "4"]])
+            ["SRV-HIV and AIDS - a", "2025", "Static Clinics (QQ901B-0000)", "0 - 24", "4"],
+            ["SRV-HIV and AIDS - a", "2025", "Static Clinics (XA777-0000)", "0 - 24", "4"]])
         rows, problems, covered = dr.derive(root, YEAR, "HIV", [])
-        check("I2: unknown code with the country's iso2 prefix carried to that country",
+        check("I2: unticked letter sub-unit carried to the country of its ticked main code; channel letters ignored",
               covered.get("ippf_hiv_services", {}).get("unknown_codes") == {"XAA": ["901B"]}, str(covered))
         check("I2: both unknown codes still listed as notes",
               sum("unknown organisation code" in p for p in problems) == 2, str(problems))
