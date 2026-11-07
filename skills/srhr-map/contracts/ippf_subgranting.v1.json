@@ -1,0 +1,33 @@
+{
+  "contract_id": "ippf_subgranting",
+  "version": "1.0.0",
+  "owner": "TO CONFIRM (Ane)",
+  "reporting_year": "the grant year; the projects sheet is named for it",
+  "about": "The regional subgranting ledger. The map uses grant streams per country and period, and partner countries (half dots). Columns and rules only; stream names and amounts stay in the organisation's storage.",
+  "files": [
+    {
+      "role": "ledger_projects",
+      "pattern": "*.xlsx",
+      "format": "xlsx",
+      "sheet": "projects {year}",
+      "header_row": 2,
+      "required_columns": ["Funding source", "Country", "grant status", "PO number", "other countries", "topic",
+                           "amount", "signed agreement", "start date", "end project", "Reporting deadline",
+                           "Status", "Report received", "Comment"],
+      "rules": [
+        {"rule": "documented", "text": "One row per grant. 'Funding source' maps to a legend stream through the stream crosswalk kept with the register, not in this repository. 'other countries' names partner countries: a partner country gets a half dot unless it already holds a full dot of the same stream."}
+      ]
+    },
+    {
+      "role": "ledger_overview",
+      "pattern": "*.xlsx",
+      "format": "xlsx",
+      "sheet": "Grant and project overview",
+      "header_row": 2,
+      "required_columns": ["Country", "membership status", "region", "Name / acronym"],
+      "rules": [
+        {"rule": "documented", "text": "Every column after the four fixed ones is a grant stream for one year; a mark in the cell means the country holds that stream. Stream columns are read, never listed here."}
+      ]
+    }
+  ]
+}

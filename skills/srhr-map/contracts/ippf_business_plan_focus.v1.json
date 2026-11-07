@@ -1,0 +1,24 @@
+{
+  "contract_id": "ippf_business_plan_focus",
+  "version": "1.0.0",
+  "owner": "TO CONFIRM (Ane)",
+  "reporting_year": "the business-plan year",
+  "about": "A coding sheet for the topic focus rating of each core-grant Member Association's business plan. One row per organisation, a plan page for every rating, never free text in place of a rating. The strongest objection (map skill spec, section 4): this is a human reading every year, so a change from last year needs a second reader.",
+  "files": [
+    {
+      "role": "coding_sheet",
+      "pattern": "business_plan_focus_*.csv",
+      "format": "csv",
+      "header_row": 1,
+      "required_columns": ["iso3", "ma_code", "plan_year", "focus", "plan_page", "reader", "second_reader", "note"],
+      "rules": [
+        {"rule": "period_is_year", "column": "plan_year"},
+        {"rule": "enum", "column": "focus", "allowed": ["high", "moderate", "no HIV focus in plan", "not assessed"]},
+        {"rule": "nonblank_unless", "column": "plan_page", "other": "focus", "value": "not assessed",
+         "why": "every rating cites the plan page it rests on"},
+        {"rule": "nonblank", "column": "reader"},
+        {"rule": "documented", "text": "second_reader is required for any rating that changed from last year; the refresh mode compares years and enforces it (phase c)."}
+      ]
+    }
+  ]
+}

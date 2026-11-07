@@ -1,0 +1,41 @@
+{
+  "contract_id": "ippf_dhis2_annual",
+  "version": "1.0.0",
+  "owner": "TO CONFIRM (Ane)",
+  "reporting_year": "the DHIS2 annual reporting year; every row's period must equal it",
+  "about": "Annual DHIS2 results exports from Member Associations and Collaborative Partners. The map uses service counts per topic and per organisation, and programme ticks. Columns and rules only; no data.",
+  "files": [
+    {
+      "role": "services",
+      "pattern": "dataValueSets.csv",
+      "format": "csv",
+      "header_row": 1,
+      "required_columns": ["dataelement", "period", "orgunit", "categoryoptioncombo", "value"],
+      "rules": [
+        {"rule": "period_is_year", "column": "period"},
+        {"rule": "ma_code_parses", "column": "orgunit",
+         "why": "org units end in the organisation code: '(XX123-0000)', 'Channels (123)', or a digital unit 'XX123-0000' with no parentheses; a sub-unit adds one letter (123A) and is its own organisation"},
+        {"rule": "documented", "text": "Topic selection: a service belongs to a topic when its data element contains the topic label (HIV: 'HIV and AIDS'). Prefix SRV- = direct service, REF- = referral. Data elements starting 'Notes-' are never counted."},
+        {"rule": "documented", "text": "Age band sits in categoryoptioncombo (0 - 24 / 25+). A sex split exists for very few organisations: never report it as a network figure."}
+      ]
+    },
+    {
+      "role": "global_indicators",
+      "pattern": "globalindicators.csv",
+      "format": "csv",
+      "header_row": 1,
+      "required_columns": ["dataelement", "period", "orgunit", "value"],
+      "rules": [
+        {"rule": "period_is_year", "column": "period"},
+        {"rule": "ma_code_parses", "column": "orgunit",
+         "why": "here org units are the organisation name with the code in the LAST parentheses, after a country tag in parentheses"},
+        {"rule": "values_in", "column": "value", "when_column": "dataelement",
+         "when_prefix": ["Marginalised - ", "EG - ", "Ext. Providers - "],
+         "except_containing": "specif",
+         "allowed": ["true", "false", ""],
+         "why": "these are tick boxes or yes/no questions, never counts; elements whose name contains 'specif' are free text (checked on the 2025 export, 07.11.2026)"}
+      ]
+    }
+  ],
+  "reconciliation": "The export of network-wide service and referral totals by category is the reconciliation total for each year. Its file name is misleading: it holds network totals, not one organisation's data. A multi-year export may lack some organisations for some years; confirm by subtraction against the totals, never estimate."
+}
