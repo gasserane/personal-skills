@@ -146,10 +146,11 @@ def test_review_writes_workbook_and_run():
     dhis2(root, 2025, 2025, extra=[unknown])
     code, out = run("review", "--topic", "HIV", "--year", "2025", "--edition", "2027", "--map-root", str(root))
     books = sorted((root / "review").glob("review_2027_*.xlsx"))
-    runf = root / "review" / "run_2027.json"
+    runf = root / "review" / "run_2027_HIV.json"
     check("review exits 0", code == 0, out)
     check("review writes one review_<edition>_<timestamp>.xlsx", len(books) == 1, str(books))
-    check("review writes run_<edition>.json through save_run", runf.exists(), out)
+    check("review --topic HIV writes run_<edition>_HIV.json through save_run (I1: one run file per topic)",
+          runf.exists(), out)
     if runf.exists():
         r = json.loads(runf.read_text(encoding="utf-8"))
         check("run file records baseline 2026 and reporting year 2025",
@@ -177,7 +178,7 @@ def test_files_in_role_subfolders_are_found():
     check("list names the subfolder for each file", "dhis2" in out and "subgranting" in out and "business_plans" in out,
           out)
     code, out = run("review", "--topic", "HIV", "--year", "2025", "--edition", "2027", "--map-root", str(root))
-    runf = root / "review" / "run_2027.json"
+    runf = root / "review" / "run_2027_HIV.json"
     changes = json.loads(runf.read_text(encoding="utf-8"))["changes"] if runf.exists() else []
     check("review derives rows from the subfolder file", code == 0 and any(c["iso3"] == "XAA" for c in changes), out)
 
@@ -210,8 +211,37 @@ def test_apply_and_approve_through_cli():
           code == 0 and (root / "map_register" / "approval_2027.json").exists(), out)
 
 
+def test_corrupt_ledger_and_lock_file_stop_plain():
+    """I6: a damaged ledger, or Excel's '~$' lock file beside it, gives a 'Stopped:' line, no stack trace."""
+    root = planted_root()
+    sub = root / "drop_in" / "2025" / "subgranting"
+    sub.mkdir(parents=True)
+    (sub / "ledger.xlsx").write_bytes(b"this is not a workbook")
+    (sub / "~$ledger.xlsx").write_bytes(b"lock")
+    for cmd in ("check", "review"):
+        try:
+            code, out = run(cmd, "--topic", "funding", "--year", "2025", "--map-root", str(root))
+        except Exception as e:  # noqa: BLE001
+            code, out = None, f"{type(e).__name__}: {e}"
+        check(f"I6: {cmd} on a damaged ledger exits 1 with 'Stopped:'", code == 1 and "Stopped:" in out
+              and "~$" not in out, out)
+
+
+def test_apply_bad_workbook_or_config_exit_1():
+    """I6: cmd_apply turns a missing or non-xlsx workbook and a config error into exit 1, not a crash."""
+    root = planted_root()
+    dhis2(root, 2025, 2025)
+    run("review", "--topic", "HIV", "--year", "2025", "--edition", "2027", "--map-root", str(root))
+    for bad in ("nope.xlsx", str(root / "map_register" / "map_register_2026.csv")):
+        try:
+            code, out = run("apply", "--year", "2025", "--edition", "2027", "--workbook", bad, "--map-root", str(root))
+        except Exception as e:  # noqa: BLE001
+            code, out = None, f"{type(e).__name__}: {e}"
+        check(f"I6: apply --workbook {Path(bad).name}: exit 1, plain line", code == 1 and "Traceback" not in out, out)
+
+
 def main():
-    for t in (test_no_map_root_message, test_map_root_from_environment, test_list_names_every_expected_file,
+    for t in (test_corrupt_ledger_and_lock_file_stop_plain, test_apply_bad_workbook_or_config_exit_1, test_no_map_root_message, test_map_root_from_environment, test_list_names_every_expected_file,
               test_broken_file_stops_plain, test_wrong_year_stops, test_review_writes_workbook_and_run,
               test_files_in_role_subfolders_are_found, test_apply_and_approve_through_cli):
         print(f"-- {t.__name__}")

@@ -126,7 +126,8 @@ def test_answers_keyed_by_change_id_after_sort():
     header, answers, problems = rw.read_answers(out)
     gone = deleted.split(";")
     kept = [c.change_id for c in changes if c.change_id not in gone]
-    check("reviewer and date read back", header == {"reviewer": "Test Reviewer", "date": "2026-01-15"}, str(header))
+    check("reviewer and date read back", (header["reviewer"], header["date"]) == ("Test Reviewer", "2026-01-15"),
+          str(header))
     check("answers of kept rows found by change_id, not position",
           all(answers.get(i) and answers[i].choice == "Correct" for i in kept), str(answers))
     check("deleted row's change_ids are reported missing",
@@ -149,6 +150,32 @@ def test_wrong_needs_value_and_blank_is_not_sure():
           str(answers.get(second)))
     check("blank answers come back as blank choice", all(a.choice == "" for i, a in answers.items()
                                                          if i not in (first, second)), str(answers))
+
+
+def test_wrong_on_grouped_line_is_problem():
+    """I4: one 'Wrong' value on a line that stands for several changes cannot be the right value for each."""
+    out, lines, _ = build(name="grouped_wrong.xlsx")
+    wb = load_workbook(out)
+    ws = wb["Must check"]
+    hdr, rows = data_rows(ws)
+    ci, a, v = hdr.index("change_ids"), hdr.index("Your answer"), hdr.index("Right value")
+    grouped = next(r for r in rows if ";" in (r[ci].value or ""))
+    grouped[a].value, grouped[v].value = rw.WRONG, "999"
+    wb.save(out)
+    _, answers, problems = rw.read_answers(out)
+    ids = grouped[ci].value.split(";")
+    check("I4: 'Wrong' on a grouped line leaves each change unanswered",
+          all(answers[i].choice == "" for i in ids), str({i: answers.get(i) for i in ids}))
+    check("I4: and says why", any(ids[0] in p and "several" in p for p in problems), str(problems))
+
+
+def test_run_digest_written_and_read():
+    """C1: the run digest travels on the hidden id sheet and comes back in the header."""
+    changes = build(name="dg.xlsx")[2]
+    out = rw.write_workbook(cr.group_changes(changes), changes, TMP / "dg2.xlsx", 2026, 2025, run_digest="abc123")
+    header, _, _ = rw.read_answers(out)
+    check("C1: header carries the run digest and the id list",
+          header.get("run_digest") == "abc123" and header.get("ids") == [c.change_id for c in changes], str(header))
 
 
 def test_dropdown_values_exact():

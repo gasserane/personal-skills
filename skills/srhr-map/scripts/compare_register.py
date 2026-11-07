@@ -20,6 +20,18 @@ FOCUS = "ippf_bp_hiv_focus"
 STREAM_SETS = {"ippf_funding_streams"}
 PARTNER = "ippf_funding_streams_partner"
 SECOND_READER = "needs a second reader before it can be ticked"
+SNAPSHOT_TICK = "snapshot ba_tick"
+
+
+def _extra(c, unknown):
+    """Name organisation codes in the new file that point to this country but have no ticked ma_codes row."""
+    codes = (unknown or {}).get(c.iso3) or []
+    if codes:
+        c.extra_codes = ";".join(codes)
+        c.guidance += (f" The new file also holds organisation code(s) {', '.join(codes)} for this country with no "
+                       "ticked row in config\\ma_codes.csv, so their values are NOT in the new value. Tick the "
+                       "code(s) in ma_codes.csv and run review again, or answer Wrong with the full value.")
+    return c
 
 
 @dataclass
@@ -34,6 +46,7 @@ class Change:
     new: dict = None
     guidance: str = ""
     link: str = ""
+    extra_codes: str = ""
 
 
 @dataclass
@@ -93,6 +106,7 @@ def compare(baseline, proposed, covered):
         if k not in earlier or int(b["reference_year"]) > int(earlier[k]["reference_year"]):
             earlier[k] = b
     changes, seen = [], set()
+    unknown = {ind: cov.get("unknown_codes") or {} for ind, cov in covered.items()}
     for n in proposed:
         k = _key(n)
         seen.add(k)
@@ -119,6 +133,8 @@ def compare(baseline, proposed, covered):
     held = {}
     for b in baseline:
         held.setdefault(b["indicator_id"], set()).add(b["iso3"])
+    for c in changes:
+        _extra(c, unknown.get(c.indicator_id))
     for ind, cov in covered.items():
         have = {k[0] for k in seen if k[1] == ind and k[2] == str(cov["year"])}
         for iso3 in sorted(held.get(ind, set()) - have):
@@ -126,6 +142,7 @@ def compare(baseline, proposed, covered):
                                   ind, str(cov["year"]), earlier.get((iso3, ind)), None,
                                   "The file at the link has no value for this country. Correct = it really "
                                   "reported nothing this year.", cov.get("link", "")))
+            _extra(changes[-1], unknown.get(ind))
     return changes
 
 
@@ -143,8 +160,8 @@ def group_changes(changes):
     """Fold changes into review lines; the first MAX_MUST by priority go on 'Must check'."""
     lines, groups = [], {}
     for c in changes:
-        snapshot = (c.new or {}).get("ticked_by") == "snapshot ba_tick"
-        own = c.kind != "new" or size_of(c) > BIG_CHANGE and c.old is not None
+        snapshot = str((c.new or {}).get("ticked_by", "")).startswith(SNAPSHOT_TICK)
+        own = c.kind != "new" or size_of(c) > BIG_CHANGE and c.old is not None or bool(c.extra_codes)
         if own:
             lines.append(Line(c.group, [c.change_id], _title(c), c.guidance, c.link,
                               "Optional" if snapshot else "Must check", size_of(c)))

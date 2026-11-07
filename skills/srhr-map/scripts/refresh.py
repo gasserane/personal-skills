@@ -13,13 +13,15 @@ SRHR_MAP_ROOT environment variable. Its layout is described in derive_rows.py.
 list    names the files expected in drop_in/<year>/ and says which are there.
 check   checks each file there against its contract; the first problem stops with one plain line.
 review  check, then derive proposed rows, compare them with the last edition, save the run file
-        (review/run_<edition>.json) and write review/review_<edition>_<timestamp>.xlsx.
+        (review/run_<edition>.json, or run_<edition>_<topic>.json with --topic) and write
+        review/review_<edition>_<timestamp>.xlsx carrying that run's fingerprint.
 apply   writes the answered workbook into map_register/map_register_<edition>.csv.
 approve records the owner's approval once every change carries a person's tick.
 
 Exit code 0 = done, 1 = stopped or refused (the reason is printed), 2 = the map root is unknown.
 """
 import argparse
+import json
 import os
 import sys
 from datetime import datetime
@@ -83,7 +85,12 @@ def cmd_check(root, year, edition, topic):
             print(f"  not found: {pattern} ({purpose}); that part is not refreshed")
             continue
         seen += 1
-        problems = dc.check_file(c, role, found, yr)
+        try:
+            problems = dc.check_file(c, role, found, yr)
+        except Exception as e:  # noqa: BLE001 - damaged, password-protected or wrong-type file
+            print(f"Stopped: {found.name} cannot be opened ({type(e).__name__}): it may be damaged, protected "
+                  "by a password, or not the right file type. Save a clean copy and run check again.")
+            return 1
         if problems:
             first = problems[0]
             if first.startswith(found.name + ":"):
@@ -108,15 +115,21 @@ def cmd_review(root, year, edition, topic):
     baseline = aa._read(aa._edition_path(root, last))
     try:
         rows, problems, covered = dr.derive(root, year, topic, baseline, edition)
+        changes = cr.compare(baseline, rows, covered)
+        lines = cr.group_changes(changes)
+        run = aa.save_run(root, edition, year, last, changes, topic=topic)
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        book = rw.write_workbook(lines, changes, root / "review" / f"review_{edition}_{stamp}.xlsx", edition, year,
+                                 notes=problems, run_digest=json.loads(run.read_text(encoding="utf-8"))["digest"])
     except (dr.RefreshStop, config_tables.ConfigError) as e:
         print(f"Stopped: {e}")
         return 1
-    changes = cr.compare(baseline, rows, covered)
-    lines = cr.group_changes(changes)
-    run = aa.save_run(root, edition, year, last, changes)
-    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    book = rw.write_workbook(lines, changes, root / "review" / f"review_{edition}_{stamp}.xlsx", edition, year,
-                             notes=problems)
+    except PermissionError as e:
+        print(f"Stopped: {Path(e.filename or 'a file').name} is open or locked. Close it (Excel?) and run review again.")
+        return 1
+    except OSError as e:
+        print(f"Stopped: a file could not be read or written ({e}). Run review again.")
+        return 1
     must = sum(1 for l in lines if l.sheet == "Must check")
     print(f"Compared with edition {last}: {len(changes)} change(s), {must} line(s) to check, "
           f"{len(lines) - must} optional.")
@@ -131,7 +144,7 @@ def cmd_apply(root, edition, workbook):
         print("Refused: name the answered workbook with --workbook.")
         return 1
     res = aa.apply(root, edition, Path(workbook))
-    fatal = [p for p in res.problems if p.startswith(("Refused", "Nothing written", "Write undone"))]
+    fatal = [p for p in res.problems if p.startswith(("Refused", "Stopped", "Nothing written", "Write undone"))]
     for p in res.problems:
         print(p if p in fatal else f"  note: {p}")
     if fatal:

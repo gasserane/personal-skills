@@ -166,9 +166,76 @@ def test_snapshot_unticked_rows_skipped():
         ])
         rows = dr.from_snapshot(p, YEAR)
         check("only ticked rows with machine_check pass are used", [r["iso3"] for r in rows] == ["XAA"], str(rows))
-        check("snapshot tag copied, upstream tick carried",
-              rows and rows[0]["snapshot_tag"] == "Snapshot 2026-10-25" and rows[0]["ticked_by"] == "snapshot ba_tick",
-              str(rows))
+        check("snapshot tag copied, upstream tick carried with the upstream ticker's name (minor)",
+              rows and rows[0]["snapshot_tag"] == "Snapshot 2026-10-25"
+              and rows[0]["ticked_by"] == "snapshot ba_tick: yes", str(rows))
+
+
+def test_unknown_code_with_country_prefix_reaches_that_country():
+    """I2: an unticked code whose prefix names a country is carried to that country's change."""
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "drop_in" / str(YEAR)).mkdir(parents=True)
+        (root / "config").mkdir()
+        (root / "intelligence_tool").mkdir()
+        write_csv(root / "config" / "streams.csv", ["key", "label", "group", "colour"], [["Stream A", "Alpha", "G", "1"]])
+        write_csv(root / "config" / "ma_codes.csv", ["ma_code", "iso3", "org_name", "ticked_by", "tick_date"],
+                  [["901", "XAA", "Org One", "R", "2026-11-08"]])
+        write_csv(root / "intelligence_tool" / "master_countries.csv", ["country", "iso3", "iso2"],
+                  [["Country A", "XAA", "XA"]])
+        dhis2_file(root / "drop_in" / str(YEAR), [
+            ["SRV-HIV and AIDS - a", "2025", "Org One (XA901-0000)", "0 - 24", "5"],
+            ["SRV-HIV and AIDS - a", "2025", "Org One sub (XA901B-0000)", "0 - 24", "4"],
+            ["SRV-HIV and AIDS - a", "2025", "Lost org (QQ777-0000)", "0 - 24", "4"]])
+        rows, problems, covered = dr.derive(root, YEAR, "HIV", [])
+        check("I2: unknown code with the country's iso2 prefix carried to that country",
+              covered.get("ippf_hiv_services", {}).get("unknown_codes") == {"XAA": ["901B"]}, str(covered))
+        check("I2: both unknown codes still listed as notes",
+              sum("unknown organisation code" in p for p in problems) == 2, str(problems))
+
+
+def test_non_numeric_dhis2_value_is_problem():
+    """I6 (re-graded minor): a non-numeric value is a problem line, never a stack trace."""
+    with tempfile.TemporaryDirectory() as tmp:
+        p = dhis2_file(tmp, [["SRV-HIV and AIDS - a", "2025", "Org One (XA901-0000)", "0 - 24", "n/a"],
+                             ["SRV-HIV and AIDS - a", "2025", "Org One (XA901-0000)", "0 - 24", "3"]])
+        try:
+            rows, problems = dr.from_dhis2(p, YEAR, {"901": "XAA"})
+            ok = [r["value"] for r in rows] == ["3"] and any("n/a" in x for x in problems)
+        except Exception as e:  # noqa: BLE001
+            ok, rows, problems = False, [], [f"{type(e).__name__}: {e}"]
+        check("I6: non-numeric value skipped with a problem line", ok, f"{rows} {problems}")
+
+
+def test_find_dropin_skips_lock_files_and_picks_newest():
+    """I6: Excel's '~$' lock file is never picked; minor: the newest file by date wins, not by name."""
+    import os
+    import time
+    with tempfile.TemporaryDirectory() as tmp:
+        sub = Path(tmp) / "subgranting"
+        sub.mkdir()
+        old, new = sub / "z_ledger_old.xlsx", sub / "a_ledger_new.xlsx"
+        old.write_bytes(b"x")
+        new.write_bytes(b"x")
+        t = time.time()
+        os.utime(old, (t - 3600, t - 3600))
+        os.utime(new, (t - 60, t - 60))
+        (sub / "~$a_ledger_new.xlsx").write_bytes(b"lock")
+        got = dr.find_dropin(Path(tmp), "ippf_subgranting.v1.json", "*.xlsx")
+        check("I6/minor: lock file skipped, newest by date picked", got == new, str(got))
+
+
+def test_partner_country_name_with_and():
+    """minor: a country name holding ' and ' stays one partner."""
+    with tempfile.TemporaryDirectory() as tmp:
+        countries = dict(COUNTRIES, **{"land and sea": "XLS"})
+        p = ledger_file(tmp, [{"Funding source": "Beta fund", "Country": "Country A",
+                               "other countries": "Land and Sea, Country B and Country C"}], [],
+                        [[None, "Country A", "MA", "EU", "A"]])
+        rows, problems = dr.from_ledger(p, EDITION, STREAMS, countries)
+        partner = sorted(r["iso3"] for r in rows if r["indicator_id"] == "ippf_funding_streams_partner")
+        check("minor: 'Land and Sea' one partner; 'Country B and Country C' still split",
+              partner == ["XBB", "XCC", "XLS"] and problems == [], f"{partner} {problems}")
 
 
 def test_snapshot_too_old_stops():

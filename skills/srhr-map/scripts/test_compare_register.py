@@ -109,6 +109,24 @@ def test_change_id_stable():
     check("partner rows of two streams get two ids", p1 != p2, f"{p1} {p2}")
 
 
+def test_unknown_codes_reach_the_country_line():
+    """I2: a country with an unticked code gets its own Must-check line naming that code."""
+    base = [row(f"X{c}A", "ippf_hiv_services", 2024, 100) for c in "ABC"]
+    new = [row(f"X{c}A", "ippf_hiv_services", 2025, 105) for c in "ABC"]
+    cov = {"ippf_hiv_services": {"year": "2025", "link": "f.csv", "unknown_codes": {"XBA": ["901B"]}}}
+    changes = cr.compare(base, new, cov)
+    xb = next(c for c in changes if c.iso3 == "XBA")
+    check("I2: the change carries the unknown code in its guidance", "901B" in xb.guidance and
+          "ma_codes.csv" in xb.guidance, xb.guidance)
+    lines = cr.group_changes(changes)
+    own = [l for l in lines if l.change_ids == [xb.change_id]]
+    check("I2: that change is its own Must-check line, not folded into a group",
+          own and own[0].sheet == "Must check", str(lines))
+    cov2 = {"ippf_hiv_services": {"year": "2025", "link": "f.csv", "unknown_codes": {"XZZ": ["777"]}}}
+    miss = [c for c in cr.compare(base + [row("XZZ", "ippf_hiv_services", 2024, 9)], new, cov2) if c.iso3 == "XZZ"]
+    check("I2: a missing country with an unknown code says so", miss and "777" in miss[0].guidance, str(miss))
+
+
 def test_must_check_capped_and_snapshot_optional():
     base = [row(f"X{i:02d}", SVC, 2025, 10) for i in range(40)]
     new = [row(f"X{i:02d}", SVC, 2025, 11 + i) for i in range(40)]

@@ -49,8 +49,15 @@ def _num(text):
 
 
 # ---------------------------------------------------------------- DHIS2 services
-def from_dhis2(path, year, codes):
-    """HIV service counts per country from dataValueSets.csv. codes = {ma_code: iso3} (ticked only)."""
+PREFIX = re.compile(r"([A-Z]{2})\d{3}[A-Z]?(?:-\d{4})?\)?\s*$")
+
+
+def from_dhis2(path, year, codes, iso2=None, unknown_out=None):
+    """HIV service counts per country from dataValueSets.csv. codes = {ma_code: iso3} (ticked only).
+
+    iso2 = {iso2: iso3}; an unticked code whose org unit starts with a country's iso2 is added to
+    unknown_out[iso3], so the review line for that country can say its total leaves the code out.
+    """
     path = Path(path)
     spec = next(f for f in dc.load_contract(CONTRACTS / "ippf_dhis2_annual.v1.json")["files"]
                 if f["role"] == "services")
@@ -61,6 +68,10 @@ def from_dhis2(path, year, codes):
         if code is None:
             continue  # dropin_check reports it
         if code not in codes:
+            m = PREFIX.search(r.get("orgunit", "") or "")
+            owner = (iso2 or {}).get(m.group(1)) if m else None
+            if owner is not None and unknown_out is not None and code not in unknown_out.get(owner, []):
+                unknown_out.setdefault(owner, []).append(code)
             if code not in unknown:
                 unknown.add(code)
                 problems.append(f"unknown organisation code '{code}' ({r.get('orgunit', '').strip()}): no ticked "
@@ -71,7 +82,11 @@ def from_dhis2(path, year, codes):
         total.setdefault(iso3, 0)
         de = r.get("dataelement", "")
         if HIV_LABEL in de and de.startswith(("SRV-", "REF-")):
-            total[iso3] += _num(r.get("value", ""))
+            try:
+                total[iso3] += _num(r.get("value", ""))
+            except ValueError:
+                problems.append(f"value '{r.get('value', '').strip()}' for {r.get('orgunit', '').strip()} "
+                                f"({de.strip()}) is not a number; not counted")
     out = [_row(iso3=iso3, ma_code=";".join(sorted(seen_codes[iso3])), topic="HIV",
                 indicator_id="ippf_hiv_services", value=str(n), value_display=f"{n:,}",
                 reference_year=str(year), source_id="ippf_dhis2_service_stats", machine_check="pass",
@@ -162,7 +177,11 @@ def from_ledger(path, edition, streams, countries):
         full.setdefault(iso, set()).add(k)
         lead_name[iso] = r["Country"].strip()
         cell = (r.get("other countries") or "").strip()
-        for p in ([] if cell.lower() in ("", "n/a") else re.split(r"[,;]| and ", cell)):
+        names = []
+        for part in ([] if cell.lower() in ("", "n/a") else re.split(r"[,;]", cell)):
+            # a country name may itself hold " and "; split on it only when the whole part is no country
+            names += [part] if _country(countries, part) else re.split(r" and ", part)
+        for p in names:
             if p.strip():
                 piso = iso_of(p, f"partner of {r['Country'].strip()}")
                 if piso:
@@ -230,15 +249,22 @@ def from_snapshot(path, reporting_year):
                 continue
             out.append(_row(iso3=s["iso3"], indicator_id=s["indicator_id"], value=s["value"],
                             value_display=s["value_display"], reference_year=s["year"],
-                            date_read=s["retrieved_on"], machine_check="pass", ticked_by="snapshot ba_tick",
+                            date_read=s["retrieved_on"], machine_check="pass",
+                            ticked_by=f"snapshot ba_tick: {s['ba_tick'].strip()}",
                             tick_date=s["retrieved_on"], snapshot_tag=tag, _link=str(path)))
     return out
 
 
 # ---------------------------------------------------------------- derive
-def _one(folder, pattern):
-    hits = sorted(Path(folder).glob(pattern))
-    return hits[-1] if hits else None
+def _one(folder, pattern, newest_by="name"):
+    """The newest file matching pattern; Excel's '~$' lock files are never picked.
+
+    newest_by="name" for files that carry their date in the name (the snapshot), "date" for drop-ins.
+    """
+    hits = [p for p in Path(folder).glob(pattern) if p.is_file() and not p.name.startswith("~$")]
+    if not hits:
+        return None
+    return max(hits, key=lambda p: p.stat().st_mtime) if newest_by == "date" else sorted(hits)[-1]
 
 
 SUBFOLDER = {"ippf_dhis2_annual.v1.json": "dhis2", "ippf_subgranting.v1.json": "subgranting",
@@ -247,7 +273,7 @@ SUBFOLDER = {"ippf_dhis2_annual.v1.json": "dhis2", "ippf_subgranting.v1.json": "
 
 def find_dropin(drop, contract_file, pattern):
     """The newest file matching pattern in drop/<role subfolder>/, else directly in drop/."""
-    return _one(Path(drop) / SUBFOLDER[contract_file], pattern) or _one(drop, pattern)
+    return _one(Path(drop) / SUBFOLDER[contract_file], pattern, "date") or _one(drop, pattern, "date")
 
 
 def _countries(path):
@@ -292,9 +318,16 @@ def derive(map_root, year, topic, baseline, edition=None):
     if want("ippf_hiv_services"):
         p = checked("ippf_dhis2_annual.v1.json", "services", "dataValueSets.csv", year)
         if p:
-            new, pr = from_dhis2(p, year, codes)
+            mc, iso2, unknown = it / "master_countries.csv", {}, {}
+            if mc.exists():
+                with open(mc, encoding="utf-8-sig", newline="") as f:
+                    iso2 = {r["iso2"].strip().upper(): r["iso3"].strip() for r in csv.DictReader(f)
+                            if (r.get("iso2") or "").strip()}
+            new, pr = from_dhis2(p, year, codes, iso2, unknown)
             problems.extend(pr)
             cover(new, "ippf_hiv_services", year)
+            if unknown:
+                covered["ippf_hiv_services"]["unknown_codes"] = unknown
     if want("ippf_funding_streams"):
         p = checked("ippf_subgranting.v1.json", "ledger_projects", "*.xlsx", edition)
         mc = it / "master_countries.csv"

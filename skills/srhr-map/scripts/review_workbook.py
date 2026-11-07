@@ -185,7 +185,7 @@ def _write_lines(ws, lines, by_id, fm, cache):
     ws.autofilter(0, 0, max(len(lines), 1), len(COLUMNS) - 1)
 
 
-def write_workbook(lines, changes, out, edition, reporting_year, notes=()):
+def write_workbook(lines, changes, out, edition, reporting_year, notes=(), run_digest=""):
     """Write the review workbook for one refresh run and return its path.
 
     notes = plain lines a person must see that are not changes (unknown organisation code, a stream
@@ -260,6 +260,7 @@ def write_workbook(lines, changes, out, edition, reporting_year, notes=()):
     ids = wb.add_worksheet(IDS_SHEET)
     for r, c in enumerate(changes):
         ids.write_string(r, 0, c.change_id)
+    ids.write_string(0, 1, run_digest)
     ids.very_hidden()
     _brand_sheet(ids, pkg)
     wb.close()
@@ -291,13 +292,20 @@ def _named(wb, name, fallback_cell):
 
 
 def read_answers(path):
-    """Return (header {reviewer, date}, {change_id: Answer}, problems)."""
+    """Return (header {reviewer, date, ids, run_digest}, {change_id: Answer}, problems).
+
+    ids = the hidden id list the workbook was written with; run_digest = the fingerprint of the review run
+    it was written from (apply refuses it when that run has changed since). 'Wrong' on a line that stands
+    for several changes is a problem and leaves them unanswered: one value cannot be right for each.
+    """
     wb = load_workbook(path, data_only=True)
     header = {"reviewer": str(_named(wb, "Reviewer", REVIEWER_CELL) or "").strip(),
               "date": _iso(_named(wb, "DateAnswered", DATE_CELL))}
     problems, answers = [], {}
     expected = [str(r[0]) for r in wb[IDS_SHEET].iter_rows(values_only=True) if r and r[0]] \
         if IDS_SHEET in wb.sheetnames else []
+    header["ids"] = expected
+    header["run_digest"] = str(wb[IDS_SHEET]["B1"].value or "").strip() if IDS_SHEET in wb.sheetnames else ""
     if not expected:
         problems.append("the workbook's hidden id list is gone; it cannot be applied. Run review again.")
     for ws in wb.worksheets:
@@ -316,6 +324,11 @@ def read_answers(path):
             if choice and choice not in CHOICES:
                 problems.append(f"{', '.join(ids)}: answer '{choice}' is not one of the three in the list; "
                                 "treated as unanswered")
+                choice = ""
+            if choice == WRONG and len(ids) > 1:
+                problems.append(f"{', '.join(ids)}: '{WRONG}' chosen on a line that stands for several changes; "
+                                "one right value cannot fit each of them, so they stay unanswered. Tell the map "
+                                "owner which value is wrong")
                 choice = ""
             if choice == WRONG and not value:
                 problems.append(f"{', '.join(ids)}: '{WRONG}' chosen but the Right value cell is empty; "
