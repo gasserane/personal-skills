@@ -318,7 +318,7 @@ def approve(map_root, edition, by):
         raise ApproveRefused(f"Not approved: {path.name} does not exist; run apply first.")
     left = unresolved(root, edition)
     if left:
-        raise ApproveRefused(f"Not approved: {len(left)} change(s) still need a tick:\n  " + "\n  ".join(left))
+        raise ApproveRefused(f"Not approved: {len(left)} change(s) still need a tick." + "\n  " +"\n  ".join(left))
     out = _reg(root) / f"approval_{edition}.json"
     out.write_text(json.dumps({"edition": edition, "approved_by": by.strip(),
                                "approved_on": date.today().isoformat(),
