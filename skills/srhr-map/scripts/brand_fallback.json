@@ -1,0 +1,11 @@
+{
+  "_note": "Copied from ane_package.reporting.brand.IPPF_FORMAT_TEMPLATE (IPPF Visual Identity 2025): colours and font only, no logo path. Used only where that package is not installed (e.g. Cowork); a workbook made with this fallback carries no logo and will not pass the brand checker.",
+  "colours": {
+    "fire_red": "#EB3300",
+    "dream": "#00313C",
+    "coco": "#3F2021",
+    "platinum": "#D8DCD8",
+    "white": "#FFFFFF"
+  },
+  "font": {"name": "Barlow Medium", "size": 11}
+}
