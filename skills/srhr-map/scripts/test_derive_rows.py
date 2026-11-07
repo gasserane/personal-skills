@@ -127,6 +127,16 @@ def test_partner_half_dot_suppressed_by_full():
         check("clean ledger has no problems", problems == [], str(problems))
 
 
+def test_country_with_org_in_brackets():
+    with tempfile.TemporaryDirectory() as tmp:
+        p = ledger_file(tmp, [{"Funding source": "Beta fund", "Country": "Country A (Org One) "}], [],
+                        [[None, "Country A", "MA", "EU", "A"]])
+        rows, problems = dr.from_ledger(p, EDITION, STREAMS, COUNTRIES)
+        full = {r["iso3"]: r["value_display"] for r in rows if r["indicator_id"] == "ippf_funding_streams"}
+        check("'Country (Org)' resolves to the country", full == {"XAA": "Stream B"} and problems == [],
+              f"{full} {problems}")
+
+
 def test_unknown_stream_is_problem():
     with tempfile.TemporaryDirectory() as tmp:
         p = ledger_file(tmp, [

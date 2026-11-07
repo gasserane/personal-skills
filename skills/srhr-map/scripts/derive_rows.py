@@ -96,7 +96,9 @@ def _matcher(streams):
 
 
 def _country(countries, name):
-    return countries.get(str(name or "").strip().lower())
+    """The ledger may name the organisation after the country: 'Country (Org)'."""
+    text = str(name or "").strip().lower()
+    return countries.get(text) or countries.get(re.sub(r"\s*\([^)]*\)\s*$", "", text))
 
 
 def from_ledger(path, edition, streams, countries):
