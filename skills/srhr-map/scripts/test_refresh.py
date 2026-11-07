@@ -163,6 +163,25 @@ def test_review_writes_workbook_and_run():
     check("review prints the workbook path", books and str(books[0].name) in out, out)
 
 
+def test_files_in_role_subfolders_are_found():
+    """The real folder holds drop_in/<year>/dhis2, subgranting, business_plans; files there must be found."""
+    root = planted_root()
+    sub = root / "drop_in" / "2025" / "dhis2"
+    sub.mkdir(parents=True)
+    spec = spec_of("ippf_dhis2_annual", "services")
+    row = dict(valid_row(spec, 2025), dataelement="SRV-HIV and AIDS counselling",
+               orgunit="Static Clinics (XX100-0000)", categoryoptioncombo="0 - 24", value="120")
+    make(sub, "dataValueSets.csv", spec, 2025, rows=[row])
+    code, out = run("list", "--year", "2025", "--map-root", str(root))
+    check("list finds a file in drop_in/<year>/dhis2", "found: dataValueSets.csv" in out, out)
+    check("list names the subfolder for each file", "dhis2" in out and "subgranting" in out and "business_plans" in out,
+          out)
+    code, out = run("review", "--topic", "HIV", "--year", "2025", "--edition", "2027", "--map-root", str(root))
+    runf = root / "review" / "run_2027.json"
+    changes = json.loads(runf.read_text(encoding="utf-8"))["changes"] if runf.exists() else []
+    check("review derives rows from the subfolder file", code == 0 and any(c["iso3"] == "XAA" for c in changes), out)
+
+
 def test_apply_and_approve_through_cli():
     root = planted_root()
     dhis2(root, 2025, 2025)
@@ -194,7 +213,7 @@ def test_apply_and_approve_through_cli():
 def main():
     for t in (test_no_map_root_message, test_map_root_from_environment, test_list_names_every_expected_file,
               test_broken_file_stops_plain, test_wrong_year_stops, test_review_writes_workbook_and_run,
-              test_apply_and_approve_through_cli):
+              test_files_in_role_subfolders_are_found, test_apply_and_approve_through_cli):
         print(f"-- {t.__name__}")
         try:
             t()

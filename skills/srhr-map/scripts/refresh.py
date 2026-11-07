@@ -63,15 +63,15 @@ def _expected(root, year, edition, topic):
         c, spec = _spec(cf, role)
         yr = year if which == "reporting" else edition
         pattern = spec["pattern"].format(year=yr)
-        yield c, role, pattern, yr, dr._one(folder, pattern), purpose
-
+        where = f"{dr.SUBFOLDER[cf]}\\{pattern}"
+        yield c, role, where, yr, dr.find_dropin(folder, cf, pattern), purpose
 
 
 def cmd_list(root, year, edition, topic):
     print(f"Files expected in drop_in\\{year} (reporting year {year}, register edition {edition}):")
     for c, role, pattern, yr, found, purpose in _expected(root, year, edition, topic):
         state = f"found: {found.name}" if found else "not found"
-        print(f"  {pattern:<28} {c['contract_id']}/{role} ({purpose}) -> {state}")
+        print(f"  {pattern:<42} {c['contract_id']}/{role} ({purpose}) -> {state}")
     return 0
 
 

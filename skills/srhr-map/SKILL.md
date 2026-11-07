@@ -19,7 +19,7 @@ You need the path to the "SRHR map data" folder. If the person has not given it 
 
 The folder holds:
 
-- `drop_in/<reporting year>/`: the new files (service statistics export, grant ledger, business-plan focus coding sheet).
+- `drop_in/<reporting year>/`: the new files, one subfolder each: `dhis2/` (service statistics export), `subgranting/` (grant ledger), `business_plans/` (business-plan focus coding sheet).
 - `intelligence_tool/`: the latest Intelligence Tool snapshot, `master_countries.csv`, and optionally `source_register.csv`.
 - `config/`: `streams.csv` (grant stream names and legend labels) and `ma_codes.csv` (organisation codes, ticked by the map owner).
 - `map_register/`: one register file per map edition. An existing edition is never changed.

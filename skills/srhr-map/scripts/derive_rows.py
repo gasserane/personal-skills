@@ -1,7 +1,9 @@
 """Turn checked drop-in files into proposed register rows (SRHR map skill, phase c, refresh step 3).
 
 Folder layout under the map root (the organisation's storage, never this public repository):
-  drop_in/<reporting year>/   dataValueSets.csv, the grant ledger (*.xlsx), business_plan_focus_*.csv
+  drop_in/<reporting year>/   dhis2/dataValueSets.csv, subgranting/<grant ledger>.xlsx,
+                              business_plans/business_plan_focus_*.csv (a file directly in the year
+                              folder is found too; the subfolder wins when both hold one)
   intelligence_tool/          track_b_proposed_<date>.csv (latest by name), master_countries.csv,
                               source_register.csv (optional, for links)
   config/                     streams.csv, ma_codes.csv (see config_tables.py)
@@ -239,6 +241,15 @@ def _one(folder, pattern):
     return hits[-1] if hits else None
 
 
+SUBFOLDER = {"ippf_dhis2_annual.v1.json": "dhis2", "ippf_subgranting.v1.json": "subgranting",
+             "ippf_business_plan_focus.v1.json": "business_plans"}
+
+
+def find_dropin(drop, contract_file, pattern):
+    """The newest file matching pattern in drop/<role subfolder>/, else directly in drop/."""
+    return _one(Path(drop) / SUBFOLDER[contract_file], pattern) or _one(drop, pattern)
+
+
 def _countries(path):
     out = {}
     with open(path, encoding="utf-8-sig", newline="") as f:
@@ -265,9 +276,10 @@ def derive(map_root, year, topic, baseline, edition=None):
 
     def checked(contract_file, role, pattern, yr):
         c = dc.load_contract(CONTRACTS / contract_file)
-        p = _one(drop, pattern)
+        p = find_dropin(drop, contract_file, pattern)
         if p is None:
-            problems.append(f"no file matching '{pattern}' in drop_in\\{year}; {role} not refreshed")
+            problems.append(f"no file matching '{pattern}' in drop_in\\{year}\\{SUBFOLDER[contract_file]}; "
+                            f"{role} not refreshed")
             return None
         bad = dc.check_file(c, role, p, yr)
         problems.extend(bad)
