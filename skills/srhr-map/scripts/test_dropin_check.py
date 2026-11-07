@@ -117,9 +117,10 @@ def main():
         p = make(tmp, "dataValueSets.csv", spec, YEAR, rows=[dict(row, orgunit="Head office")])
         expect("orgunit_unparsed", dh, "services", p, YEAR, 1, "line 2")
 
-        for text, code in (("Digital/Virtual DV523-0000", "523"), ("Static Clinics (CL542-0000)", "542"),
-                           ("Channels (510)", "510"), ("Some Name (DE) (510)", "510"),
-                           ("Static Clinics (CL503A-0000)", "503A"), ("Head office", None)):
+        # invented codes (9xx): real organisation codes never go in this public repository
+        for text, code in (("Digital/Virtual DV923-0000", "923"), ("Static Clinics (CL942-0000)", "942"),
+                           ("Channels (910)", "910"), ("Some Name (XX) (910)", "910"),
+                           ("Static Clinics (CL903A-0000)", "903A"), ("Head office", None)):
             record(f"ma_code {text!r}", dc.ma_code(text) == code, f"got {dc.ma_code(text)!r}, want {code!r}")
 
         spec = spec_of("ippf_dhis2_annual", "global_indicators")
