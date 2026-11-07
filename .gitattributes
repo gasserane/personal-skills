@@ -1,0 +1,3 @@
+# Byte-identical copies of a canonical file kept elsewhere: never convert line endings,
+# or the byte check in the SRHR data pipeline fails on a checkout.
+skills/srhr-map/shared/* -text
