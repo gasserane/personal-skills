@@ -185,8 +185,12 @@ def _write_lines(ws, lines, by_id, fm, cache):
     ws.autofilter(0, 0, max(len(lines), 1), len(COLUMNS) - 1)
 
 
-def write_workbook(lines, changes, out, edition, reporting_year):
-    """Write the review workbook for one refresh run and return its path."""
+def write_workbook(lines, changes, out, edition, reporting_year, notes=()):
+    """Write the review workbook for one refresh run and return its path.
+
+    notes = plain lines a person must see that are not changes (unknown organisation code, a stream
+    name with no crosswalk row, a file not dropped in); listed on 'How to use' under row 10.
+    """
     out = Path(out)
     out.parent.mkdir(parents=True, exist_ok=True)
     pkg = brand_package()
@@ -215,6 +219,10 @@ def write_workbook(lines, changes, out, edition, reporting_year):
     wb.define_name("DateAnswered", f"='How to use'!${DATE_CELL[0]}${DATE_CELL[1:]}")
     how.write(8, 0, f"{len(must)} line(s) on Must check, {len(opt)} on Optional, {len(changes)} change(s) in all.",
               fm["text"])
+    if notes:
+        how.write(10, 0, "Also tell the map owner about these (not changes, so no answer is needed):", fm["header"])
+        for i, n in enumerate(notes, start=11):
+            how.write_string(i, 0, f"- {n}", fm["text"])
     _brand_sheet(how, pkg)
 
     for name, ls in (("Must check", must), ("Optional", opt)):
