@@ -1,0 +1,223 @@
+{
+  "schema_version": "1.1.1",
+  "_changes": {
+    "1.1.1": "2026-11-07, map skill phase (b): bundle_copies lists the map skill's copy through a ${PERSONAL_SKILLS_CLONE} token; schema_check globs map_skill tables under SRHR_MAP_ROOT (the register lives in SharePoint, never in git). No table changed. Pending Ane's sign-off with 1.1.0.",
+    "1.1.0": "2026-11-07, map skill phase (a): new_topic_request and new_topic_candidates tables (map skill spec section 5, step 2). Pending Ane's sign-off as method owner.",
+    "1.0.1": "2026-11-07, Ane: indicators_track_b.source_id may list several sources separated by '; ' (the Dublin 95-95-95 indicators combine ECDC Dublin and UNAIDS); each listed id must be in the source register."
+  },
+  "_about": "Shared data contract between the SRHR Intelligence Tool and the SRHR map skill (map skill spec section 3). Canonical copy: this file until skill-source/ exists, then skill-source/shared/. Each skill bundle carries a byte-identical copy, listed in bundle_copies. A change bumps schema_version and needs Ane's sign-off as method owner.",
+  "country_key": "iso3",
+  "types": {
+    "str": "any text",
+    "int": "whole number, optional leading minus",
+    "date": "YYYY-MM-DD",
+    "iso3": "3 capital letters (A-Z), present in master_countries.iso3",
+    "value": "a number or a text category (snapshot values mix both)",
+    "tick": "blank means not ticked; any text means ticked",
+    "enum:a|b": "one of the listed values"
+  },
+  "field_defaults": {"required": true, "nonblank": false},
+  "tables": {
+    "master_countries": {
+      "owner": "intelligence_tool",
+      "glob": "master_countries.csv",
+      "unique": ["iso3"],
+      "fields": [
+        {"name": "country", "type": "str", "nonblank": true},
+        {"name": "iso3", "type": "iso3", "nonblank": true},
+        {"name": "iso2", "type": "str"},
+        {"name": "m49", "type": "str"},
+        {"name": "eurostat_geo", "type": "str"},
+        {"name": "sub_region", "type": "str", "nonblank": true},
+        {"name": "sub_region_name", "type": "str"},
+        {"name": "roll_up", "type": "str", "nonblank": true},
+        {"name": "scope", "type": "str", "nonblank": true},
+        {"name": "eu_status", "type": "str", "nonblank": true},
+        {"name": "ippf_relationship", "type": "str", "nonblank": true},
+        {"name": "ippf_relationship_source", "type": "str"},
+        {"name": "aoc_portfolio", "type": "str"},
+        {"name": "notes", "type": "str"}
+      ]
+    },
+    "source_register": {
+      "owner": "intelligence_tool",
+      "glob": "source_register.csv",
+      "unique": ["source_id"],
+      "fields": [
+        {"name": "source_id", "type": "str", "nonblank": true},
+        {"name": "source", "type": "str", "nonblank": true},
+        {"name": "publisher", "type": "str"},
+        {"name": "track", "type": "str"},
+        {"name": "access", "type": "str"},
+        {"name": "url", "type": "str"},
+        {"name": "current_edition", "type": "str"},
+        {"name": "published", "type": "str"},
+        {"name": "cadence", "type": "str"},
+        {"name": "next_expected", "type": "str"},
+        {"name": "topics", "type": "str"},
+        {"name": "coverage_note", "type": "str"},
+        {"name": "verified_on", "type": "str"},
+        {"name": "status", "type": "str"}
+      ]
+    },
+    "indicators_track_a": {
+      "owner": "intelligence_tool",
+      "glob": "indicators_track_a.csv",
+      "unique": ["indicator_id"],
+      "fields": [
+        {"name": "indicator_id", "type": "str", "nonblank": true},
+        {"name": "topic", "type": "str"},
+        {"name": "dimension", "type": "str"},
+        {"name": "feed", "type": "str"},
+        {"name": "code", "type": "str"},
+        {"name": "filter", "type": "str"},
+        {"name": "name", "type": "str"},
+        {"name": "unit", "type": "str"},
+        {"name": "disability_disaggregation", "type": "str"},
+        {"name": "notes", "type": "str"}
+      ]
+    },
+    "indicators_track_b": {
+      "owner": "intelligence_tool",
+      "glob": "indicators_track_b.csv",
+      "unique": ["indicator_id"],
+      "fields": [
+        {"name": "indicator_id", "type": "str", "nonblank": true},
+        {"name": "topic", "type": "str"},
+        {"name": "dimension", "type": "str"},
+        {"name": "feed", "type": "str"},
+        {"name": "code", "type": "str"},
+        {"name": "filter", "type": "str"},
+        {"name": "name", "type": "str"},
+        {"name": "unit", "type": "str"},
+        {"name": "disability_disaggregation", "type": "str"},
+        {"name": "notes", "type": "str"},
+        {"name": "source_id", "type": "str"},
+        {"name": "publication_month", "type": "str"}
+      ]
+    },
+    "snapshot_track_a": {
+      "owner": "intelligence_tool",
+      "glob": "snapshots/track_a_*.csv",
+      "fields": [
+        {"name": "iso3", "type": "iso3", "nonblank": true},
+        {"name": "indicator_id", "type": "str", "nonblank": true},
+        {"name": "year", "type": "int", "nonblank": true},
+        {"name": "value", "type": "value"},
+        {"name": "value_display", "type": "str"},
+        {"name": "feed", "type": "str"},
+        {"name": "code", "type": "str"},
+        {"name": "retrieved_on", "type": "date", "nonblank": true}
+      ]
+    },
+    "snapshot_track_b_proposed": {
+      "owner": "intelligence_tool",
+      "glob": "snapshots/track_b_proposed_*.csv",
+      "fields": [
+        {"name": "iso3", "type": "iso3", "nonblank": true},
+        {"name": "indicator_id", "type": "str", "nonblank": true},
+        {"name": "year", "type": "int", "nonblank": true},
+        {"name": "value", "type": "value"},
+        {"name": "value_display", "type": "str"},
+        {"name": "feed", "type": "str"},
+        {"name": "code", "type": "str"},
+        {"name": "retrieved_on", "type": "date", "nonblank": true},
+        {"name": "source_ref", "type": "str"},
+        {"name": "ba_tick", "type": "tick"},
+        {"name": "machine_check", "type": "str", "required": false},
+        {"name": "note", "type": "str"}
+      ]
+    },
+    "map_register": {
+      "owner": "map_skill",
+      "glob": "map_register/map_register_*.csv",
+      "_about": "Map skill spec section 4; Annex F Mapping Evidence Register shape. Public context rows carry the Intelligence Tool snapshot_tag and are never re-derived. IPPF internal sources use source_id values starting ippf_.",
+      "fields": [
+        {"name": "iso3", "type": "iso3", "nonblank": true},
+        {"name": "ma_code", "type": "str"},
+        {"name": "member_status", "type": "str"},
+        {"name": "topic", "type": "str", "nonblank": true},
+        {"name": "indicator_id", "type": "str", "nonblank": true},
+        {"name": "value", "type": "value"},
+        {"name": "value_display", "type": "str"},
+        {"name": "unit", "type": "str"},
+        {"name": "reference_year", "type": "int", "nonblank": true},
+        {"name": "source_id", "type": "str", "nonblank": true},
+        {"name": "date_read", "type": "date", "nonblank": true},
+        {"name": "machine_check", "type": "str"},
+        {"name": "ticked_by", "type": "tick"},
+        {"name": "tick_date", "type": "date"},
+        {"name": "snapshot_tag", "type": "str"}
+      ],
+      "rules": [
+        {"rule": "nonblank_unless_prefix", "field": "snapshot_tag", "prefix_field": "source_id", "prefix": "ippf_",
+         "why": "public context rows must carry the snapshot they were copied from"},
+        {"rule": "together", "fields": ["ticked_by", "tick_date"],
+         "why": "a tick names who and when, or neither"}
+      ]
+    },
+    "new_topic_request": {
+      "owner": "map_skill",
+      "glob": "requests/new_topic_*.csv",
+      "_about": "The map skill asks the Intelligence Tool to search public repositories for a new topic (spec section 5, step 2). The search runs in Claude Code on the Intelligence Tool side.",
+      "fields": [
+        {"name": "request_id", "type": "str", "nonblank": true},
+        {"name": "topic", "type": "str", "nonblank": true},
+        {"name": "requested_by", "type": "str", "nonblank": true},
+        {"name": "requested_on", "type": "date", "nonblank": true},
+        {"name": "indicator_needs", "type": "str", "nonblank": true},
+        {"name": "country_scope", "type": "enum:AoC|AoC+expansion", "nonblank": true},
+        {"name": "status", "type": "enum:open|searched|closed", "nonblank": true}
+      ]
+    },
+    "new_topic_candidates": {
+      "owner": "intelligence_tool",
+      "may_be_empty": true,
+      "glob": "snapshots/new_topic_candidates_*.csv",
+      "_about": "Candidate repositories found by the search, in source register shape plus the four criteria of spec section 5, step 2, kept separate (no combined score). Only rows a person approved move to the source register.",
+      "fields": [
+        {"name": "source_id", "type": "str", "nonblank": true},
+        {"name": "source", "type": "str", "nonblank": true},
+        {"name": "publisher", "type": "str"},
+        {"name": "track", "type": "str"},
+        {"name": "access", "type": "str"},
+        {"name": "url", "type": "str"},
+        {"name": "current_edition", "type": "str"},
+        {"name": "published", "type": "str"},
+        {"name": "cadence", "type": "str"},
+        {"name": "next_expected", "type": "str"},
+        {"name": "topics", "type": "str"},
+        {"name": "coverage_note", "type": "str"},
+        {"name": "verified_on", "type": "str"},
+        {"name": "status", "type": "str"},
+        {"name": "request_id", "type": "str", "nonblank": true},
+        {"name": "aoc_coverage", "type": "int", "nonblank": true},
+        {"name": "last_update", "type": "date", "nonblank": true},
+        {"name": "licence", "type": "str", "nonblank": true},
+        {"name": "recheckable", "type": "enum:yes|no|partial", "nonblank": true},
+        {"name": "evidence_url", "type": "str", "nonblank": true},
+        {"name": "approved_by", "type": "tick"},
+        {"name": "approved_on", "type": "date"}
+      ],
+      "unique": ["source_id"],
+      "rules": [
+        {"rule": "together", "fields": ["approved_by", "approved_on"],
+         "why": "an approval names who and when, or neither"}
+      ]
+    }
+  },
+  "foreign_keys": [
+    {"table": "snapshot_track_a", "field": "iso3", "ref": "iso3"},
+    {"table": "snapshot_track_b_proposed", "field": "iso3", "ref": "iso3"},
+    {"table": "map_register", "field": "iso3", "ref": "iso3"},
+    {"table": "snapshot_track_a", "field": "indicator_id", "ref": "indicator_id"},
+    {"table": "snapshot_track_b_proposed", "field": "indicator_id", "ref": "indicator_id"},
+    {"table": "indicators_track_b", "field": "source_id", "ref": "source_id", "list_sep": "; "},
+    {"table": "map_register", "field": "source_id", "ref": "source_id", "exempt_prefix": {"field": "source_id", "prefix": "ippf_"}},
+    {"table": "map_register", "field": "indicator_id", "ref": "indicator_id", "exempt_prefix": {"field": "source_id", "prefix": "ippf_"}}
+  ],
+  "bundle_copies": [
+    "${PERSONAL_SKILLS_CLONE}/skills/srhr-map/shared/srhr_data_contract.v1.json"
+  ],
+  "_bundle_copies_note": "Byte-identical copies inside each skill bundle. A path is relative to the work-folder root unless it starts with ${NAME}, read from the environment, then from ane_package.config. An unresolved name is reported, never passed."
+}
