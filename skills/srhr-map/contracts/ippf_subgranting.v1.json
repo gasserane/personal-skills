@@ -1,7 +1,7 @@
 {
   "contract_id": "ippf_subgranting",
-  "version": "1.0.0",
-  "owner": "TO CONFIRM (Ane)",
+  "version": "1.0.1",
+  "owner": "Ane Gasser",
   "reporting_year": "the grant year; the projects sheet is named for it",
   "about": "The regional subgranting ledger. The map uses grant streams per country and period, and partner countries (half dots). Columns and rules only; stream names and amounts stay in the organisation's storage.",
   "files": [

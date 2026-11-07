@@ -1,7 +1,7 @@
 {
   "contract_id": "ippf_dhis2_annual",
-  "version": "1.0.0",
-  "owner": "TO CONFIRM (Ane)",
+  "version": "1.0.1",
+  "owner": "Ane Gasser",
   "reporting_year": "the DHIS2 annual reporting year; every row's period must equal it",
   "about": "Annual DHIS2 results exports from Member Associations and Collaborative Partners. The map uses service counts per topic and per organisation, and programme ticks. Columns and rules only; no data.",
   "files": [
