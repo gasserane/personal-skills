@@ -6,7 +6,8 @@ Folder layout under the map root (the organisation's storage, never this public 
                               folder is found too; the subfolder wins when both hold one)
   intelligence_tool/          track_b_proposed_<date>.csv (latest by name), master_countries.csv,
                               source_register.csv (optional, for links)
-  config/                     streams.csv, ma_codes.csv (see config_tables.py)
+  config/                     streams.csv, ma_codes.csv (see config_tables.py), optional
+                              country_aliases.csv (ledger spellings; ticked rows only, see load_countries)
 
 DHIS2 and the Intelligence Tool snapshot are read at the reporting year; the grant ledger and the
 business-plan coding sheet at the edition year (reporting year + 1 by default), because the register
@@ -28,6 +29,7 @@ FIELDS = ["iso3", "ma_code", "member_status", "topic", "indicator_id", "value", 
 CONTRACTS = Path(__file__).resolve().parent.parent / "contracts"
 HIV_LABEL = "HIV and AIDS"
 NOT_ON_MAP = "not on map"
+NOT_A_COUNTRY = "-"  # a ticked alias with blank iso3: the ledger's word is no country (e.g. a catch-all row)
 TOPIC_OF = {"ippf_hiv_services": "HIV", "ippf_bp_hiv_focus": "HIV", "ippf_funding_streams": "funding",
             "ippf_grant_streams_count": "funding", "ippf_funding_streams_partner": "funding"}
 
@@ -145,6 +147,8 @@ def from_ledger(path, edition, streams, countries):
 
     def iso_of(name, where):
         iso = _country(countries, name)
+        if iso == NOT_A_COUNTRY:
+            return None
         if iso is None and str(name).strip().lower() not in ("", "n/a") and (name, where) not in said:
             said.add((name, where))
             problems.append(f"country '{str(name).strip()}' ({where}) has no row in master_countries.csv; not mapped")
@@ -293,6 +297,21 @@ def _countries(path):
     return out
 
 
+def load_countries(map_root):
+    """{country name, iso2 or iso3 lowercased: iso3} from intelligence_tool/master_countries.csv, plus the
+    TICKED rows of the optional config/country_aliases.csv (alias,iso3,ticked_by,tick_date) for ledger
+    spellings the master list does not hold; a ticked alias with blank iso3 maps to NOT_A_COUNTRY."""
+    root = Path(map_root)
+    out = _countries(root / "intelligence_tool" / "master_countries.csv")
+    al = root / "config" / "country_aliases.csv"
+    if al.exists():
+        with open(al, encoding="utf-8-sig", newline="") as f:
+            for r in csv.DictReader(f):
+                if (r.get("alias") or "").strip() and (r.get("ticked_by") or "").strip():
+                    out[r["alias"].strip().lower()] = (r.get("iso3") or "").strip() or NOT_A_COUNTRY
+    return out
+
+
 def derive(map_root, year, topic, baseline, edition=None):
     """Return (proposed rows, problems, covered). covered = {indicator_id: {"year", "link"}}.
 
@@ -338,7 +357,7 @@ def derive(map_root, year, topic, baseline, edition=None):
             problems.append("intelligence_tool\\master_countries.csv is missing; funding not refreshed")
         elif p and not dc.check_file(dc.load_contract(CONTRACTS / "ippf_subgranting.v1.json"),
                                      "ledger_overview", p, edition):
-            new, pr = from_ledger(p, edition, streams, _countries(mc))
+            new, pr = from_ledger(p, edition, streams, load_countries(root))
             problems.extend(pr)
             for ind in ("ippf_funding_streams", "ippf_grant_streams_count", "ippf_funding_streams_partner"):
                 cover([r for r in new if r["indicator_id"] == ind], ind, edition)

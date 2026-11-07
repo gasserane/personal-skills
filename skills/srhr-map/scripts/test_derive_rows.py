@@ -227,6 +227,31 @@ def test_find_dropin_skips_lock_files_and_picks_newest():
         check("I6/minor: lock file skipped, newest by date picked", got == new, str(got))
 
 
+def test_country_aliases_ticked_only():
+    """B4: config/country_aliases.csv maps ledger spellings to iso3; unticked rows unused; blank iso3 = not a country."""
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "config").mkdir()
+        (root / "intelligence_tool").mkdir()
+        write_csv(root / "intelligence_tool" / "master_countries.csv", ["country", "iso3", "iso2"],
+                  [["Country A", "XAA", "XA"]])
+        write_csv(root / "config" / "country_aliases.csv", ["alias", "iso3", "ticked_by", "tick_date"],
+                  [["Cntry A", "XAA", "R", "2026-11-08"], ["Unticked spelling", "XAA", "", ""],
+                   ["Elsewhere", "", "R", "2026-11-08"]])
+        got = dr.load_countries(root)
+        check("B4: ticked alias maps, unticked alias does not", got.get("cntry a") == "XAA"
+              and "unticked spelling" not in got, str(got))
+        check("B4: ticked alias with blank iso3 marks 'not a country'", got.get("elsewhere") == dr.NOT_A_COUNTRY,
+              str(got))
+        p = ledger_file(tmp, [{"Funding source": "Beta fund", "Country": "Cntry A"},
+                              {"Funding source": "Beta fund", "Country": "Elsewhere"}], [],
+                        [[None, "Country A", "MA", "EU", "A"], [None, "Elsewhere", "", "", ""]])
+        rows, problems = dr.from_ledger(p, EDITION, STREAMS, got)
+        full = {r["iso3"] for r in rows if r["indicator_id"] == "ippf_funding_streams"}
+        check("B4: alias spelling counted for its country; 'not a country' gives no row and no problem",
+              full == {"XAA"} and problems == [], f"{full} {problems}")
+
+
 def test_partner_country_name_with_and():
     """minor: a country name holding ' and ' stays one partner."""
     with tempfile.TemporaryDirectory() as tmp:
