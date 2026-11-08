@@ -66,6 +66,8 @@ def make_root(root: Path):
     write_csv(root / "config" / "summary_page.csv", ["key", "value"],
               [{"key": "contact", "value": "x@example.org"}, {"key": "author_unit", "value": "Unit"},
                {"key": "disclosure", "value": "Text."}])
+    write_csv(root / "config" / "context_names.csv", ["geometry_name", "shown_name"],
+              [{"geometry_name": "Context-land", "shown_name": "Context Land Renamed"}])
     write_csv(root / "intelligence_tool" / "source_register.csv", ["source_id", "source", "publisher", "url"],
                   [{"source_id": "src_a", "source": "Source A", "publisher": "Agency A", "url": ""}])
     (root / "publish" / "_geometry" / "countries-50m.json").write_text(json.dumps(twm.TOPO), encoding="utf-8")
@@ -129,6 +131,11 @@ def main():
         check(f"{sub}_exit_0", code == 0 and target.exists(), (code, log))
     code, log = run("webmap", *base)
     check("builder_refuses_existing", code == 2 and "never overwritten" in log, (code, log))
+    # PROMPT 7 names (Ane 2026-11-09): grey context names come from config/context_names.csv, on both pages
+    for nm, f in (("webmap", pub / f"webmap_{ED}.html"), ("summary", pub / f"webmap_summary_{ED}.html")):
+        txt = f.read_text(encoding="utf-8") if f.exists() else ""
+        check(f"{nm}_context_name_from_config",
+              '"name":"Context Land Renamed"' in txt and '"name":"Context-land"' not in txt, nm)
 
     # --- check agrees ---
     code, log = run("check", *base)
@@ -207,6 +214,32 @@ def main():
     wm.write_text(text, encoding="utf-8")
     code, log = run("check", *base)
     check("check_green_again_after_restore", code == 0, log)
+    # PROMPT 7 names: a page holding an old grey name fails check (each page), and so does a missing config file
+    for nm, f in (("webmap", wm), ("summary", sm)):
+        t = f.read_text(encoding="utf-8")
+        f.write_text(t.replace('"name":"Context Land Renamed"', '"name":"Context-land"', 1), encoding="utf-8")
+        code, log = run("check", *base)
+        check(f"check_flags_stale_context_name_{nm}", code == 1 and f"FAIL {nm}" in log
+              and "grey" in log.split(f"FAIL {nm}")[-1], log[-400:])
+        f.write_text(t, encoding="utf-8")
+    cn = root / "config" / "context_names.csv"
+    cn_keep = cn.read_bytes()
+    cn.unlink()
+    code, log = run("check", *base)
+    check("check_stops_without_context_names", code == 1 and "context_names.csv" in log, log[-400:])
+    wm.rename(wm.with_name(wm.name + ".keep"))
+    code, log = run("webmap", *base)
+    check("webmap_stops_without_context_names", code == 1 and "context_names.csv" in log and not wm.exists(),
+          (code, log[-300:]))
+    sm.rename(sm.with_name(sm.name + ".keep"))
+    code, log = run("summary", "--map-root", str(root))
+    check("summary_stops_without_context_names", code == 1 and "context_names.csv" in log and not sm.exists(),
+          (code, log[-300:]))
+    wm.with_name(wm.name + ".keep").rename(wm)
+    sm.with_name(sm.name + ".keep").rename(sm)
+    cn.write_bytes(cn_keep)
+    code, log = run("check", *base)
+    check("check_green_after_context_names_restored", code == 0, log)
 
     # --- check sees stale values: change one register value (same rows, same ticks, same coloured set),
     #     rebuild only the dataset; the kept workbook and web map must still fail (final review I-1) ---

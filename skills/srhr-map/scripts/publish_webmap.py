@@ -25,6 +25,7 @@ The target is never overwritten (exit 2). Exit 1 = input error.
 """
 import argparse
 import base64
+import csv
 import hashlib
 import html
 import json
@@ -116,8 +117,41 @@ def _bbox(polys):
     return (min(xs), min(ys), max(xs), max(ys)) if xs else None
 
 
-def countries(topo, master_rows, frame_isos):
-    """[{iso3, name, paths}] for the master countries and the grey context countries around them."""
+def load_context_names(path):
+    """{geometry name: hover name} from config/context_names.csv (geometry_name,shown_name), the map owner's
+    names for the grey context shapes. An empty shown_name keeps that shape silent. The table lives in the
+    private config, not here, because it names places on the master list. A missing or malformed file stops
+    the build, so the grey names never fall back to the geometry file's short forms unnoticed."""
+    p = Path(path)
+    out = {}
+    try:
+        with open(p, encoding="utf-8-sig", newline="") as f:
+            rd = csv.DictReader(f)
+            if [h.strip() for h in (rd.fieldnames or [])[:2]] != ["geometry_name", "shown_name"]:
+                raise Stop(1, f"stop: {p.name} needs the header geometry_name,shown_name")
+            for r in rd:
+                k = (r.get("geometry_name") or "").strip()
+                if not k:
+                    continue
+                if k in out:
+                    raise Stop(1, f"stop: {p.name} lists {k!r} twice")
+                out[k] = (r.get("shown_name") or "").strip()
+    except OSError as e:
+        raise Stop(1, f"stop: cannot read {p.name} (the grey country names, config/context_names.csv): {e}")
+    return out
+
+
+def grey_names(geometry, master_rows, frame_isos, context_names):
+    """Sorted hover names of the grey shapes a page built now would carry (publish.py check)."""
+    names = load_context_names(context_names)
+    topo = json.loads(Path(geometry).read_bytes().decode("utf-8"))
+    return sorted(c["name"] for c in countries(topo, master_rows, frame_isos, names) if not c["iso3"])
+
+
+def countries(topo, master_rows, frame_isos, names=None):
+    """[{iso3, name, paths}] for the master countries and the grey context countries around them; names
+    (load_context_names) renames the grey ones, "" = silent."""
+    names = names or {}
     arcs = _arcs(topo)
     obj = topo["objects"].get("countries") or next(iter(topo["objects"].values()))
     by_m49 = {r["m49"].zfill(3): r for r in master_rows if r.get("m49", "").strip().isdigit()}
@@ -134,7 +168,7 @@ def countries(topo, master_rows, frame_isos):
         if r:
             found.setdefault(r["iso3"], {"iso3": r["iso3"], "name": r["country"], "paths": []})["paths"] += polys
         else:
-            context.append({"iso3": "", "name": name, "paths": polys})
+            context.append({"iso3": "", "name": names.get(name, name), "paths": polys})
     boxes = [_bbox(c["paths"]) for i, c in found.items() if i in frame_isos] or \
             [_bbox(c["paths"]) for c in found.values()]
     boxes = [b for b in boxes if b]
@@ -386,8 +420,9 @@ def page(data, d3_js, header_html=None, footer_html=None, title=None):
     return re.sub(r"@@([A-Z0-9]+)@@", lambda m: fill[m.group(1)], PAGE)
 
 
-def build(register, crosswalk_path, master, decks, geometry, out, edition=None, d3=None):
+def build(register, crosswalk_path, master, decks, geometry, out, edition=None, d3=None, context_names=None):
     refuse_existing(out)
+    names = load_context_names(context_names) if context_names else None
     try:
         d3_bytes = Path(d3).read_bytes()
         d3_js = d3_bytes.decode("utf-8")
@@ -410,7 +445,7 @@ def build(register, crosswalk_path, master, decks, geometry, out, edition=None, 
     except (OSError, ValueError) as e:
         raise Stop(1, f"stop: cannot read the geometry file: {e}")
     data = {"edition": edition, "made_on": made_on(), "views": views,
-            "countries": countries(topo, master_rows, frame)}
+            "countries": countries(topo, master_rows, frame, names)}
     text = page(data, d3_js)
     with claimed(out, encoding="utf-8") as fh:  # creates a new edition's folder; never overwrites (mode "x")
         fh.write(text)
@@ -448,9 +483,11 @@ def main(argv=None):
     for a in ("--register", "--crosswalk", "--master", "--decks", "--geometry", "--out", "--d3"):
         ap.add_argument(a, required=True)
     ap.add_argument("--edition")
+    ap.add_argument("--context-names", help="config/context_names.csv: hover names for the grey shapes")
     a = ap.parse_args(argv)
     try:
-        out, data = build(a.register, a.crosswalk, a.master, a.decks, a.geometry, a.out, a.edition, a.d3)
+        out, data = build(a.register, a.crosswalk, a.master, a.decks, a.geometry, a.out, a.edition, a.d3,
+                          a.context_names)
     except Stop as e:
         print(str(e), file=sys.stderr)
         return e.code

@@ -93,6 +93,7 @@ class Paths:
         self.who = root / "config" / "who_europe.csv"
         self.page_cfg = root / "config" / "summary_page.csv"
         self.allow = root / "config" / "summary_scan_allow.csv"
+        self.context_names = root / "config" / "context_names.csv"
 
 
 def _csv(path):
@@ -153,7 +154,7 @@ def step_webmap(p):
         publish_webmap.fetch_d3(p.d3)
     rc = publish_webmap.main(["--register", str(p.register), "--crosswalk", str(p.crosswalk), "--master", str(p.master),
                               "--decks", str(p.decks), "--geometry", str(p.geometry), "--out", str(p.webmap), "--d3", str(p.d3),
-                              "--edition", p.edition])
+                              "--edition", p.edition, "--context-names", str(p.context_names)])
     if rc:
         raise Stop(rc, "stop: web map step")
 
@@ -165,7 +166,8 @@ def step_summary(p):
     rc = publish_summary.main(["--register", str(p.register), "--ma-codes", str(p.ma_codes), "--crosswalk",
                                str(p.crosswalk), "--master", str(p.master), "--who", str(p.who), "--page-config",
                                str(p.page_cfg), "--geometry", str(p.geometry), "--d3", str(p.d3),
-                               "--out", str(p.summary), "--edition", p.edition, "--allow", str(p.allow)])
+                               "--out", str(p.summary), "--edition", p.edition, "--allow", str(p.allow),
+                               "--context-names", str(p.context_names)])
     if rc:
         raise Stop(rc, "stop: summary step")
 
@@ -260,12 +262,13 @@ def check_webmap(p, reg, crosswalk):
     if not m:
         return ["no embedded map data"]
     import json
-    got = {v["id"]: v for v in json.loads(m.group(1).replace("<\\/", "</"))["views"]}
+    page_data = json.loads(m.group(1).replace("<\\/", "</"))
+    got = {v["id"]: v for v in page_data["views"]}
     try:
-        views, _ = publish_webmap.build_views(reg, p.crosswalk, _csv(p.master), p.decks)
+        views, frame = publish_webmap.build_views(reg, p.crosswalk, _csv(p.master), p.decks)
     except publish_webmap.Stop as e:
         return [str(e)]
-    probs = []
+    probs = _grey_problems(p, page_data, frame)
     for v in json.loads(json.dumps(views)):
         g = got.get(v["id"], {})
         for field in ("colour", "tips", "legend", "filters", "title", "subtitle", "legend_title"):
@@ -277,6 +280,19 @@ def check_webmap(p, reg, crosswalk):
                 else:
                     probs.append(f"map {v['id']} {field} differ from the register")
     return probs
+
+
+def _grey_problems(p, page_data, frame):
+    """The grey context names on a kept page, against config/context_names.csv now (both pages)."""
+    try:
+        want = publish_webmap.grey_names(p.geometry, _csv(p.master), frame, p.context_names)
+    except (publish_webmap.Stop, OSError, ValueError) as e:
+        return [str(e)]
+    got = sorted(c.get("name", "") for c in page_data.get("countries", []) if not c.get("iso3"))
+    if got == want:
+        return []
+    off = sorted(set(got) ^ set(want))
+    return [f"grey country names differ from config/context_names.csv: {off[:4]}"]
 
 
 def check_summary(p, reg):
@@ -291,13 +307,14 @@ def check_summary(p, reg):
     probs = []
     try:
         master = _csv(p.master)
-        views, _ = publish_summary.summary_views(reg, master)
+        views, frame = publish_summary.summary_views(reg, master)
         head = publish_summary.headline(reg, publish_summary.load_who(p.who))
         terms = publish_summary.forbidden_terms(p.crosswalk, p.ma_codes)
         allowed = publish_summary.load_allow(p.allow)
         footer = publish_summary.footer_html(publish_summary.load_page_cfg(p.page_cfg))
     except publish_workbook.Stop as e:
         return [str(e)]
+    probs += _grey_problems(p, got, frame)
     if head["outside"]:
         probs.append("counted in the headline but missing from the WHO European Region list: "
                      + ", ".join(head["outside"]))

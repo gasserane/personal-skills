@@ -346,14 +346,14 @@ def _topo(geometry):
         raise Stop(1, f"stop: cannot read the geometry file: {e}")
 
 
-def summary_page_text(rows, master_rows, who, cfg, topo, d3_js, edition, made):
+def summary_page_text(rows, master_rows, who, cfg, topo, d3_js, edition, made, names=None):
     """(page text, data, notes) for the summary page; publish.py check calls the same parts."""
     head = headline(rows, who)
     if head["outside"]:
         raise Stop(1, "stop: counted in the headline but missing from the WHO European Region list: "
                       + ", ".join(head["outside"]) + ". Check config/who_europe.csv; nothing written.")
     views, frame = summary_views(rows, master_rows)
-    shapes = pw.countries(topo, master_rows, frame)
+    shapes = pw.countries(topo, master_rows, frame, names)
     drawn = {c["iso3"] for c in shapes if c["iso3"] and c["paths"]}
     notes = region_notes(master_rows, who, drawn, set(frame))
     newer = pw.newer_rate_years(rows)
@@ -375,10 +375,12 @@ def summary_page_text(rows, master_rows, who, cfg, topo, d3_js, edition, made):
     return text, data, notes
 
 
-def build_summary(register, ma_codes, crosswalk, master, who, page_cfg, geometry, d3, out, edition=None, allow=None):
+def build_summary(register, ma_codes, crosswalk, master, who, page_cfg, geometry, d3, out, edition=None, allow=None,
+                  context_names=None):
     """Write the summary page; nothing is written when any check stops the build (the scan runs on the
     finished page text before the file is opened)."""
     pw.refuse_existing(out)
+    names = pw.load_context_names(context_names) if context_names else None
     d3_js = _d3_text(d3)
     rows, _, _, edition = pw.load_inputs(register, None, None, edition)
     master_rows = pw._read(master)
@@ -387,7 +389,7 @@ def build_summary(register, ma_codes, crosswalk, master, who, page_cfg, geometry
     terms = forbidden_terms(crosswalk, ma_codes)
     allowed = load_allow(allow) if allow else set()
     text, data, notes = summary_page_text(rows, master_rows, who_set, cfg, _topo(geometry), d3_js, edition,
-                                          pw.made_on())
+                                          pw.made_on(), names)
     for n in notes:
         print(n)
     hits = scan(page_strings(text), terms, allowed)
@@ -406,10 +408,11 @@ def main(argv=None):
         ap.add_argument(a, required=True)
     ap.add_argument("--edition")
     ap.add_argument("--allow")
+    ap.add_argument("--context-names", help="config/context_names.csv: hover names for the grey shapes")
     a = ap.parse_args(argv)
     try:
         out, data = build_summary(a.register, a.ma_codes, a.crosswalk, a.master, a.who, a.page_config, a.geometry,
-                                  a.d3, a.out, a.edition, a.allow)
+                                  a.d3, a.out, a.edition, a.allow, a.context_names)
     except Stop as e:
         print(str(e), file=sys.stderr)
         return e.code

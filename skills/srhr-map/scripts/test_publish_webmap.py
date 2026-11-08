@@ -397,7 +397,38 @@ def main():
     check("context_shapes_hover_name_only",
           'var ctx = g.selectAll("path.ctx")' in pwm.PAGE and pwm.PAGE.count(ctx_on) == 1
           and re.search(r"ctx\.(on\(\"(focus|blur)\"|attr\(\"(tabindex|aria-label)\")", pwm.PAGE) is None, "")
-    slot =pwm.page(gold, "LIBRARY", header_html="<h1>HEAD-SLOT</h1>", footer_html="FOOT-SLOT", title="TITLE-SLOT")
+    # PROMPT 7 names (Ane 2026-11-09): grey context names come from the private config/context_names.csv
+    # (geometry_name,shown_name; an empty shown_name = silent, show() returns on an empty name), so no real
+    # place name sits in this public code; an unlisted name passes through; a missing or malformed file stops
+    cn = TMP / "context_names.csv"
+    cn.write_text("geometry_name,shown_name\nMute-land,\nPart-land,Whole-land\nShort Rep.,Short Republic\n",
+                  encoding="utf-8-sig")
+    names = pwm.load_context_names(cn)
+    want = {"Mute-land": "", "Part-land": "Whole-land", "Short Rep.": "Short Republic", "Context-land": "Context-land"}
+    ntopo = {"type": "Topology", "transform": {"scale": [1, 1], "translate": [0, 40]},
+             "objects": {"countries": {"type": "GeometryCollection", "geometries":
+                 [{"type": "Polygon", "id": "901", "arcs": [[0]], "properties": {"name": "One-land"}}]
+                 + [{"type": "Polygon", "id": str(800 + i), "arcs": [[i + 1]], "properties": {"name": n}}
+                    for i, n in enumerate(want)]}},
+             "arcs": [ring(10, 10)] + [ring(11 + i, 11) for i in range(len(want))]}
+    master1 = [{"m49": "901", "iso3": "XAA", "country": "One-land"}]
+    shown = {c["paths"][0][0][0][0]: c["name"] for c in pwm.countries(ntopo, master1, {"XAA"}, names) if not c["iso3"]}
+    got_names = {n: shown.get(11 + i) for i, n in enumerate(want)}
+    plain = {c["name"] for c in pwm.countries(ntopo, master1, {"XAA"}) if not c["iso3"]}
+    check("context_names_renamed", got_names == want and plain == set(want), (got_names, plain))
+    bad = {"missing": None, "header": "name,shown\nA,B\n", "duplicate": "geometry_name,shown_name\nA,B\nA,C\n"}
+    stops = {}
+    for case, txt in bad.items():
+        p = TMP / f"context_names_{case}.csv"
+        if txt is not None:
+            p.write_text(txt, encoding="utf-8")
+        try:
+            pwm.load_context_names(p)
+            stops[case] = "no stop"
+        except pwm.Stop as e:
+            stops[case] = "context_names" in str(e)
+    check("context_names_bad_file_stops", stops == {k: True for k in bad}, stops)
+    slot = pwm.page(gold, "LIBRARY", header_html="<h1>HEAD-SLOT</h1>", footer_html="FOOT-SLOT", title="TITLE-SLOT")
     check("page_slots_filled", "<h1>HEAD-SLOT</h1>" in slot and "<footer>FOOT-SLOT</footer>" in slot
           and "<title>TITLE-SLOT</title>" in slot and "hover text on the map slides" not in slot
           and "SRHR maps" not in slot, slot[slot.find("<div class=\"wrap\">"):][:200])
