@@ -375,20 +375,29 @@ def main():
     # line restored the output reproduced 9af44131..., so nothing else moved.
     # Re-pinned in phase e review minor 7 (<html lang="en"> after the doctype); with that line removed the output
     # reproduced 82fbb570..., so nothing else moved.
-    gold = {"edition": "2031", "made_on": "2031-01-02", "countries": [{"iso3": "XAA", "name": "A & <b>", "paths": []}],
+    # Re-pinned in PROMPT 7 (grey context shapes get the name-only hover: "var ctx =" plus one ctx.on line);
+    # with those two old lines restored the output reproduced aea4b702..., so nothing else moved.
+    gold ={"edition": "2031", "made_on": "2031-01-02", "countries": [{"iso3": "XAA", "name": "A & <b>", "paths": []}],
             "views": [{"id": "A", "name": "N", "title": "T", "subtitle": "S", "legend_title": "L", "legend": [],
                        "filters": [], "colour": {}, "tips": {"XAA": "A's tip"}}]}
     got = hashlib.sha256(pwm.page(gold, "LIBRARY").encode("utf-8")).hexdigest()
-    check("internal_page_unchanged", got == "aea4b7023d825fa7709316bcd71080ff73524c14f6fde2faa0eab05baa990b6b", got)
+    check("internal_page_unchanged", got == "288201f8fde8f44b9bdafcd0359ec1da1eb7a5f5fece3a06b65bdc247e41a12f", got)
     # phase e review minor 7: the page declares its language (WCAG 3.1.1)
     check("page_html_lang_en", re.search(r"<!doctype html>\s*<html lang=\"en\">", pwm.PAGE) is not None
           and '<html lang="en">' in pwm.page(gold, "LIBRARY"), pwm.PAGE[:80])
     # phase e review minor 6 (Ane 2026-11-08 21:56, both pages): a master-list country with no tip (withdrawn,
-    # non-member) shows its name only on hover (grey context shapes carry no listener); it stays out of the Tab order (tabindex still keyed on v.tips)
+    # non-member) shows its name only on hover (grey context shapes too since PROMPT 7, see below); it stays out of the Tab order (tabindex still keyed on v.tips)
     check("hover_falls_back_to_country_name",
           re.search(r"t = v\.tips\[d\.properties\.iso3\] \|\| d\.properties\.name;", pwm.PAGE) is not None
           and '.attr("tabindex", iso in v.tips ? 0 : null)' in pwm.PAGE, "")
-    slot = pwm.page(gold, "LIBRARY", header_html="<h1>HEAD-SLOT</h1>", footer_html="FOOT-SLOT", title="TITLE-SLOT")
+    # PROMPT 7 (Ane 2026-11-08 23:15, both pages): a grey context shape (outside the master list, iso3 "")
+    # shows its geometry name on hover via the same show() fallback; mouse and tap only, so it gets no
+    # focus/blur listener, no tabindex and no aria-label, and the Tab order stays as built
+    ctx_on = 'ctx.on("mousemove", show).on("mouseleave", hide).on("click", show);'
+    check("context_shapes_hover_name_only",
+          'var ctx = g.selectAll("path.ctx")' in pwm.PAGE and pwm.PAGE.count(ctx_on) == 1
+          and re.search(r"ctx\.(on\(\"(focus|blur)\"|attr\(\"(tabindex|aria-label)\")", pwm.PAGE) is None, "")
+    slot =pwm.page(gold, "LIBRARY", header_html="<h1>HEAD-SLOT</h1>", footer_html="FOOT-SLOT", title="TITLE-SLOT")
     check("page_slots_filled", "<h1>HEAD-SLOT</h1>" in slot and "<footer>FOOT-SLOT</footer>" in slot
           and "<title>TITLE-SLOT</title>" in slot and "hover text on the map slides" not in slot
           and "SRHR maps" not in slot, slot[slot.find("<div class=\"wrap\">"):][:200])

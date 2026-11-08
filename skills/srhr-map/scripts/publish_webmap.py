@@ -586,7 +586,7 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
   svg.append("defs").append("clipPath").attr("id", "clip").append("rect").attr("width", W).attr("height", H);
   // the outer group clips to the frame; the inner group carries the zoom transform
   var g = svg.append("g").attr("clip-path", "url(#clip)").append("g");
-  g.selectAll("path.ctx").data(shapes.filter(function (c) { return !c.iso3; }).map(feat)).join("path")
+  var ctx = g.selectAll("path.ctx").data(shapes.filter(function (c) { return !c.iso3; }).map(feat)).join("path")
     .attr("class", "ctx").attr("d", path);
   var sel = g.selectAll("path.c").data(shapes.filter(function (c) { return c.iso3; }).map(feat)).join("path")
     .attr("class", "c").attr("d", path).attr("data-iso", function (d) { return d.properties.iso3; });
@@ -658,6 +658,8 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
   }
   function hide() { tip.hidden = true; d3.select(this).classed("hot", false); hl.style("display", "none"); }
   sel.on("mousemove", show).on("mouseleave", hide).on("focus", show).on("blur", hide).on("click", show);
+  // grey context shapes: name only, mouse and tap only (no focus, so the Tab order stays as built)
+  ctx.on("mousemove", show).on("mouseleave", hide).on("click", show);
 
   function render(id) {
     cur = views[id] ? id : data.views[0].id; filter = null;
