@@ -26,6 +26,7 @@ The folder holds:
 - `review/`: the review workbooks and run files this skill writes.
 
 The scripts are in this skill's `scripts/` folder. Every command takes `--map-root <folder>` (or uses `SRHR_MAP_ROOT`) and `--year <reporting year>`. The edition built is the next year unless `--edition` says otherwise.
+On Windows, give `--map-root`, `SRHR_MAP_ROOT` and `SRHR_MASTER_COUNTRIES` as Windows paths (`C:\...`). Python does not read a Git Bash `/c/...` path in an environment variable, so the tests' `public_repo_clean` check then fails with "not set or not found".
 
 ## Refresh mode, for a colleague
 
