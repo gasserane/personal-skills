@@ -388,8 +388,17 @@ nav.tabs a:focus-visible, button:focus-visible, path.c:focus-visible { outline: 
 @media (max-width: 820px) { .stage { grid-template-columns: minmax(0, 1fr); } }
 .map { background: var(--map-bg); border: 1px solid var(--line); position: relative; min-width: 0; overflow: hidden; }
 .map svg { display: block; width: 100%; height: auto; overflow: hidden; }
-path.ctx { fill: var(--map-land); stroke: var(--map-line); stroke-width: .5; }
-path.c { stroke: var(--map-line); stroke-width: .6; cursor: default; }
+path.ctx { fill: var(--map-land); stroke: var(--map-line); stroke-width: .5; vector-effect: non-scaling-stroke; }
+path.c { stroke: var(--map-line); stroke-width: .6; cursor: default; vector-effect: non-scaling-stroke; }
+.map svg { cursor: grab; touch-action: pan-x pan-y; }
+.map svg:active { cursor: grabbing; }
+.zoom { position: absolute; top: 10px; left: 10px; display: grid; gap: 4px; z-index: 4; }
+.zoom button { font: 600 1rem/1 var(--body); min-width: 36px; height: 36px; padding: 0 8px; color: #00313C; background: #FFFFFF;
+  border: 1px solid #B8C2C0; border-radius: 3px; cursor: pointer; }
+.zoom button:disabled { color: #9AA7A9; cursor: default; }
+.zoom #zoom-reset { font-size: .78rem; }
+.map-col { min-width: 0; }
+.hint { margin: 6px 0 0; font-size: .82rem; color: var(--muted); }
 path.c.has-tip { cursor: pointer; }
 path.c.dim { fill: var(--map-off) !important; }
 path.c.hot { stroke: var(--accent); stroke-width: 1.6; }
@@ -420,7 +429,16 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
   <nav class="tabs" id="tabs" aria-label="Maps"></nav>
   <section class="view-head"><h2 id="v-title"></h2><p id="v-sub"></p></section>
   <div class="stage">
-    <div class="map" id="map"><div id="tip" hidden></div></div>
+    <div class="map-col">
+      <div class="map" id="map"><div id="tip" hidden></div>
+        <div class="zoom" role="group" aria-label="Map zoom">
+          <button type="button" id="zoom-in" aria-label="Zoom in" title="Zoom in">+</button>
+          <button type="button" id="zoom-out" aria-label="Zoom out" title="Zoom out">&minus;</button>
+          <button type="button" id="zoom-reset" aria-label="Reset zoom" title="Reset zoom">Reset</button>
+        </div>
+      </div>
+      <p class="hint">Use the + and &minus; buttons or the mouse wheel to zoom. Drag to move a zoomed map. On a phone, pinch with two fingers.</p>
+    </div>
     <aside>
       <div><h3 id="lg-title">Legend</h3><ul class="legend" id="legend"></ul></div>
       <div id="flt-box"><h3>Show only</h3><div class="filters" id="filters"></div></div>
@@ -447,13 +465,43 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
   var path = d3.geoPath(proj);
   var svg = d3.select("#map").append("svg").attr("viewBox", "0 0 " + W + " " + H).attr("role", "img");
   svg.append("defs").append("clipPath").attr("id", "clip").append("rect").attr("width", W).attr("height", H);
-  var g = svg.append("g").attr("clip-path", "url(#clip)");
+  // the outer group clips to the frame; the inner group carries the zoom transform
+  var g = svg.append("g").attr("clip-path", "url(#clip)").append("g");
   g.selectAll("path.ctx").data(shapes.filter(function (c) { return !c.iso3; }).map(feat)).join("path")
     .attr("class", "ctx").attr("d", path);
   var sel = g.selectAll("path.c").data(shapes.filter(function (c) { return c.iso3; }).map(feat)).join("path")
     .attr("class", "c").attr("d", path).attr("data-iso", function (d) { return d.properties.iso3; });
   var tip = document.getElementById("tip"), readout = document.getElementById("readout");
   var cur = null, filter = null;
+
+  // Zoom: one transform per map view, so each map keeps its own zoom when you switch tabs.
+  var zoomOf = {}, KMAX = 8;
+  var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var zoom = d3.zoom().scaleExtent([1, KMAX]).translateExtent([[0, 0], [W, H]])
+    .filter(function (ev) {
+      if (ev.type === "wheel") return true;
+      // touch: two fingers pinch at any zoom; one finger moves the map only once it is zoomed in,
+      // so a one-finger drag at full view still scrolls the page
+      if (ev.touches) return ev.touches.length > 1 || (zoomOf[cur] ? zoomOf[cur].k > 1 : false);
+      return !ev.ctrlKey && !ev.button;
+    })
+    .on("zoom", function (ev) {
+      g.attr("transform", ev.transform);
+      if (cur) zoomOf[cur] = ev.transform;
+      if (ev.sourceEvent) tip.hidden = true;
+      zoomUi(ev.transform.k);
+    });
+  function zoomUi(k) {
+    svg.style("touch-action", k > 1 ? "none" : "pan-x pan-y");
+    document.getElementById("zoom-in").disabled = k >= KMAX - 1e-6;
+    document.getElementById("zoom-out").disabled = k <= 1 + 1e-6;
+    document.getElementById("zoom-reset").disabled = k <= 1 + 1e-6 && !(zoomOf[cur] && (zoomOf[cur].x || zoomOf[cur].y));
+  }
+  function moved() { return svg.transition().duration(still ? 0 : 250); }
+  svg.call(zoom);
+  document.getElementById("zoom-in").addEventListener("click", function () { moved().call(zoom.scaleBy, 1.6); });
+  document.getElementById("zoom-out").addEventListener("click", function () { moved().call(zoom.scaleBy, 1 / 1.6); });
+  document.getElementById("zoom-reset").addEventListener("click", function () { moved().call(zoom.transform, d3.zoomIdentity); });
 
   function colourOf(v, iso) {
     if (!(iso in v.colour)) return null;
@@ -489,6 +537,7 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
   function render(id) {
     cur = views[id] ? id : data.views[0].id; filter = null;
     var v = views[cur];
+    svg.interrupt().call(zoom.transform, zoomOf[cur] || d3.zoomIdentity);
     document.getElementById("v-title").textContent = v.title;
     document.getElementById("v-sub").textContent = v.subtitle;
     document.getElementById("lg-title").textContent = v.legend_title || "Legend";

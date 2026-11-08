@@ -213,6 +213,26 @@ def main():
         re.match(r"https" + r"://cdnjs\.cloudflare\.com/ajax/libs/[\w.-]+/\d+\.\d+\.\d+/", s) for s in srcs), srcs)
     check("no_local_path_in_page", not re.search(r"[A-Za-z]:\\\\", text))
 
+    # --- zoom (Task 7 amendment, Session 5): buttons, wheel and pinch on every view ---
+    script = text.split('id="map-data"', 1)[-1]
+    for bid, label in (("zoom-in", "Zoom in"), ("zoom-out", "Zoom out"), ("zoom-reset", "Reset zoom")):
+        m = re.search(r'<button[^>]*id="' + bid + r'"[^>]*>', text)
+        check(f"zoom_button_{bid}", m is not None and 'type="button"' in m.group(0)
+              and f'aria-label="{label}"' in m.group(0), m and m.group(0))
+    check("zoom_buttons_inside_map_card", re.search(r'<div class="map" id="map">.*?id="zoom-in"', text, re.S) is not None)
+    check("zoom_behaviour_bound", "d3.zoom()" in script and ".scaleExtent([1," in script
+          and ".translateExtent(" in script and "svg.call(zoom)" in script, "")
+    check("zoom_moves_the_map_group", re.search(r'g\.attr\("transform",\s*ev\.transform\)', script) is not None)
+    check("zoom_reset_to_identity", "d3.zoomIdentity" in script)
+    check("zoom_kept_per_view", "zoomOf[cur]" in script and re.search(r"zoomOf\[cur\]\s*=", script) is not None)
+    check("zoom_restored_on_view_change", re.search(r"zoom\.transform,\s*zoomOf\[cur\]", script) is not None)
+    check("zoom_wheel_not_filtered", "ev.type === \"wheel\"" in script)
+    check("zoom_pinch_two_fingers", "touches.length" in script)
+    check("zoom_strokes_do_not_scale", text.count("vector-effect: non-scaling-stroke") >= 2)
+    check("hover_tap_handlers_kept",
+          'sel.on("mousemove", show).on("mouseleave", hide).on("focus", show).on("blur", hide).on("click", show)'
+          in script)
+
     # --- refusals ---
     code, log = run(args(out))
     check("refuses_existing_out", code == 2 and out.read_text(encoding="utf-8") == text, (code, log))
