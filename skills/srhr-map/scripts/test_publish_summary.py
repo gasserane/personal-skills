@@ -86,6 +86,59 @@ def main():
     record("region_notes_silent_when_aligned",
            ps.region_notes(master[:2], {"XAA", "XBB"}, drawn={"XAA", "XBB"}, counted={"XAA"}) == [], "")
 
+    # --- Task 3: the three summary views ---
+    fund = [row("XAA", "ippf_funding_streams", "2", "Core Z1, Stream Q"),
+            row("XBB", "ippf_funding_streams", "1", "Stream Q", status="associate member"),
+            row("XCC", "ippf_funding_streams", "0", "none", status="Collaborative Partner"),
+            row("XDD", "ippf_funding_streams", "1", "Stream Q", status="withdrawn")]
+    rates = [row("XAA", "ecdc_hiv_diagnosis_rate", "4.4", year=ps.rdc.RATE_YEAR, unit="per 100 000 people"),
+             row("XAA", "ecdc_hiv_diagnosis_rate", "77.7", year="2999", unit="per 100 000 people"),
+             row("XDD", "ecdc_hiv_diagnosis_rate", "6.6", year=ps.rdc.RATE_YEAR, status="withdrawn",
+                 unit="per 100 000 people")]
+    mem_a = [dict(MEMBERS[0], value_display="MA with core grant")] + MEMBERS[1:]
+    rows3 = mem_a + fund + rates
+    master3 = [{"iso3": i, "country": n} for i, n in
+               (("XAA", "Aland"), ("XBB", "Bland"), ("XCC", "Cland"), ("XDD", "Dland"))]
+    views, frame = ps.summary_views(rows3, master3)
+    vid = {v["id"]: v for v in views}
+    record("views_order_A_F_D", [v["id"] for v in views] == ["A", "F", "D"], [v["id"] for v in views])
+    keys = {"id", "name", "title", "subtitle", "legend_title", "legend", "filters", "colour", "tips"}
+    record("views_have_page_keys", all(set(v) == keys for v in views), [sorted(v) for v in views])
+    A, F, D = vid.get("A", {}), vid.get("F", {}), vid.get("D", {})
+    a_text = ps.json.dumps(A)
+    record("A_colours_by_member_status_not_value_display",
+           A.get("colour") == {"XAA": "full member", "XBB": "associate member", "XCC": "Collaborative Partner"}
+           and "core" not in a_text.lower(), A.get("colour"))
+    record("A_hover_plain_words", A.get("tips", {}).get("XCC") == "Cland: IPPF collaborative partner"
+           and A.get("tips", {}).get("XAA") == "Aland: IPPF member association", A.get("tips"))
+    record("A_colours_from_palette_by_status", [lg["colour"] for lg in A.get("legend", [])]
+           == ps.pw.PALETTE["A"][:3], A.get("legend"))
+    f_counts = {lg["key"]: lg["count"] for lg in F.get("legend", [])}
+    record("F_legend_counts_match_bands", f_counts == {"core": 1, "other": 1, "none": 1}, f_counts)
+    record("F_hover_partner_word", F.get("tips", {}).get("XCC") == "Cland: IPPF partner, no IPPF grant in 2026"
+           and F.get("tips", {}).get("XAA") == "Aland: receives the IPPF core grant in 2026", F.get("tips"))
+    f_text = ps.json.dumps(F)
+    record("F_no_stream_key_or_label_in_view", not any(t in f_text for t in ("Core Z1", "Stream Q")), f_text[:200])
+    record("F_filters_by_band", [f["key"] for f in F.get("filters", [])] == ["core", "other", "none"]
+           and not D.get("filters") and len(A.get("filters", [])) == 3, F.get("filters"))
+    d_text = ps.json.dumps(D)
+    record("D_uses_rate_year", "77.7" not in d_text and "2999" not in d_text
+           and D.get("colour", {}).get("XAA") == ps.computed.d_class(4.4), D.get("colour"))
+    record("D_hover_rate_text", D.get("tips", {}).get("XAA") ==
+           f"Aland: 4.4 new HIV diagnoses per 100 000 people, {ps.rdc.RATE_YEAR}. Source: ECDC/WHO", D.get("tips"))
+    record("D_missing_rate_hover", D.get("tips", {}).get("XBB") == f"Bland: no {ps.rdc.RATE_YEAR} data"
+           and "XBB" not in D.get("colour", {}), D.get("tips"))
+    record("frame_is_members", frame == {"XAA", "XBB", "XCC"}, frame)
+    record("titles_from_templates", A.get("title") == "IPPF members and partners, 2026"
+           and F.get("title") == "IPPF funding to members, 2026"
+           and D.get("title") == f"New HIV diagnoses, {ps.rdc.RATE_YEAR}", [v.get("title") for v in views])
+    import test_register_deck_check as trd
+    nm = [{"iso3": i, "country": n} for n, i in trd.NAMES.items()]
+    dv, _ = ps.summary_views(trd.REG, nm)
+    deck = [t for tips in trd.TIPS.values() for t in tips.values()]
+    hits = [t for v in dv for t in v["tips"].values() for s in deck if t == s or s in t]
+    record("no_view_text_from_deck_tips", not hits and bool(dv[0]["tips"]), hits)
+
     print(f"{sum(results)}/{len(results)} cases ok")
     sys.exit(0 if all(results) else 1)
 
