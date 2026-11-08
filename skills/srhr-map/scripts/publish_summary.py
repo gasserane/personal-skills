@@ -8,6 +8,8 @@ the page frame are reused from publish_webmap.py. Exit 1 = input error, exit 2 =
 """
 import csv
 import html
+import re
+from html.parser import HTMLParser
 import sys
 from pathlib import Path
 
@@ -190,3 +192,93 @@ def footer_html(cfg: dict) -> str:
     return ("<p>Sources: {}.</p><p>For more information: <a href=\"mailto:{c}\">{c}</a></p>"
             "<p>Prepared by {}.</p><p>{}</p>").format(_e(SOURCES), _e(cfg["author_unit"]), _e(cfg["disclosure"]),
                                                       c=_e(cfg["contact"]))
+
+
+# --- forbidden-text scan (design 6.1) -------------------------------------------------------------------
+
+def forbidden_terms(streams_path, ma_codes_path) -> set:
+    """Every stream key, label and ledger name, and every member association name and ma_code: none of
+    them may appear on the summary page. A file that yields no term stops the build, so an unreachable
+    or emptied file can never make the scan pass."""
+    def read(path):
+        try:
+            with open(path, encoding="utf-8-sig", newline="") as f:
+                return list(csv.DictReader(f))
+        except OSError as e:
+            raise Stop(1, f"stop: cannot read {Path(path).name} for the forbidden-text scan: {e}")
+    s_terms, m_terms = set(), set()
+    for r in read(streams_path):
+        names = [r.get("key"), r.get("label")] + re.split(r"[;|]", r.get("ledger_names") or "")
+        s_terms |= {(n or "").strip() for n in names}
+    for r in read(ma_codes_path):
+        m_terms |= {(r.get("org_name") or "").strip(), (r.get("ma_code") or "").strip()}
+    s_terms.discard("")
+    m_terms.discard("")
+    for path, terms in ((streams_path, s_terms), (ma_codes_path, m_terms)):
+        if not terms:
+            raise Stop(1, f"stop: {Path(path).name} yields no term; the forbidden-text scan would prove nothing")
+    return s_terms | m_terms
+
+
+class _PageText(HTMLParser):
+    """Visible text outside <script>/<style>, plus the raw text of the map-data JSON element."""
+
+    def __init__(self):
+        super().__init__()
+        self.text, self.data, self._in = [], None, None
+
+    def handle_starttag(self, tag, attrs):
+        if tag in ("script", "style"):
+            self._in = "data" if tag == "script" and dict(attrs).get("id") == "map-data" else tag
+
+    def handle_endtag(self, tag):
+        if tag in ("script", "style"):
+            self._in = None
+
+    def handle_data(self, d):
+        if self._in == "data":
+            self.data = (self.data or "") + d
+        elif self._in is None and d.strip():
+            self.text.append(d.strip())
+
+
+def _json_strings(x):
+    if isinstance(x, str):
+        yield x
+    elif isinstance(x, dict):
+        for v in x.values():
+            yield from _json_strings(v)
+    elif isinstance(x, list):
+        for v in x:
+            yield from _json_strings(v)
+
+
+def page_strings(html_text: str) -> list:
+    """The strings a reader can see: page text outside scripts and styles, and every string value in the
+    embedded map data. Numbers (so geometry coordinates), dict keys and the d3 library are left out."""
+    p = _PageText()
+    p.feed(html_text)
+    p.close()
+    out = list(p.text)
+    if p.data:
+        out += [s for s in _json_strings(json.loads(p.data)) if s.strip()]
+    return out
+
+
+def scan(strings: list, terms: set, allow: set) -> list:
+    """[(term, string)] for each whole-word, case-sensitive occurrence of a term not on the allowlist."""
+    hits = []
+    for t in sorted(terms - set(allow)):
+        rx = re.compile(r"(?<!\w)" + re.escape(t) + r"(?!\w)")
+        hits += [(t, s) for s in strings if rx.search(s)]
+    return hits
+
+
+def load_allow(path) -> set:
+    """config/summary_scan_allow.csv (term,ticked_by,date): a term counts only once Ane has ticked it."""
+    try:
+        with open(path, encoding="utf-8-sig", newline="") as f:
+            return {r["term"].strip() for r in csv.DictReader(f)
+                    if (r.get("term") or "").strip() and (r.get("ticked_by") or "").strip()}
+    except FileNotFoundError:
+        return set()

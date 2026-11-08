@@ -179,6 +179,61 @@ def main():
             except Stop as e:
                 record(f"page_cfg_refuses_missing_{missing}", e.code == 1, e.code)
 
+    # --- Task 5: forbidden-text scan ---
+    with tempfile.TemporaryDirectory() as d:
+        streams = Path(d) / "streams.csv"
+        streams.write_text("key,label,group,colour,ledger_names\nCore Z1,Stream Q,g,#000000,Ledger One;Ledger Two|"
+                           "Ledger Three\nKW,Word,g,,\n", encoding="utf-8")
+        codes = Path(d) / "ma_codes.csv"
+        codes.write_text("ma_code,iso3,org_name,ticked_by,tick_date,suggestion_basis\n123,XAA,Org Kappa,t,d,b\n",
+                         encoding="utf-8")
+        terms = ps.forbidden_terms(streams, codes)
+        record("terms_from_both_files", terms == {"Core Z1", "Stream Q", "Ledger One", "Ledger Two", "Ledger Three",
+                                                  "KW", "Word", "123", "Org Kappa"}, sorted(terms))
+        empty = Path(d) / "empty.csv"
+        empty.write_text("ma_code,iso3,org_name\n", encoding="utf-8")
+        for case, args in (("terms_refuse_empty_file", (streams, empty)), ("terms_refuse_empty_streams", (empty, codes)),
+                           ("terms_refuse_missing_file", (Path(d) / "gone.csv", codes))):
+            try:
+                ps.forbidden_terms(*args)
+                record(case, False, "no Stop")
+            except Stop as e:
+                record(case, e.code == 1, e.code)
+        allow = Path(d) / "allow.csv"
+        allow.write_text("term,ticked_by,date\nWord,Ane,2031-01-02\nStream Q,,\n", encoding="utf-8")
+        record("allow_needs_tick", ps.load_allow(allow) == {"Word"}, ps.load_allow(allow))
+        record("allow_missing_file_is_empty", ps.load_allow(Path(d) / "none.csv") == set(), "")
+
+    def fixture_page(views):
+        data = {"edition": "2031", "made_on": "2031-01-02", "views": views,
+                "countries": [{"iso3": "XAA", "name": "Aland", "paths": [[[[123, 45], [124.5, 46], [123, 45]]]]}]}
+        return ps.pw.page(data, "/* d3 block: Stream Q Org Kappa 123 */", ps.header_html(h, "2031", "2031-01-02"),
+                          ps.footer_html({"contact": "x@example.org", "author_unit": "Unit", "disclosure": "Text."}),
+                          title="IPPF across Europe, 2031")
+
+    clean_views, _ = ps.summary_views(rows3, master3)
+    clean = fixture_page(clean_views)
+    strs = ps.page_strings(clean)
+    record("page_strings_has_visible_and_json_text", any("work in 3 of the 5" in s for s in strs)
+           and "Aland: IPPF member association" in strs and not any("d3 block" in s for s in strs)
+           and not any("{" in s and "}" in s for s in strs), strs[:6])
+    record("scan_clean_page_passes", ps.scan(strs, terms, set()) == [], ps.scan(strs, terms, set()))
+    planted = ps.json.loads(ps.json.dumps(clean_views))
+    planted[1]["tips"]["XAA"] = "Aland: receives Stream Q in 2026"
+    hits = ps.scan(ps.page_strings(fixture_page(planted)), terms, set())
+    record("scan_planted_term_fails", [t for t, _ in hits] == ["Stream Q"], hits)
+    planted2 = ps.json.loads(ps.json.dumps(clean_views))
+    planted2[0]["legend"][0]["label"] = "Org 123 office"
+    hits2 = ps.scan(ps.page_strings(fixture_page(planted2)), terms, set())
+    record("scan_planted_ma_code_in_json_fails", [t for t, _ in hits2] == ["123"], hits2)
+    record("scan_ignores_coordinates", "123" in clean and not ps.scan(ps.page_strings(clean), {"123"}, set()), "")
+    record("scan_whole_word", ps.scan(["Stream AB here"], {"Stream A"}, set()) == []
+           and ps.scan(["a Stream A."], {"Stream A"}, set()) == [("Stream A", "a Stream A.")]
+           and ps.scan(["a Keyword"], {"Key"}, set()) == [], "")
+    record("scan_case_sensitive", ps.scan(["the word here"], {"Word"}, set()) == [], "")
+    record("scan_allow_clears_only_ticked", ps.scan(["Word and Stream Q"], {"Word", "Stream Q"}, {"Word"})
+           == [("Stream Q", "Word and Stream Q")], "")
+
     print(f"{sum(results)}/{len(results)} cases ok")
     sys.exit(0 if all(results) else 1)
 
