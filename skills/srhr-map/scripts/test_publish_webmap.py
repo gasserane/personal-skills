@@ -339,6 +339,13 @@ def main():
         pwm.page = real_page
     check("failed_build_leaves_no_partial_file", not failing.exists())
 
+    # page(): inserted values are escaped HTML and are never searched for placeholders again
+    odd = {"edition": "2031 <b>@@DATA@@</b>", "made_on": "@@D3JS@@", "views": [], "countries": []}
+    pg = pwm.page(odd, "LIBRARY")
+    check("page_escapes_edition", "<b>" not in pg and "&lt;b&gt;" in pg, pg[pg.find("<header>"):][:200])
+    check("page_single_pass_placeholders", pg.count("LIBRARY") == 1 and pg.count('"countries":[]') == 1
+          and "@@DATA@@" in pg and "@@D3JS@@" in pg, (pg.count("LIBRARY"), pg.count('"countries":[]')))
+
     # one rate year for map D (Session A ruling): colour, legend, title, tooltip, swap and deck check
     rate_year = getattr(rdc, "RATE_YEAR", None)
     check("rate_year_is_one_constant", rate_year == "2024" and getattr(rdc, "TREND_BASE_YEAR", None) == "2015"

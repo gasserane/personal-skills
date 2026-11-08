@@ -24,6 +24,7 @@ artifact. The target is never overwritten (exit 2). Exit 1 = input error.
 import argparse
 import base64
 import hashlib
+import html
 import json
 import re
 import sys
@@ -366,12 +367,12 @@ def _json(data):
 
 def page(data, d3_js):
     head_title, head_sub = TEMPLATES["page"]
-    return (PAGE.replace("@@TITLE@@", head_title)
-            .replace("@@HEADING@@", computed.render(head_title))
-            .replace("@@SUB@@", computed.render(head_sub, edition=data["edition"], made_on=data["made_on"]))
-            .replace("@@WEB@@", WEB)
-            .replace("@@DATA@@", _json(data))
-            .replace("@@D3JS@@", d3_js))  # last, so no other placeholder is searched inside the library
+    fill = {"TITLE": html.escape(head_title),
+            "HEADING": html.escape(computed.render(head_title)),
+            "SUB": html.escape(computed.render(head_sub, edition=data["edition"], made_on=data["made_on"])),
+            "WEB": WEB, "DATA": _json(data), "D3JS": d3_js}
+    # one pass over the template: an inserted value is never searched for another placeholder
+    return re.sub(r"@@([A-Z0-9]+)@@", lambda m: fill[m.group(1)], PAGE)
 
 
 def build(register, crosswalk_path, master, decks, geometry, out, edition=None, d3=None):
