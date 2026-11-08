@@ -31,6 +31,22 @@ def b_class(n: int) -> str:
     return f"{n} grant stream{'' if n == 1 else 's'}"
 
 
+D_BANDS = (3, 5, 10, 20)  # map D colour bands (rate of new HIV diagnoses), read off the approved deck fills
+
+
+def d_class(rate: float) -> int:
+    """Map D colour band 0..len(D_BANDS): the number of band edges at or below the rate."""
+    return sum(1 for edge in D_BANDS if rate >= edge)
+
+
+def d_band_label(i: int) -> str:
+    if i == 0:
+        return f"below {D_BANDS[0]}"
+    if i == len(D_BANDS):
+        return f"{D_BANDS[-1]} or more"
+    return f"{D_BANDS[i - 1]} to {D_BANDS[i]}"
+
+
 def _active(rows, indicator):
     return [r for r in rows if r["indicator_id"] == indicator and r["member_status"] != "withdrawn"]
 
