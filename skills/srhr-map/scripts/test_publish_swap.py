@@ -156,6 +156,51 @@ def main():
                and not list(d.glob("swap_log*.csv")), code)
         record("cli_bad_plan_exit_1", ps.main(["--decks", str(d), "--plan", str(t / "bad_field.csv")]) == 1)
 
+    # --- _write on text: late-bound COM exposes the span only as GetCharacters(start, len);
+    #     Characters(start, len) raises "Does not support a collection" (Run A, 2026-11-08) ---
+    class Span:
+        def __init__(self, box, a, n):
+            self.box, self.a, self.n = box, a, n
+
+        @property
+        def Text(self):
+            return self.box.text[self.a - 1:self.a - 1 + self.n]
+
+        @Text.setter
+        def Text(self, v):
+            self.box.text = self.box.text[:self.a - 1] + v + self.box.text[self.a - 1 + self.n:]
+
+        def InsertAfter(self, v):
+            self.box.text = self.box.text[:self.a - 1 + self.n] + v + self.box.text[self.a - 1 + self.n:]
+
+        def InsertBefore(self, v):
+            self.box.text = self.box.text[:self.a - 1] + v + self.box.text[self.a - 1:]
+
+    class LateBoundRange:
+        def __init__(self, text):
+            self.text = text
+
+        def GetCharacters(self, a, n):
+            return Span(self, a, n)
+
+        @property
+        def Characters(self):
+            raise RuntimeError("Does not support a collection.")
+
+    class FakeShape:
+        def __init__(self, text):
+            self.TextFrame2 = type("TF", (), {})()
+            self.TextFrame2.TextRange = LateBoundRange(text)
+
+    for old, new in [("4", "5"), ("Class P (9)", "Class P (10)"), ("(11)", "(111)"), ("26.5", "6.5"), ("ab", "xab")]:
+        sh = FakeShape(old)
+        try:
+            ps._write(sh, "text", old, new)
+            got = sh.TextFrame2.TextRange.text
+        except Exception as e:  # noqa: BLE001
+            got = f"raised {e}"
+        record(f"write_text_late_bound_{old}->{new}", got == new, got)
+
     print(f"{sum(results)}/{len(results)} cases ok")
     sys.exit(0 if all(results) else 1)
 

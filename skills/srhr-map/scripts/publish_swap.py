@@ -164,12 +164,14 @@ def _write(shape, field, old, new):
         return
     tr = shape.TextFrame2.TextRange
     a, n, ins = text_edit(old, new)
+    # Late-bound pywin32 reads Characters as a property and then calls the result, which raises
+    # "Does not support a collection"; GetCharacters(start, len) is the parameterised form that works.
     if n:
-        tr.Characters(a, n).Text = ins
+        tr.GetCharacters(a, n).Text = ins
     elif a > 1:
-        tr.Characters(a - 1, 1).InsertAfter(ins)
+        tr.GetCharacters(a - 1, 1).InsertAfter(ins)
     else:
-        tr.Characters(1, 1).InsertBefore(ins)
+        tr.GetCharacters(1, 1).InsertBefore(ins)
 
 
 def apply_deck(app, path, rows, stamp):
