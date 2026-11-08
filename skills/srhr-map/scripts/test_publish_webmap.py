@@ -339,6 +339,12 @@ def main():
         pwm.page = real_page
     check("failed_build_leaves_no_partial_file", not failing.exists())
 
+    # wheel at full view scrolls the page; Ctrl + wheel (or a trackpad pinch) zooms; zoomed in, the wheel zooms
+    wl = re.search(r'if \(ev\.type === "wheel"\)([^;]*);', script)
+    check("wheel_scrolls_page_at_full_view", wl is not None and "return true" not in wl.group(1)
+          and "ev.ctrlKey" in wl.group(1) and "zoomOf[cur].k > 1" in wl.group(1), wl and wl.group(0))
+    check("hint_names_ctrl_wheel", re.search(r'class="hint">[^<]*Ctrl', text) is not None, "")
+
     # highlight never reorders country paths (DOM order = keyboard Tab order)
     check("highlight_does_not_reorder_paths", ".raise()" not in script and ".lower()" not in script, "")
     check("highlight_overlay_path", re.search(r'g\.append\("path"\)\.attr\("class", "hl"\)', script) is not None

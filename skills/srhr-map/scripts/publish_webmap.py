@@ -542,7 +542,7 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
           <button type="button" id="zoom-reset" aria-label="Reset zoom" title="Reset zoom">Reset</button>
         </div>
       </div>
-      <p class="hint">Use the + and &minus; buttons or the mouse wheel to zoom. Drag to move a zoomed map. On a phone, pinch with two fingers.</p>
+      <p class="hint">Use the + and &minus; buttons, or hold Ctrl and turn the mouse wheel, to zoom. Once the map is zoomed in, the wheel zooms and you drag to move the map. On a phone, pinch with two fingers.</p>
     </div>
     <aside>
       <div><h3 id="lg-title">Legend</h3><ul class="legend" id="legend"></ul></div>
@@ -589,7 +589,9 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
   var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var zoom = d3.zoom().scaleExtent([1, KMAX]).translateExtent([[0, 0], [W, H]])
     .filter(function (ev) {
-      if (ev.type === "wheel") return true;
+      // wheel: at full view the page scrolls; Ctrl + wheel (a trackpad pinch arrives as one) zooms in;
+      // once zoomed in, the plain wheel zooms
+      if (ev.type === "wheel") return ev.ctrlKey || (zoomOf[cur] ? zoomOf[cur].k > 1 : false);
       // touch: two fingers pinch at any zoom; one finger moves the map only once it is zoomed in,
       // so a one-finger drag at full view still scrolls the page
       if (ev.touches) return ev.touches.length > 1 || (zoomOf[cur] ? zoomOf[cur].k > 1 : false);
