@@ -451,7 +451,9 @@ def main(argv=None):
     return 0
 
 
-PAGE = r"""<title>@@TITLE@@</title>
+PAGE = r"""<!doctype html>
+<meta charset="utf-8">
+<title>@@TITLE@@</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="@@WEB@@fonts.googleapis.com">
 <link rel="stylesheet" href="@@WEB@@fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@600;700&display=swap">

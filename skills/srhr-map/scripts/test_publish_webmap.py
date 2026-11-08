@@ -362,6 +362,11 @@ def main():
     check("page_escapes_edition", "<b>" not in pg and "&lt;b&gt;" in pg, pg[pg.find("<header>"):][:200])
     check("page_single_pass_placeholders", pg.count("LIBRARY") == 1 and pg.count('"countries":[]') == 1
           and "@@DATA@@" in pg and "@@D3JS@@" in pg, (pg.count("LIBRARY"), pg.count('"countries":[]')))
+    # page(): a standalone file opened from disk declares UTF-8 itself (else "T\u00fcrkiye" reads as
+    # "T\u00c3\u00bcrkiye"), within the first 1024 bytes as HTML requires, and runs in standards mode
+    head = pg.encode("utf-8")[:1024].decode("utf-8", "ignore").lower()
+    check("page_starts_with_doctype", pg.lstrip().lower().startswith("<!doctype html>"), pg[:80])
+    check("page_declares_utf8_early", '<meta charset="utf-8">' in head, head[:200])
 
     # one rate year for map D (Session A ruling): colour, legend, title, tooltip, swap and deck check
     rate_year = getattr(rdc, "RATE_YEAR", None)
