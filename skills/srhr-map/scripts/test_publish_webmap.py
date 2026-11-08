@@ -371,11 +371,18 @@ def main():
     # old tab line restored the output reproduced 23025e4b..., so nothing else moved. Internal data has no flag.
     # Re-pinned in the dark-accent fix (S3 review item b: dark --accent #FF6A3D -> #EB3300, both dark blocks);
     # with the two old lines restored the output reproduced 84b9e9c4..., so nothing else moved.
-    gold = {"edition": "2031", "made_on": "2031-01-02", "countries": [{"iso3": "XAA", "name": "A & <b>", "paths": []}],
+    # Re-pinned in phase e review minor 6 (hover falls back to the country name in show()); with the old show()
+    # line restored the output reproduced 9af44131..., so nothing else moved.
+    gold ={"edition": "2031", "made_on": "2031-01-02", "countries": [{"iso3": "XAA", "name": "A & <b>", "paths": []}],
             "views": [{"id": "A", "name": "N", "title": "T", "subtitle": "S", "legend_title": "L", "legend": [],
                        "filters": [], "colour": {}, "tips": {"XAA": "A's tip"}}]}
     got = hashlib.sha256(pwm.page(gold, "LIBRARY").encode("utf-8")).hexdigest()
-    check("internal_page_unchanged", got == "9af44131d505e6190a969fb0ee9d9a6121d9786411f4d83df3bda2ecdd00f5a0", got)
+    check("internal_page_unchanged", got == "82fbb570ccf3a997ae1b33ef51ff196f92309cd2c5e9a40a77d94e52752f5e35", got)
+    # phase e review minor 6 (Ane 2026-11-08 21:56, both pages): a country with no tip (withdrawn, non-member,
+    # grey context) shows its name only on hover; it stays out of the Tab order (tabindex still keyed on v.tips)
+    check("hover_falls_back_to_country_name",
+          re.search(r"t = v\.tips\[d\.properties\.iso3\] \|\| d\.properties\.name;", pwm.PAGE) is not None
+          and '.attr("tabindex", iso in v.tips ? 0 : null)' in pwm.PAGE, "")
     slot = pwm.page(gold, "LIBRARY", header_html="<h1>HEAD-SLOT</h1>", footer_html="FOOT-SLOT", title="TITLE-SLOT")
     check("page_slots_filled", "<h1>HEAD-SLOT</h1>" in slot and "<footer>FOOT-SLOT</footer>" in slot
           and "<title>TITLE-SLOT</title>" in slot and "hover text on the map slides" not in slot

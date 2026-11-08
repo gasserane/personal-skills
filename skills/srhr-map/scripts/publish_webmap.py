@@ -646,7 +646,7 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
     });
   }
   function show(ev, d) {
-    var v = views[cur], t = v.tips[d.properties.iso3];
+    var v = views[cur], t = v.tips[d.properties.iso3] || d.properties.name;
     if (!t) return;
     tip.textContent = t; tip.hidden = false; readout.textContent = t;
     var box = document.getElementById("map").getBoundingClientRect();
