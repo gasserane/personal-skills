@@ -180,6 +180,10 @@ def main():
         def __init__(self, text):
             self.text = text
 
+        @property
+        def Text(self):  # as real COM: the whole text, \r between paragraphs
+            return self.text
+
         def GetCharacters(self, a, n):
             return Span(self, a, n)
 
@@ -200,6 +204,33 @@ def main():
         except Exception as e:  # noqa: BLE001
             got = f"raised {e}"
         record(f"write_text_late_bound_{old}->{new}", got == new, got)
+
+    # --- multi-paragraph text: COM joins paragraphs with \r and line breaks with \x0b; the inventory
+    #     (and so the plan) joins runs with nothing (Session A, minor 10) ---
+    record("read_text_drops_paragraph_marks", ps._read(FakeShape("Line one\rClass P\x0b(13)"), "text")
+           == "Line oneClass P(13)", ps._read(FakeShape("Line one\rClass P\x0b(13)"), "text"))
+    sh = FakeShape("Line one\rClass P (13)")
+    try:
+        ps._write(sh, "text", "Line oneClass P (13)", "Line oneClass P (14)")
+        got = sh.TextFrame2.TextRange.text
+    except Exception as e:  # noqa: BLE001
+        got = f"raised {e!r}"
+    record("write_multi_paragraph_keeps_break", got == "Line one\rClass P (14)", got)
+    sh = FakeShape("one\rtwo (9)")
+    try:
+        ps._write(sh, "text", "onetwo (9)", "onetwo (10)")
+        got = sh.TextFrame2.TextRange.text
+    except Exception as e:  # noqa: BLE001
+        got = f"raised {e!r}"
+    record("write_multi_paragraph_grow", got == "one\rtwo (10)", got)
+    try:
+        ps.raw_edit("ab\rcd", "abcd", "aXd")
+        crossed = "no error"
+    except ps.PlanError as e:
+        crossed = "refused" if "paragraph" in str(e) else str(e)
+    except Exception as e:  # noqa: BLE001
+        crossed = repr(e)
+    record("edit_across_paragraph_break_refused", crossed == "refused", crossed)
 
     # --- --apply: a PowerPoint error on one deck (e.g. a locked file) must not lose the log of the
     #     decks already saved, and must end in exit 1, not a traceback ---

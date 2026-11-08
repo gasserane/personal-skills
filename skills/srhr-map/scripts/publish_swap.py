@@ -152,10 +152,34 @@ def _shape_map(slide):
     return found, dup
 
 
+BREAKS = "\r\x0b"  # COM TextRange2.Text: \r between paragraphs, \x0b for a line break
+
+
+def _plain(raw):
+    """Shape text as the inventory (and so the plan) holds it: runs joined, no paragraph or line marks."""
+    return "".join(ch for ch in raw if ch not in BREAKS)
+
+
+def raw_edit(raw, old, new):
+    """text_edit(old, new) on the plain text, moved onto the raw COM text (1-based start, length, insert).
+    An edit that would remove or straddle a paragraph or line break is refused (PlanError)."""
+    if _plain(raw) != old:
+        raise PlanError(f"shape holds {_plain(raw)!r}, plan expected {old!r}")
+    pos = [i for i, ch in enumerate(raw) if ch not in BREAKS]  # plain index -> raw index
+    a, n, ins = text_edit(old, new)
+    if n:
+        first, last = pos[a - 1], pos[a - 1 + n - 1]
+        if last - first + 1 != n:
+            raise PlanError(f"the change {old!r} -> {new!r} crosses a paragraph or line break in the shape; "
+                            "edit it by hand")
+        return first + 1, n, ins
+    return (pos[a - 2] + 2 if a > 1 else (pos[0] + 1 if pos else 1)), 0, ins
+
+
 def _read(shape, field):
     if field == "screentip":
         return shape.ActionSettings(1).Hyperlink.ScreenTip
-    return shape.TextFrame2.TextRange.Text
+    return _plain(shape.TextFrame2.TextRange.Text)
 
 
 def _write(shape, field, old, new):
@@ -163,7 +187,7 @@ def _write(shape, field, old, new):
         shape.ActionSettings(1).Hyperlink.ScreenTip = new
         return
     tr = shape.TextFrame2.TextRange
-    a, n, ins = text_edit(old, new)
+    a, n, ins = raw_edit(tr.Text, old, new)
     # Late-bound pywin32 reads Characters as a property and then calls the result, which raises
     # "Does not support a collection"; GetCharacters(start, len) is the parameterised form that works.
     if n:
@@ -200,6 +224,11 @@ def apply_deck(app, path, rows, stamp):
             if old_read != r["old"]:
                 raise PlanError(f"map {r['deck']} {r['slide']} {r['shape_name']}: deck holds {old_read!r}, "
                                 f"plan expected {r['old']!r}; nothing saved")
+            if r["field"] != "screentip":
+                try:  # refuse an edit across a paragraph break now, before anything in the deck changes
+                    raw_edit(shape.TextFrame2.TextRange.Text, r["old"], r["new"])
+                except PlanError as e:
+                    raise PlanError(f"map {r['deck']} {r['slide']} {r['shape_name']}: {e}; nothing saved") from None
             targets.append((r, shape, old_read))
         for r, shape, old_read in targets:
             _write(shape, r["field"], old_read, r["new"])
