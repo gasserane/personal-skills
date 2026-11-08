@@ -339,6 +339,10 @@ def main():
         pwm.page = real_page
     check("failed_build_leaves_no_partial_file", not failing.exists())
 
+    doc = pwm.__doc__ or ""
+    check("docstring_says_d3_embedded", "loads one pinned script" not in doc and "artifact" not in doc
+          and re.search(r"embeds .*d3", doc, re.S) is not None, doc[-400:])
+
     # page(): inserted values are escaped HTML and are never searched for placeholders again
     odd = {"edition": "2031 <b>@@DATA@@</b>", "made_on": "@@D3JS@@", "views": [], "countries": []}
     pg = pwm.page(odd, "LIBRARY")

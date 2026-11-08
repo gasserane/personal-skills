@@ -18,8 +18,10 @@ publish time through computed.py, the same functions the decks use:
   titles    digit-free templates (TEMPLATES) filled through computed.render
 Geometry: the pinned world-atlas topology (GEOMETRY_URL), joined to the master list by its m49 code,
 or by name when a country has no m49 code; neighbouring countries are drawn grey for context.
-The page loads one pinned script (d3, cdnjs) and embeds everything else, so it also works as a claude.ai
-artifact. The target is never overwritten (exit 2). Exit 1 = input error.
+The page embeds everything: the pinned d3 7.9.0 library (--d3, refused unless it matches D3_SRI), the
+geometry (refused unless it matches GEOMETRY_SHA256) and the data, so it opens offline and is shared as a
+file. Only the Google Fonts stylesheet is external; offline the page falls back to Arial.
+The target is never overwritten (exit 2). Exit 1 = input error.
 """
 import argparse
 import base64
