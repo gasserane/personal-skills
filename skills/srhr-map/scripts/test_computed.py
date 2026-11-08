@@ -82,6 +82,39 @@ def main():
     except ValueError:
         record("render_template_with_digit_raises", True)
 
+    # --- phase (e): membership classes and funding bands for the summary page ---
+    mem = [row("XA1", "ippf_membership", "MA with x", status="full member"),
+           row("XB2", "ippf_membership", "MA with x", status="associate member"),
+           row("XC3", "ippf_membership", "CP", status="Collaborative Partner"),
+           row("XD4", "ippf_membership", "MA", status="withdrawn"),
+           row("XE5", "ippf_membership", "MA", status="full member"),
+           row("XF6", "ippf_membership", "MA", status="full member")]
+    fund = [row("XA1", "ippf_funding_streams", "2", "Core X1, Stream A"),
+            row("XB2", "ippf_funding_streams", "1", "Core X1", status="associate member"),
+            row("XC3", "ippf_funding_streams", "1", "Stream A", status="Collaborative Partner"),
+            row("XD4", "ippf_funding_streams", "1", "Stream A", status="withdrawn"),
+            row("XE5", "ippf_funding_streams", "0", "none"),
+            row("XF6", "ippf_funding_streams", "0", "none"),
+            row("XG7", "ippf_funding_streams", "1", "Stream A"),  # no membership row
+            row("XF6", "ippf_funding_streams_partner", "Stream B")]
+    rows_e = mem + fund
+    msc = cp.member_status_classes(rows_e)
+    record("member_status_excludes_withdrawn",
+           msc == {"XA1": "full member", "XB2": "associate member", "XC3": "Collaborative Partner",
+                   "XE5": "full member", "XF6": "full member"}, msc)
+    band = cp.funding_band(rows_e)
+    record("band_core_with_other", band.get("XA1") == "core", band.get("XA1"))
+    record("band_core_only", band.get("XB2") == "core", band.get("XB2"))
+    record("band_other_only", band.get("XC3") == "other", band.get("XC3"))
+    record("band_none", band.get("XE5") == "none", band.get("XE5"))
+    nop = cp.funding_band(rows_e, with_partner=False)
+    record("band_partner_only_counts", band.get("XF6") == "other" and nop.get("XF6") == "none",
+           (band.get("XF6"), nop.get("XF6")))
+    record("band_skips_withdrawn_and_nonmember", "XD4" not in band and "XG7" not in band, sorted(band))
+    record("funding_bands_legend_order", cp.FUNDING_BANDS == ("core", "other", "none"), cp.FUNDING_BANDS)
+    record("funding_labels_hold_year_slot", set(cp.FUNDING_LABELS) == set(cp.FUNDING_BANDS)
+           and "{year}" in cp.FUNDING_LABELS["none"], cp.FUNDING_LABELS)
+
     print(f"{sum(results)}/{len(results)} cases ok")
     sys.exit(0 if all(results) else 1)
 

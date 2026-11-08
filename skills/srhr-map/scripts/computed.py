@@ -79,6 +79,30 @@ def partner_keys(rows: list) -> dict:
     return out
 
 
+FUNDING_BANDS = ("core", "other", "none")  # summary funding map, legend order (phase e, design 4.3)
+FUNDING_LABELS = {"core": "IPPF core grant", "other": "Other IPPF grants only", "none": "No IPPF grant in {year}"}
+
+
+def member_status_classes(rows: list) -> dict:
+    """{iso3: member_status} for the membership rows of active (not withdrawn) members: map A of the
+    summary page and the N of its headline."""
+    return {r["iso3"]: r["member_status"] for r in _active(rows, "ippf_membership")}
+
+
+def funding_band(rows: list, with_partner: bool = True) -> dict:
+    """{iso3: "core" | "other" | "none"} for active members' funding rows. Held keys are the own streams
+    plus, when with_partner, the streams held as partner; "core" if any held key starts with "Core"."""
+    members = member_status_classes(rows)
+    partner = partner_keys(rows) if with_partner else {}
+    out = {}
+    for r in _active(rows, "ippf_funding_streams"):
+        if r["iso3"] not in members:
+            continue
+        held = set(stream_keys(r["value_display"])) | partner.get(r["iso3"], set())
+        out[r["iso3"]] = "core" if any(k.startswith("Core") for k in held) else "other" if held else "none"
+    return out
+
+
 def class_counts(m: str, rows: list, crosswalk: list) -> dict:
     """{class: (n, half)}. A and B key by class label; C keys streams by crosswalk key and adds one
     entry per member_status for the membership legend."""
