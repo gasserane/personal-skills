@@ -29,6 +29,10 @@ TITLES = {"A": "IPPF members and partners, {year}", "F": "IPPF funding to member
 SUBTITLES = {"A": "Countries where an IPPF member association or collaborative partner is based",
              "F": "Countries by the IPPF grants their member or partner receives",
              "D": "Rate of new HIV diagnoses per country. Source: ECDC/WHO"}
+# Funding bands in FUNDING_BANDS order (core, other, none): IPPF Dream, Crystal and a Pear tint. Not the internal
+# map C tints, whose first colour is a grey close to the context land; every band here is clearly not grey
+# (CIEDE2000 >= 21 against --map-land). Ane chose this 2026-11-08 (phase e task 7).
+F_COLOURS = ("#00313C", "#71C5E8", "#D5DE7C")
 STATUS_ORDER = ("full member", "associate member", "Collaborative Partner")
 STATUS_LABELS = {"full member": "Full member", "associate member": "Associate member",
                  "Collaborative Partner": "Collaborative Partner"}
@@ -136,7 +140,7 @@ def summary_views(rows: list, master_rows: list):
     for iso, band in f["colour"].items():
         member = "partner" if status.get(iso) == "Collaborative Partner" else "member"
         f["tips"][iso] = HOVER["F"][band].format(country=nm(iso), year=fyear, member=member)
-    _classed(f, computed.FUNDING_BANDS, lambda i: pw.PALETTE["C"][i],
+    _classed(f, computed.FUNDING_BANDS, lambda i: F_COLOURS[i],
              lambda k: computed.FUNDING_LABELS[k].format(year=fyear))
 
     rates = [r for r in pw._rates(rows) if r["reference_year"] == rdc.RATE_YEAR]

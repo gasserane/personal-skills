@@ -115,6 +115,12 @@ def main():
            == ps.pw.PALETTE["A"][:3], A.get("legend"))
     f_counts = {lg["key"]: lg["count"] for lg in F.get("legend", [])}
     record("F_legend_counts_match_bands", f_counts == {"core": 1, "other": 1, "none": 1}, f_counts)
+    f_cols = {lg["key"]: lg["colour"] for lg in F.get("legend", [])}
+    record("F_colours_dream_crystal_pear_tint", f_cols == {"core": "#00313C", "other": "#71C5E8", "none": "#D5DE7C"}
+           and [f["colour"] for f in F.get("filters", [])] == ["#00313C", "#71C5E8", "#D5DE7C"], f_cols)
+    land = re.search(r"--map-land:\s*(#[0-9A-Fa-f]{6})", ps.pw.PAGE).group(1).upper()
+    record("F_no_band_is_context_grey", land not in {c.upper() for c in f_cols.values()}
+           and "#BFC8CB" not in f_cols.values(), (land, f_cols))
     record("F_hover_partner_word", F.get("tips", {}).get("XCC") == "Cland: IPPF partner, no IPPF grant in 2026"
            and F.get("tips", {}).get("XAA") == "Aland: receives the IPPF core grant in 2026", F.get("tips"))
     f_text = ps.json.dumps(F)
