@@ -182,20 +182,22 @@ def test_derive_skips_country_not_on_the_map():
         (root / "intelligence_tool").mkdir()
         write_csv(root / "config" / "streams.csv", ["key", "label", "group", "colour"], [["Stream A", "Alpha", "G", "1"]])
         write_csv(root / "config" / "ma_codes.csv", ["ma_code", "iso3", "org_name", "ticked_by", "tick_date"],
-                  [["901", "XAA", "Org One", "R", "2026-11-08"], ["902", "XBB", "Org Two", "R", "2026-11-08"]])
+                  [["901", "XAA", "Org One", "R", "2026-11-08"], ["902", "XBB", "Org Two", "R", "2026-11-08"],
+                   ["904", "XCC", "Org Four", "R", "2026-11-08"]])
         write_csv(root / "intelligence_tool" / "master_countries.csv", ["country", "iso3", "iso2"],
-                  [["Country A", "XAA", "XA"], ["Country B", "XBB", "XB"]])
+                  [["Country A", "XAA", "XA"], ["Country B", "XBB", "XB"], ["Country C", "XCC", "XC"]])
         dhis2_file(root / "drop_in" / str(YEAR), [["SRV-HIV and AIDS - a", "2025", "Org One (XA901-0000)", "0 - 24", "5"],
-                                                  ["SRV-HIV and AIDS - a", "2025", "Org Two (XB902-0000)", "0 - 24", "7"]])
+                                                  ["SRV-HIV and AIDS - a", "2025", "Org Two (XB902-0000)", "0 - 24", "7"],
+                                                  ["SRV-HIV and AIDS - a", "2025", "Org Four (XC904-0000)", "0 - 24", "2"]])
         baseline = [{"iso3": "XAA", "indicator_id": "ippf_hiv_services", "member_status": "full member",
                      "unit": "services", "topic": "HIV", "source_id": "ippf_dhis2_service_stats", "reference_year": "2024"}]
         rows, problems, covered = dr.derive(root, YEAR, "HIV", baseline)
         check("a country with no row in the last edition is not proposed", {r["iso3"] for r in rows} == {"XAA"},
               str(rows))
-        check("the skipped country is named in a note",
-              any("XBB" in p and "not on the map" in p for p in problems), str(problems))
+        notes = [p for p in problems if "not on the map" in p]
+        check("skipped countries share one note naming each", len(notes) == 1 and "XBB, XCC" in notes[0], str(problems))
         rows, problems, covered = dr.derive(root, YEAR, "HIV", [])
-        check("with no previous edition every country is proposed", {r["iso3"] for r in rows} == {"XAA", "XBB"},
+        check("with no previous edition every country is proposed", {r["iso3"] for r in rows} == {"XAA", "XBB", "XCC"},
               str(rows))
 
 

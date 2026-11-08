@@ -430,9 +430,10 @@ def derive(map_root, year, topic, baseline, edition=None):
     on_map = {b["iso3"] for b in baseline}
     if on_map:
         off = sorted({r["iso3"] for r in rows} - on_map)
-        for iso in off:
-            problems.append(f"country {iso} is in the new files but not on the map (no row in the last register "
-                            f"edition); not proposed. Adding a country to the map is done at publish.")
+        if off:
+            problems.append(f"{len(off)} countries in the new files are not on the map (no row in the last register "
+                            f"edition), so nothing is proposed for them: {', '.join(off)}. Adding a country to the "
+                            f"map is done at publish.")
         rows = [r for r in rows if r["iso3"] in on_map]
     # fill what the source files do not hold, from the baseline and the ticked code table
     status, unit, topic_of = {}, {}, {}
