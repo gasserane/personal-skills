@@ -47,7 +47,7 @@ HOVER = {
     "D_none": "{country}: no {year} data",
 }
 
-HEADLINE = "IPPF member associations and partners work in {n} of the {m} countries of the WHO European Region"
+HEADLINE = "IPPF member associations and partners work in {n} of the {m} countries of the WHO European Region."
 DEFINITION = ("\"Work in\" means an IPPF member association or partner organisation is based in the country. "
               "It does not mean service coverage.")
 
@@ -190,7 +190,13 @@ def header_html(head: dict, edition: str, made_on: str) -> str:
         _e(PAGE_TITLE.format(edition=edition)),
         _e(HEADLINE.format(n=head["n"], m=head["m"])),
         _e(DEFINITION),
-        _e(f"Edition {edition}, made on {made_on}")))
+        _e(f"Edition {edition}, made on {_dmy(made_on)}")))
+
+
+def _dmy(iso: str) -> str:
+    """2026-11-08 -> 08.11.2026 (IPPF date style); any other text is kept as it is."""
+    m = re.fullmatch(r"(\d{4})-(\d{2})-(\d{2})", iso)
+    return f"{m.group(3)}.{m.group(2)}.{m.group(1)}" if m else iso
 
 
 def footer_html(cfg: dict) -> str:
@@ -336,7 +342,7 @@ def summary_page_text(rows, master_rows, who, cfg, topo, d3_js, edition, made):
     if moved:
         notes.append("note: counting partner streams moves these countries to another funding band: " + ", ".join(moved))
     data = {"edition": edition, "made_on": made, "headline": {"n": head["n"], "m": head["m"]},
-            "views": views, "countries": shapes}
+            "tab_letters": False, "views": views, "countries": shapes}
     text = pw.page(data, d3_js, header_html(head, edition, made), footer_html(cfg),
                    title=_e(PAGE_TITLE.format(edition=edition)))
     return text, data, notes

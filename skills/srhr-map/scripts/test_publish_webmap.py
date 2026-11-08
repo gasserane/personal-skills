@@ -367,11 +367,13 @@ def main():
     # come out byte-identical. Golden = sha256 of this call on the code BEFORE the slots (personal-skills f202a06),
     # re-pinned once in phase e task 7 when route() learned any one-letter view id (summary map F was unreachable);
     # with the old route line restored the output reproduced the f202a06 golden d1e8179b..., so nothing else moved.
+    # Re-pinned again (same task) when the tab label learned data.tab_letters (summary drops "Map X: "); with the
+    # old tab line restored the output reproduced 23025e4b..., so nothing else moved. Internal data has no flag.
     gold = {"edition": "2031", "made_on": "2031-01-02", "countries": [{"iso3": "XAA", "name": "A & <b>", "paths": []}],
             "views": [{"id": "A", "name": "N", "title": "T", "subtitle": "S", "legend_title": "L", "legend": [],
                        "filters": [], "colour": {}, "tips": {"XAA": "A's tip"}}]}
     got = hashlib.sha256(pwm.page(gold, "LIBRARY").encode("utf-8")).hexdigest()
-    check("internal_page_unchanged", got == "23025e4bc2f0dd171ededbb7462cd43313e1544f28e2e08a454e5fe81dc78789", got)
+    check("internal_page_unchanged", got == "84b9e9c4d949680de97241cd2322cd4592013cdc2cf5855bd6466a63f2f64232", got)
     slot = pwm.page(gold, "LIBRARY", header_html="<h1>HEAD-SLOT</h1>", footer_html="FOOT-SLOT", title="TITLE-SLOT")
     check("page_slots_filled", "<h1>HEAD-SLOT</h1>" in slot and "<footer>FOOT-SLOT</footer>" in slot
           and "<title>TITLE-SLOT</title>" in slot and "hover text on the map slides" not in slot

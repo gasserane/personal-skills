@@ -52,7 +52,7 @@ def main():
     record("headline_template_has_no_digits", re.search(r"\d", ps.HEADLINE) is None
            and re.search(r"\d", ps.DEFINITION) is None, ps.HEADLINE)
     record("headline_fills", ps.HEADLINE.format(n=3, m=5).endswith("work in 3 of the 5 countries of the WHO "
-                                                                    "European Region"), ps.HEADLINE)
+                                                                    "European Region."), ps.HEADLINE)
 
     with tempfile.TemporaryDirectory() as d:
         try:
@@ -153,7 +153,7 @@ def main():
     hd = ps.header_html({"n": 3, "m": 5, "outside": []}, "2031 <b>", "2031-01-02")
     ft = ps.footer_html(cfg)
     record("summary_header_escapes", "<b>" not in hd and "&lt;b&gt;" in hd and "work in 3 of the 5" in hd
-           and "service coverage" in hd and "Edition 2031 &lt;b&gt;, made on 2031-01-02" in hd, hd)
+           and "service coverage" in hd and "Edition 2031 &lt;b&gt;, made on 02.01.2031" in hd, hd)
     record("summary_footer_escapes", "<Dept>" not in ft and "&lt;Dept&gt;" in ft and "<i>" not in ft
            and "'d@" not in ft and "Prepared by Unit &amp; &lt;Dept&gt; &#x27;X&#x27;." in ft, ft)
     record("footer_has_mailto", 'href="mailto:a&amp;b&lt;c&gt;&#x27;d@example.org"' in ft
@@ -279,6 +279,8 @@ def main():
         text = out.read_text(encoding="utf-8") if out.exists() else ""
         data = ps.json.loads(re.search(r'id="map-data">(.*?)</script>', text, re.S).group(1)) if text else {}
         record("build_embeds_headline", data.get("headline") == {"n": 2, "m": 4}, data.get("headline"))
+        record("summary_tabs_without_letters", data.get("tab_letters") is False
+               and '(data.tab_letters === false ? "" : "Map " + v.id + ": ") + v.name' in ps.pw.PAGE, data.get("tab_letters"))
         record("build_page_has_no_deck_or_stream_text", text and not ps.scan(ps.page_strings(text),
                ps.forbidden_terms(twm.CROSS, codes6), set()) and "Country One: MA with core grant" not in text, "")
         record("build_notes_region", "not on the WHO" in log and "NOC" in log and "ZZZ" in log, log)
