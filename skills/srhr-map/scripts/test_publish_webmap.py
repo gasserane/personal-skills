@@ -364,12 +364,14 @@ def main():
     check("page_single_pass_placeholders", pg.count("LIBRARY") == 1 and pg.count('"countries":[]') == 1
           and "@@DATA@@" in pg and "@@D3JS@@" in pg, (pg.count("LIBRARY"), pg.count('"countries":[]')))
     # page() gained header/footer/title slots for the summary page (phase e task 4); the internal page must
-    # come out byte-identical. Golden = sha256 of this call on the code BEFORE the slots (personal-skills f202a06).
+    # come out byte-identical. Golden = sha256 of this call on the code BEFORE the slots (personal-skills f202a06),
+    # re-pinned once in phase e task 7 when route() learned any one-letter view id (summary map F was unreachable);
+    # with the old route line restored the output reproduced the f202a06 golden d1e8179b..., so nothing else moved.
     gold = {"edition": "2031", "made_on": "2031-01-02", "countries": [{"iso3": "XAA", "name": "A & <b>", "paths": []}],
             "views": [{"id": "A", "name": "N", "title": "T", "subtitle": "S", "legend_title": "L", "legend": [],
                        "filters": [], "colour": {}, "tips": {"XAA": "A's tip"}}]}
     got = hashlib.sha256(pwm.page(gold, "LIBRARY").encode("utf-8")).hexdigest()
-    check("internal_page_unchanged", got == "d1e8179b403f90851c302f992d3ea0c55d81d42b1622582583f14af4b478a4f2", got)
+    check("internal_page_unchanged", got == "23025e4bc2f0dd171ededbb7462cd43313e1544f28e2e08a454e5fe81dc78789", got)
     slot = pwm.page(gold, "LIBRARY", header_html="<h1>HEAD-SLOT</h1>", footer_html="FOOT-SLOT", title="TITLE-SLOT")
     check("page_slots_filled", "<h1>HEAD-SLOT</h1>" in slot and "<footer>FOOT-SLOT</footer>" in slot
           and "<title>TITLE-SLOT</title>" in slot and "hover text on the map slides" not in slot

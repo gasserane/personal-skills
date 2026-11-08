@@ -702,7 +702,8 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
     var a = document.createElement("a"); a.href = "#map-" + v.id.toLowerCase(); a.dataset.id = v.id;
     a.textContent = "Map " + v.id + ": " + v.name; tabs.append(a);
   });
-  function route() { var m = /^#map-([a-d])$/.exec(location.hash); render(m ? m[1].toUpperCase() : data.views[0].id); }
+  function route() { var m = /^#map-([a-z])$/.exec(location.hash), id = m ? m[1].toUpperCase() : "";
+    render(data.views.some(function (v) { return v.id === id; }) ? id : data.views[0].id); }
   window.addEventListener("hashchange", route);
   route();
 })();
