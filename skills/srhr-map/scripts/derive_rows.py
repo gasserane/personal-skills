@@ -127,9 +127,42 @@ def _country(countries, name):
     return countries.get(text) or countries.get(re.sub(r"\s*\([^)]*\)\s*$", "", text))
 
 
-def from_ledger(path, edition, streams, countries):
-    """Funding rows from the grant ledger. countries = {name, iso2 or iso3 lowercased: iso3}."""
+def load_stream_overrides(map_root, edition, streams):
+    """Per-country stream overrides from the optional config/stream_overrides.csv
+    (edition,iso3,ledger_stream,map_stream,ticked_by,tick_date[,suggestion_basis]).
+
+    For a country whose ledger names one stream while the map shows another (for example one core grant
+    line in the ledger that the map splits in two). Only TICKED rows of this edition count, so a row
+    goes stale with its edition instead of silently carrying over. Returns ({iso3: {ledger key: map key}},
+    problems).
+    """
+    path = Path(map_root) / "config" / "stream_overrides.csv"
+    if not path.exists():
+        return {}, []
+    keys, out, problems = {s["key"] for s in streams}, {}, []
+    with open(path, encoding="utf-8-sig", newline="") as f:
+        for r in csv.DictReader(f):
+            if not (r.get("ticked_by") or "").strip() or (r.get("edition") or "").strip() != str(edition):
+                continue
+            iso, old, new = (r.get(c, "").strip() for c in ("iso3", "ledger_stream", "map_stream"))
+            bad = [k for k in (old, new) if k not in keys]
+            if bad:
+                problems.append(f"stream_overrides.csv row for {iso}: stream '{bad[0]}' has no row in "
+                                f"config\\streams.csv; row not used")
+                continue
+            out.setdefault(iso, {})[old] = new
+    return out, problems
+
+
+def from_ledger(path, edition, streams, countries, overrides=None):
+    """Funding rows from the grant ledger. countries = {name, iso2 or iso3 lowercased: iso3}.
+    overrides = {iso3: {ledger stream key: map stream key}} from load_stream_overrides."""
     path = Path(path)
+    overrides = overrides or {}
+
+    def remap(iso, k):
+        return overrides.get(iso, {}).get(k, k)
+
     contract = dc.load_contract(CONTRACTS / "ippf_subgranting.v1.json")
     spec = {f["role"]: f for f in contract["files"]}
     match, order = _matcher(streams), {s["key"]: i for i, s in enumerate(streams)}
@@ -168,7 +201,7 @@ def from_ledger(path, edition, streams, countries):
             if re.search(rf"\b{edition}\b", col) and str(v).strip():
                 k = key_of(col)
                 if k:
-                    held.add(k)
+                    held.add(remap(iso, k))
     # projects: one row per grant, Funding source written once per block
     _, pr_rows, err = dc._read(path, spec["ledger_projects"], edition)
     if err:
@@ -187,7 +220,7 @@ def from_ledger(path, edition, streams, countries):
         k = key_of(source)
         if iso is None or k is None:
             continue
-        full.setdefault(iso, set()).add(k)
+        full.setdefault(iso, set()).add(remap(iso, k))
         lead_name[iso] = r["Country"].strip()
         cell = (r.get("other countries") or "").strip()
         names = []
@@ -198,7 +231,7 @@ def from_ledger(path, edition, streams, countries):
             if p.strip():
                 piso = iso_of(p, f"partner of {r['Country'].strip()}")
                 if piso:
-                    partners.append((piso, k, lead_name[iso]))
+                    partners.append((piso, remap(piso, k), lead_name[iso]))
     link = f"{path}#'projects {edition}'"
     out = []
     for iso in sorted(full):
@@ -359,7 +392,9 @@ def derive(map_root, year, topic, baseline, edition=None):
             problems.append("intelligence_tool\\master_countries.csv is missing; funding not refreshed")
         elif p and not dc.check_file(dc.load_contract(CONTRACTS / "ippf_subgranting.v1.json"),
                                      "ledger_overview", p, edition):
-            new, pr = from_ledger(p, edition, streams, load_countries(root))
+            ov, pr = load_stream_overrides(root, edition, streams)
+            problems.extend(pr)
+            new, pr = from_ledger(p, edition, streams, load_countries(root), overrides=ov)
             problems.extend(pr)
             for ind in ("ippf_funding_streams", "ippf_grant_streams_count", "ippf_funding_streams_partner"):
                 cover([r for r in new if r["indicator_id"] == ind], ind, edition)
@@ -390,6 +425,15 @@ def derive(map_root, year, topic, baseline, edition=None):
                 mine = [s for s in new if s["indicator_id"] == ind]
                 if mine:
                     cover(mine, ind, max(s["reference_year"] for s in mine))
+    # the map's countries are the last edition's countries: refresh never adds one (a new map country is a
+    # structural change, made at publish); with no previous edition every country is proposed
+    on_map = {b["iso3"] for b in baseline}
+    if on_map:
+        off = sorted({r["iso3"] for r in rows} - on_map)
+        for iso in off:
+            problems.append(f"country {iso} is in the new files but not on the map (no row in the last register "
+                            f"edition); not proposed. Adding a country to the map is done at publish.")
+        rows = [r for r in rows if r["iso3"] in on_map]
     # fill what the source files do not hold, from the baseline and the ticked code table
     status, unit, topic_of = {}, {}, {}
     for b in baseline:

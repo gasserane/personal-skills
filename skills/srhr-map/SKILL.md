@@ -21,7 +21,7 @@ The folder holds:
 
 - `drop_in/<reporting year>/`: the new files, one subfolder each: `dhis2/` (service statistics export), `subgranting/` (grant ledger), `business_plans/` (business-plan focus coding sheet).
 - `intelligence_tool/`: the latest Intelligence Tool snapshot, `master_countries.csv`, and optionally `source_register.csv`.
-- `config/`: `streams.csv` (grant stream names and legend labels) and `ma_codes.csv` (organisation codes, ticked by the map owner).
+- `config/`: `streams.csv` (grant stream names and legend labels) and `ma_codes.csv` (organisation codes, ticked by the map owner). Optional: `country_aliases.csv` (ledger spellings of a country) and `stream_overrides.csv` (for one country and one edition, show a ledger stream as a different map stream). Only rows the map owner ticked are used; an override row counts only for its own edition.
 - `map_register/`: one register file per map edition. An existing edition is never changed.
 - `review/`: the review workbooks and run files this skill writes.
 
@@ -41,6 +41,7 @@ Rules that hold in every step:
 - A person ticks every change. Never write a tick, a name or a date into the register yourself.
 - Never open an existing register edition for writing. `apply` writes the new edition and backs it up before any rewrite.
 - Use `--topic HIV` or `--topic funding` to refresh one topic only.
+- Refresh never adds a country to the map. A country in the new files with no row in the last edition is listed as a note; adding it is a publish decision for the map owner.
 
 ## Where refresh runs: Claude Code
 

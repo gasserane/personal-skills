@@ -143,6 +143,62 @@ def test_overview_only_stream_reaches_funding_streams():
         check("overview-only stream raises no problem", problems == [], str(problems))
 
 
+def test_stream_overrides_ticked_rows_for_the_edition_only():
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "config").mkdir()
+        write_csv(root / "config" / "stream_overrides.csv",
+                  ["edition", "iso3", "ledger_stream", "map_stream", "ticked_by", "tick_date", "suggestion_basis"], [
+                      [str(EDITION), "XBB", "Stream A", "Stream B", "R", "2026-11-08", ""],
+                      [str(EDITION), "XCC", "Stream A", "Stream B", "", "", "unticked"],
+                      [str(EDITION - 1), "XAA", "Stream A", "Stream B", "R", "2025-11-08", ""],
+                      [str(EDITION), "XAA", "Stream A", "Stream Q", "R", "2026-11-08", ""]])
+        ov, problems = dr.load_stream_overrides(root, EDITION, STREAMS)
+        check("only ticked rows of this edition with known streams are used", ov == {"XBB": {"Stream A": "Stream B"}},
+              str(ov))
+        check("an unknown stream key in an override is a problem",
+              len(problems) == 1 and "Stream Q" in problems[0], str(problems))
+        none, pr = dr.load_stream_overrides(Path(tmp) / "absent", EDITION, STREAMS)
+        check("no override file means no overrides", none == {} and pr == [], f"{none} {pr}")
+        p = ledger_file(tmp, [
+            {"Funding source": "Alpha grant", "Country": "Country A", "other countries": "Country B"},
+            {"Funding source": "", "Country": "Country B"},
+        ], ["Alpha fund 2026"], [[None, "Country A", "MA", "EU", "A", "x"], [None, "Country B", "MA", "EU", "B", "x"]])
+        rows, problems = dr.from_ledger(p, EDITION, STREAMS, COUNTRIES, overrides=ov)
+        full = {r["iso3"]: r["value_display"] for r in rows if r["indicator_id"] == "ippf_funding_streams"}
+        check("override changes the stream for that country only", full == {"XAA": "Stream A", "XBB": "Stream B"},
+              str(full))
+        count = {r["iso3"]: r["value_display"] for r in rows if r["indicator_id"] == "ippf_grant_streams_count"}
+        check("override reaches the overview count label", count.get("XBB") == "1 (Beta fund)", str(count))
+        partner = [(r["iso3"], r["value"]) for r in rows if r["indicator_id"] == "ippf_funding_streams_partner"]
+        check("override reaches partner rows", partner == [], str(partner))
+
+
+def test_derive_skips_country_not_on_the_map():
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "drop_in" / str(YEAR)).mkdir(parents=True)
+        (root / "config").mkdir()
+        (root / "intelligence_tool").mkdir()
+        write_csv(root / "config" / "streams.csv", ["key", "label", "group", "colour"], [["Stream A", "Alpha", "G", "1"]])
+        write_csv(root / "config" / "ma_codes.csv", ["ma_code", "iso3", "org_name", "ticked_by", "tick_date"],
+                  [["901", "XAA", "Org One", "R", "2026-11-08"], ["902", "XBB", "Org Two", "R", "2026-11-08"]])
+        write_csv(root / "intelligence_tool" / "master_countries.csv", ["country", "iso3", "iso2"],
+                  [["Country A", "XAA", "XA"], ["Country B", "XBB", "XB"]])
+        dhis2_file(root / "drop_in" / str(YEAR), [["SRV-HIV and AIDS - a", "2025", "Org One (XA901-0000)", "0 - 24", "5"],
+                                                  ["SRV-HIV and AIDS - a", "2025", "Org Two (XB902-0000)", "0 - 24", "7"]])
+        baseline = [{"iso3": "XAA", "indicator_id": "ippf_hiv_services", "member_status": "full member",
+                     "unit": "services", "topic": "HIV", "source_id": "ippf_dhis2_service_stats", "reference_year": "2024"}]
+        rows, problems, covered = dr.derive(root, YEAR, "HIV", baseline)
+        check("a country with no row in the last edition is not proposed", {r["iso3"] for r in rows} == {"XAA"},
+              str(rows))
+        check("the skipped country is named in a note",
+              any("XBB" in p and "not on the map" in p for p in problems), str(problems))
+        rows, problems, covered = dr.derive(root, YEAR, "HIV", [])
+        check("with no previous edition every country is proposed", {r["iso3"] for r in rows} == {"XAA", "XBB"},
+              str(rows))
+
+
 def test_country_with_org_in_brackets():
     with tempfile.TemporaryDirectory() as tmp:
         p = ledger_file(tmp, [{"Funding source": "Beta fund", "Country": "Country A (Org One) "}], [],
