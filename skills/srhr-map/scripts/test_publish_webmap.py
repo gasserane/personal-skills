@@ -377,7 +377,10 @@ def main():
             "views": [{"id": "A", "name": "N", "title": "T", "subtitle": "S", "legend_title": "L", "legend": [],
                        "filters": [], "colour": {}, "tips": {"XAA": "A's tip"}}]}
     got = hashlib.sha256(pwm.page(gold, "LIBRARY").encode("utf-8")).hexdigest()
-    check("internal_page_unchanged", got == "82fbb570ccf3a997ae1b33ef51ff196f92309cd2c5e9a40a77d94e52752f5e35", got)
+    check("internal_page_unchanged", got == "aea4b7023d825fa7709316bcd71080ff73524c14f6fde2faa0eab05baa990b6b", got)
+    # phase e review minor 7: the page declares its language (WCAG 3.1.1)
+    check("page_html_lang_en", re.search(r"<!doctype html>\s*<html lang=\"en\">", pwm.PAGE) is not None
+          and '<html lang="en">' in pwm.page(gold, "LIBRARY"), pwm.PAGE[:80])
     # phase e review minor 6 (Ane 2026-11-08 21:56, both pages): a country with no tip (withdrawn, non-member,
     # grey context) shows its name only on hover; it stays out of the Tab order (tabindex still keyed on v.tips)
     check("hover_falls_back_to_country_name",

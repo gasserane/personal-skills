@@ -461,6 +461,7 @@ def main(argv=None):
 
 
 PAGE = r"""<!doctype html>
+<html lang="en">
 <meta charset="utf-8">
 <title>@@TITLE@@</title>
 <meta name="claude:viewport-fit-sides" content="cover">
