@@ -267,6 +267,16 @@ def main():
     from contextlib import redirect_stderr, redirect_stdout
     import test_publish_webmap as twm  # invented register, topology and pinned fake d3
 
+    # review minor 2: an active member with no funding row is named in a build note, never a stop
+    no_fund = [r for r in rows3 if not (r["iso3"] == "XBB" and r["indicator_id"] == "ippf_funding_streams")]
+    record("members_without_funding_named", ps.members_without_funding(no_fund) == ["XBB"]
+           and ps.members_without_funding(rows3) == [], ps.members_without_funding(no_fund))
+    _, _, nf_notes = ps.summary_page_text(no_fund, master3, {"XAA", "XBB", "XCC", "XDD"},
+                                          {"contact": "x@example.org", "author_unit": "Unit", "disclosure": "Text."},
+                                          twm.TOPO, twm.FAKE_D3, "2031", "2031-01-02")
+    record("members_without_funding_note", any("no funding row" in n and "Bland (XBB)" in n for n in nf_notes),
+           nf_notes)
+
     def cli(argv):
         o, e = io.StringIO(), io.StringIO()
         with redirect_stdout(o), redirect_stderr(e):

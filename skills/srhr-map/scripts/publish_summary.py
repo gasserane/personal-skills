@@ -310,6 +310,11 @@ def partner_band_changes(rows: list) -> list:
     return sorted(i for i in a if a[i] != b.get(i))
 
 
+def members_without_funding(rows: list) -> list:
+    """Active members with no funding row: map F gives them no band and no grant hover (a build note)."""
+    return sorted(set(computed.member_status_classes(rows)) - set(computed.funding_band(rows)))
+
+
 def _d3_text(d3):
     try:
         data = Path(d3).read_bytes()
@@ -348,6 +353,11 @@ def summary_page_text(rows, master_rows, who, cfg, topo, d3_js, edition, made):
     moved = partner_band_changes(rows)
     if moved:
         notes.append("note: counting partner streams moves these countries to another funding band: " + ", ".join(moved))
+    unfunded = members_without_funding(rows)
+    if unfunded:
+        name = {r["iso3"]: r["country"] for r in master_rows}
+        notes.append("note: active members with no funding row, so no band on the funding map: "
+                     + ", ".join(f"{name.get(i, i)} ({i})" for i in unfunded))
     data = {"edition": edition, "made_on": made, "headline": {"n": head["n"], "m": head["m"]},
             "tab_letters": False, "views": views, "countries": shapes}
     text = pw.page(data, d3_js, header_html(head, edition, made), footer_html(cfg),
