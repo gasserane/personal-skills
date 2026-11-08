@@ -210,18 +210,25 @@ def footer_html(cfg: dict) -> str:
 def forbidden_terms(streams_path, ma_codes_path) -> set:
     """Every stream key, label and ledger name, and every member association name and ma_code: none of
     them may appear on the summary page. A file that yields no term stops the build, so an unreachable
-    or emptied file can never make the scan pass."""
-    def read(path):
+    or emptied file can never make the scan pass. A file missing a scanned column stops too, so a
+    dropped column can never shrink the term list without anyone seeing it."""
+    def read(path, columns):
         try:
             with open(path, encoding="utf-8-sig", newline="") as f:
-                return list(csv.DictReader(f))
+                rd = csv.DictReader(f)
+                have = {c.strip() for c in (rd.fieldnames or [])}
+                gone = [c for c in columns if c not in have]
+                if gone:
+                    raise Stop(1, f"stop: {Path(path).name} has no {', '.join(gone)} column; the forbidden-text "
+                                  "scan needs it")
+                return [{(k or "").strip(): v for k, v in r.items()} for r in rd]
         except OSError as e:
             raise Stop(1, f"stop: cannot read {Path(path).name} for the forbidden-text scan: {e}")
     s_terms, m_terms = set(), set()
-    for r in read(streams_path):
+    for r in read(streams_path, ("key", "label", "ledger_names")):
         names = [r.get("key"), r.get("label")] + re.split(r"[;|]", r.get("ledger_names") or "")
         s_terms |= {(n or "").strip() for n in names}
-    for r in read(ma_codes_path):
+    for r in read(ma_codes_path, ("org_name", "ma_code")):
         m_terms |= {(r.get("org_name") or "").strip(), (r.get("ma_code") or "").strip()}
     s_terms.discard("")
     m_terms.discard("")

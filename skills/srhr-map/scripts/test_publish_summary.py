@@ -208,6 +208,20 @@ def main():
                 record(case, False, "no Stop")
             except Stop as e:
                 record(case, e.code == 1, e.code)
+        # review minor 1: a file missing a scanned column stops, naming the file and the column
+        no_ledger = Path(d) / "streams_no_ledger.csv"
+        no_ledger.write_text("key,label,group,colour\nCore Z1,Stream Q,g,#000000\n", encoding="utf-8")
+        no_org = Path(d) / "codes_no_org.csv"
+        no_org.write_text("ma_code,iso3\n123,XAA\n", encoding="utf-8")
+        for case, args, want in (("terms_refuse_missing_ledger_names_column", (no_ledger, codes),
+                                  ("streams_no_ledger.csv", "ledger_names")),
+                                 ("terms_refuse_missing_org_name_column", (streams, no_org),
+                                  ("codes_no_org.csv", "org_name"))):
+            try:
+                ps.forbidden_terms(*args)
+                record(case, False, "no Stop")
+            except Stop as e:
+                record(case, e.code == 1 and all(w in str(e) for w in want), str(e))
         allow = Path(d) / "allow.csv"
         allow.write_text("term,ticked_by,date\nWord,Ane,2031-01-02\nStream Q,,\n", encoding="utf-8")
         record("allow_needs_tick", ps.load_allow(allow) == {"Word"}, ps.load_allow(allow))
@@ -263,12 +277,17 @@ def main():
         d = Path(d)
         codes6 = d / "ma_codes.csv"
         codes6.write_text("ma_code,iso3,org_name\n777,ONE,Org Invented One\n", encoding="utf-8")
+        # the shared webmap crosswalk plus the ledger_names column the scan requires (review minor 1)
+        cross_lines = twm.CROSS.read_text(encoding="utf-8").splitlines()
+        cross6 = d / "streams6.csv"
+        cross6.write_text("\n".join([cross_lines[0] + ",ledger_names"] + [ln + "," for ln in cross_lines[1:] if ln])
+                          + "\n", encoding="utf-8")
         who6 = _who_file(d, "iso3,country\nONE,Country One\nTWO,Country Two\nGON,Country Gone\nZZZ,Zland\n", "who6.csv")
         cfg6 = d / "page.csv"
         cfg6.write_text("key,value\ncontact,x@example.org\nauthor_unit,Unit\ndisclosure,Text.\n", encoding="utf-8")
 
         def argv6(out, who=who6, cfg=cfg6):
-            return ["--register", str(twm.REG), "--ma-codes", str(codes6), "--crosswalk", str(twm.CROSS),
+            return ["--register", str(twm.REG), "--ma-codes", str(codes6), "--crosswalk", str(cross6),
                     "--master", str(twm.MASTER), "--who", str(who), "--page-config", str(cfg),
                     "--geometry", str(twm.GEO), "--d3", str(twm.D3), "--out", str(out)]
 
@@ -282,7 +301,7 @@ def main():
         record("summary_tabs_without_letters", data.get("tab_letters") is False
                and '(data.tab_letters === false ? "" : "Map " + v.id + ": ") + v.name' in ps.pw.PAGE, data.get("tab_letters"))
         record("build_page_has_no_deck_or_stream_text", text and not ps.scan(ps.page_strings(text),
-               ps.forbidden_terms(twm.CROSS, codes6), set()) and "Country One: MA with core grant" not in text, "")
+               ps.forbidden_terms(cross6, codes6), set()) and "Country One: MA with core grant" not in text, "")
         record("build_notes_region", "not on the WHO" in log and "NOC" in log and "ZZZ" in log, log)
 
         code, log = cli(argv6(out))

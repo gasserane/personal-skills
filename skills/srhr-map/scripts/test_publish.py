@@ -55,8 +55,8 @@ def make_root(root: Path):
             r["ticked_by"], r["tick_date"] = "Reviewer One", "2031-01-02"
     write_csv(root / "map_register" / "map_register_2030.csv", list(rows[0]), rows[:3])
     write_csv(root / "map_register" / f"map_register_{ED}.csv", list(rows[0]), rows)
-    write_csv(root / "config" / "streams.csv", ["key", "label", "group", "colour"],
-                  [{"key": k, "label": v, "group": "g", "colour": ""} for k, v in trc.CROSS])
+    write_csv(root / "config" / "streams.csv", ["key", "label", "group", "colour", "ledger_names"],
+                  [{"key": k, "label": v, "group": "g", "colour": "", "ledger_names": ""} for k, v in trc.CROSS])
     write_csv(root / "intelligence_tool" / "master_countries.csv", ["country", "iso3", "m49"],
                   [{"country": n, "iso3": i, "m49": twm.M49[i]} for n, i in trc.NAMES.items()])
     write_csv(root / "config" / "ma_codes.csv", ["ma_code", "iso3", "org_name"],
