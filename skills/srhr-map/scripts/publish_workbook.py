@@ -189,11 +189,16 @@ def write(out, edition, rows):
     return out
 
 
-def build(register_path, sources_path, master_path, out, edition=None):
-    out = Path(out)
-    if out.exists():
-        raise Stop(2, f"stop: {out.name} already exists in {out.parent}. It is never overwritten, because a person "
-                      "may have edited it. Move or rename it first if a new build is really wanted.")
+def refuse_existing(*targets):
+    """Stop (exit 2) before anything is written when any target file already exists."""
+    for out in map(Path, targets):
+        if out.exists():
+            raise Stop(2, f"stop: {out.name} already exists in {out.parent}. It is never overwritten, because a "
+                          "person may have edited it. Move or rename it first if a new build is really wanted.")
+
+
+def load_inputs(register_path, sources_path, master_path, edition=None):
+    """Return (register rows, sources by id, country name by iso3, edition); Stop(1) on bad input."""
     register = _read(register_path)
     if not register:
         raise Stop(1, f"stop: the register {Path(register_path).name} has no rows")
@@ -208,7 +213,13 @@ def build(register_path, sources_path, master_path, out, edition=None):
         edition = m.group(1)
     sources = {s["source_id"]: s for s in _read(sources_path)} if sources_path else {}
     countries = {c["iso3"]: c["country"] for c in _read(master_path)} if master_path else {}
-    return write(out, edition, value_rows(register, sources, countries))
+    return register, sources, countries, edition
+
+
+def build(register_path, sources_path, master_path, out, edition=None):
+    refuse_existing(out)
+    register, sources, countries, edition = load_inputs(register_path, sources_path, master_path, edition)
+    return write(Path(out), edition, value_rows(register, sources, countries))
 
 
 def main(argv=None):
