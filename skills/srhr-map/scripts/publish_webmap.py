@@ -367,11 +367,20 @@ def _json(data):
     return json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
 
 
-def page(data, d3_js):
+FOOTER = ("Colours, counts and texts are computed from the approved map register. The text for each country is "
+          "the same text as the hover text on the map slides.")
+
+
+def page(data, d3_js, header_html=None, footer_html=None, title=None):
+    """The page text. header_html / footer_html / title are ready-made (already escaped) markup for the
+    summary page (publish_summary.py); left as None they give the internal page, unchanged."""
     head_title, head_sub = TEMPLATES["page"]
-    fill = {"TITLE": html.escape(head_title),
-            "HEADING": html.escape(computed.render(head_title)),
-            "SUB": html.escape(computed.render(head_sub, edition=data["edition"], made_on=data["made_on"])),
+    if header_html is None:
+        header_html = "<h1>{}</h1><p>{}</p>".format(
+            html.escape(computed.render(head_title)),
+            html.escape(computed.render(head_sub, edition=data["edition"], made_on=data["made_on"])))
+    fill = {"TITLE": html.escape(head_title) if title is None else title,
+            "HEADER": header_html, "FOOTER": html.escape(FOOTER, quote=False) if footer_html is None else footer_html,
             "WEB": WEB, "DATA": _json(data), "D3JS": d3_js}
     # one pass over the template: an inserted value is never searched for another placeholder
     return re.sub(r"@@([A-Z0-9]+)@@", lambda m: fill[m.group(1)], PAGE)
@@ -532,7 +541,7 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
 @media (prefers-reduced-motion: no-preference) { path.c { transition: fill .15s; } }
 </style>
 <div class="wrap">
-  <header><h1>@@HEADING@@</h1><p>@@SUB@@</p></header>
+  <header>@@HEADER@@</header>
   <nav class="tabs" id="tabs" aria-label="Maps"></nav>
   <section class="view-head"><h2 id="v-title"></h2><p id="v-sub"></p></section>
   <div class="stage">
@@ -553,7 +562,7 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
     </aside>
   </div>
   <details><summary>All values as a table</summary><div class="tbl"><table id="table"><thead><tr><th>Country</th><th>Map text</th></tr></thead><tbody></tbody></table></div></details>
-  <footer>Colours, counts and texts are computed from the approved map register. The text for each country is the same text as the hover text on the map slides.</footer>
+  <footer>@@FOOTER@@</footer>
 </div>
 <script type="application/json" id="map-data">@@DATA@@</script>
 <script>/* d3 7.9.0, embedded so the page runs offline */

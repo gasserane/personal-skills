@@ -6,6 +6,7 @@ against the same fixture the deck check uses. Writes into a temporary folder. Ru
     python test_publish_webmap.py
 """
 import csv
+import hashlib
 import html
 import io
 import json
@@ -362,6 +363,18 @@ def main():
     check("page_escapes_edition", "<b>" not in pg and "&lt;b&gt;" in pg, pg[pg.find("<header>"):][:200])
     check("page_single_pass_placeholders", pg.count("LIBRARY") == 1 and pg.count('"countries":[]') == 1
           and "@@DATA@@" in pg and "@@D3JS@@" in pg, (pg.count("LIBRARY"), pg.count('"countries":[]')))
+    # page() gained header/footer/title slots for the summary page (phase e task 4); the internal page must
+    # come out byte-identical. Golden = sha256 of this call on the code BEFORE the slots (personal-skills f202a06).
+    gold = {"edition": "2031", "made_on": "2031-01-02", "countries": [{"iso3": "XAA", "name": "A & <b>", "paths": []}],
+            "views": [{"id": "A", "name": "N", "title": "T", "subtitle": "S", "legend_title": "L", "legend": [],
+                       "filters": [], "colour": {}, "tips": {"XAA": "A's tip"}}]}
+    got = hashlib.sha256(pwm.page(gold, "LIBRARY").encode("utf-8")).hexdigest()
+    check("internal_page_unchanged", got == "d1e8179b403f90851c302f992d3ea0c55d81d42b1622582583f14af4b478a4f2", got)
+    slot = pwm.page(gold, "LIBRARY", header_html="<h1>HEAD-SLOT</h1>", footer_html="FOOT-SLOT", title="TITLE-SLOT")
+    check("page_slots_filled", "<h1>HEAD-SLOT</h1>" in slot and "<footer>FOOT-SLOT</footer>" in slot
+          and "<title>TITLE-SLOT</title>" in slot and "hover text on the map slides" not in slot
+          and "SRHR maps" not in slot, slot[slot.find("<div class=\"wrap\">"):][:200])
+
     # page(): a standalone file opened from disk declares UTF-8 itself (else "T\u00fcrkiye" reads as
     # "T\u00c3\u00bcrkiye"), within the first 1024 bytes as HTML requires, and runs in standards mode
     head = pg.encode("utf-8")[:1024].decode("utf-8", "ignore").lower()

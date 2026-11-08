@@ -139,6 +139,46 @@ def main():
     hits = [t for v in dv for t in v["tips"].values() for s in deck if t == s or s in t]
     record("no_view_text_from_deck_tips", not hits and bool(dv[0]["tips"]), hits)
 
+    # --- Task 4: header, footer and the page config ---
+    cfg = {"contact": "a&b<c>'d@example.org", "author_unit": "Unit & <Dept> 'X'", "disclosure": "Disclosed <i>here</i>."}
+    hd = ps.header_html({"n": 3, "m": 5, "outside": []}, "2031 <b>", "2031-01-02")
+    ft = ps.footer_html(cfg)
+    record("summary_header_escapes", "<b>" not in hd and "&lt;b&gt;" in hd and "work in 3 of the 5" in hd
+           and "service coverage" in hd and "Edition 2031 &lt;b&gt;, made on 2031-01-02" in hd, hd)
+    record("summary_footer_escapes", "<Dept>" not in ft and "&lt;Dept&gt;" in ft and "<i>" not in ft
+           and "'d@" not in ft and "Prepared by Unit &amp; &lt;Dept&gt; &#x27;X&#x27;." in ft, ft)
+    record("footer_has_mailto", 'href="mailto:a&amp;b&lt;c&gt;&#x27;d@example.org"' in ft
+           and "For more information:" in ft, ft)
+    record("footer_has_sources_line", "IPPF membership and grant records; ECDC/WHO HIV surveillance; "
+                                      "WHO European Region member list" in ft, ft)
+    from html.parser import HTMLParser
+
+    class Tags(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.seen = []
+
+        def handle_starttag(self, tag, attrs):
+            self.seen.append(tag)
+    tg = Tags()
+    tg.feed(hd + ft)
+    record("summary_header_footer_parse_to_own_tags", set(tg.seen) <= {"h1", "p", "a"}, tg.seen)
+    with tempfile.TemporaryDirectory() as d:
+        good = Path(d) / "page.csv"
+        good.write_bytes(b"\xef\xbb\xbfkey,value\r\ncontact,x@example.org\r\nauthor_unit,Unit\r\ndisclosure,Text.\r\n")
+        record("page_cfg_loads", ps.load_page_cfg(good) == {"contact": "x@example.org", "author_unit": "Unit",
+                                                            "disclosure": "Text."}, ps.load_page_cfg(good))
+        for missing in ("contact", "author_unit", "disclosure"):
+            p = Path(d) / f"no_{missing}.csv"
+            body = {"contact": "x@example.org", "author_unit": "Unit", "disclosure": "Text."}
+            body[missing] = ""
+            p.write_text("key,value\n" + "".join(f"{k},{v}\n" for k, v in body.items()), encoding="utf-8")
+            try:
+                ps.load_page_cfg(p)
+                record(f"page_cfg_refuses_missing_{missing}", False, "no Stop")
+            except Stop as e:
+                record(f"page_cfg_refuses_missing_{missing}", e.code == 1, e.code)
+
     print(f"{sum(results)}/{len(results)} cases ok")
     sys.exit(0 if all(results) else 1)
 

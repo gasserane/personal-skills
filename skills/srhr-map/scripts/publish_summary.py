@@ -7,6 +7,7 @@ string comes from the templates in this file and the register values. Geometry, 
 the page frame are reused from publish_webmap.py. Exit 1 = input error, exit 2 = the target exists.
 """
 import csv
+import html
 import sys
 from pathlib import Path
 
@@ -151,3 +152,41 @@ def summary_views(rows: list, master_rows: list):
         d["legend"].append({"key": i, "label": lab, "count": n, "half": 0, "colour": pw.PALETTE["D"][i],
                             "text": pw._text(lab, n)})
     return [a, f, d], set(status)
+
+
+# --- page header, footer and the page config -----------------------------------------------------------
+
+SOURCES = "IPPF membership and grant records; ECDC/WHO HIV surveillance; WHO European Region member list"
+PAGE_KEYS = ("contact", "author_unit", "disclosure")
+
+
+def _e(s):
+    return html.escape(str(s), quote=True)
+
+
+def load_page_cfg(path) -> dict:
+    """config/summary_page.csv (key,value): contact, author_unit and disclosure, all non-empty. They live in
+    the map root, not in this public repository."""
+    try:
+        with open(path, encoding="utf-8-sig", newline="") as f:
+            cfg = {(r.get("key") or "").strip(): (r.get("value") or "").strip() for r in csv.DictReader(f)}
+    except OSError as e:
+        raise Stop(1, f"stop: cannot read the summary page config: {e}")
+    missing = [k for k in PAGE_KEYS if not cfg.get(k)]
+    if missing:
+        raise Stop(1, f"stop: {Path(path).name} lacks a value for: {', '.join(missing)}")
+    return {k: cfg[k] for k in PAGE_KEYS}
+
+
+def header_html(head: dict, edition: str, made_on: str) -> str:
+    return ("<h1>{}</h1><p>{}</p><p>{}</p><p>{}</p>".format(
+        _e(PAGE_TITLE.format(edition=edition)),
+        _e(HEADLINE.format(n=head["n"], m=head["m"])),
+        _e(DEFINITION),
+        _e(f"Edition {edition}, made on {made_on}")))
+
+
+def footer_html(cfg: dict) -> str:
+    return ("<p>Sources: {}.</p><p>For more information: <a href=\"mailto:{c}\">{c}</a></p>"
+            "<p>Prepared by {}.</p><p>{}</p>").format(_e(SOURCES), _e(cfg["author_unit"]), _e(cfg["disclosure"]),
+                                                      c=_e(cfg["contact"]))
