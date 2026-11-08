@@ -189,7 +189,13 @@ def main():
         for path in SKILL.rglob("*"):
             if path.is_file() and path.suffix in (".md", ".json", ".py", ".csv", ".txt"):
                 text = path.read_text(encoding="utf-8", errors="replace")
-                hits += [f"{path.relative_to(SKILL)}: {p.pattern}" for p in pats if p.search(text)]
+                for p in pats:
+                    m = p.search(text)
+                    if m:
+                        line = text.count("\n", 0, m.start()) + 1
+                        hint = (" (a colon before a slash or backslash reads as a drive letter, e.g. regex ':"
+                                + "\\" + "s'; write ' *' or '[ ]*')") if p.pattern.startswith("[A-Za-z]") else ""
+                        hits.append(f"{path.relative_to(SKILL)} line {line} {m.group(0)!r}{hint}")
         record("public_repo_clean", not hits, f"hits {hits[:5]}")
 
     print(f"{sum(results)}/{len(results)} cases ok" + (f", {len(skipped)} skipped" if skipped else ""))
