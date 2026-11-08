@@ -76,6 +76,7 @@ class Paths:
         self.sources = root / "intelligence_tool" / "source_register.csv"
         self.out = root / "publish" / edition
         self.geometry = root / "publish" / "_geometry" / "countries-50m.json"
+        self.d3 = root / "publish" / "_geometry" / "d3-7.9.0.min.js"
         self.decks = decks
         self.workbook = self.out / f"map_data_{edition}.xlsx"
         self.dataset = self.out / f"powerbi_dataset_{edition}.csv"
@@ -137,8 +138,9 @@ def step_dataset(p):
 def step_webmap(p):
     if not p.webmap.exists():
         publish_webmap.fetch_geometry(p.geometry)
+        publish_webmap.fetch_d3(p.d3)
     rc = publish_webmap.main(["--register", str(p.register), "--crosswalk", str(p.crosswalk), "--master", str(p.master),
-                              "--decks", str(p.decks), "--geometry", str(p.geometry), "--out", str(p.webmap),
+                              "--decks", str(p.decks), "--geometry", str(p.geometry), "--out", str(p.webmap), "--d3", str(p.d3),
                               "--edition", p.edition])
     if rc:
         raise Stop(rc, "stop: web map step")

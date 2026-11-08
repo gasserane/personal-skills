@@ -22,6 +22,7 @@ The page loads one pinned script (d3, cdnjs) and embeds everything else, so it a
 artifact. The target is never overwritten (exit 2). Exit 1 = input error.
 """
 import argparse
+import base64
 import hashlib
 import json
 import re
@@ -40,6 +41,8 @@ from publish_workbook import Stop, _read, load_inputs, made_on, refuse_existing 
 WEB = "https" + "://"  # split so public_repo_clean does not read the scheme as a drive letter
 GEOMETRY_URL = WEB + "cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json"
 D3_URL = WEB + "cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"
+# Integrity hash cdnjs publishes for d3 7.9.0 d3.min.js (read from the cdnjs API, 2026-11-08).
+D3_SRI = "sha512-vc58qvvBdrDR4etbxMdlTt4GBQk1qjvyORR2nrsPsFPyrs+/u5c3+1Ct6upOgdZoIl7eq6k3a1UPDSNAQi/32A=="
 FRAME_MARGIN = 6  # degrees around the deck countries kept as grey context
 MAP_NAMES = {"A": "Members and partners", "B": "Other grant streams", "C": "Funding streams",
              "D": "HIV need and MA focus"}
@@ -151,6 +154,27 @@ def fetch_geometry(dest: Path) -> str:
         with urllib.request.urlopen(GEOMETRY_URL, timeout=60) as r:
             dest.write_bytes(r.read())
     return hashlib.sha256(dest.read_bytes()).hexdigest()
+
+
+def _sri(data: bytes) -> str:
+    return "sha512-" + base64.b64encode(hashlib.sha512(data).digest()).decode()
+
+
+def fetch_d3(dest: Path) -> str:
+    """Download the pinned d3 once into dest; refuse any file (cached or downloaded) whose hash differs."""
+    dest = Path(dest)
+    if dest.exists():
+        data = dest.read_bytes()
+    else:
+        with urllib.request.urlopen(D3_URL, timeout=60) as r:
+            data = r.read()
+        if _sri(data) != D3_SRI:
+            raise Stop(1, "stop: the downloaded d3 does not match the pinned integrity hash; nothing written")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(data)
+    if _sri(data) != D3_SRI:
+        raise Stop(1, f"stop: {dest.name} does not match the pinned d3 integrity hash; delete it and run again")
+    return D3_SRI
 
 
 # --- views ------------------------------------------------------------------------------------------
@@ -287,17 +311,24 @@ def _json(data):
     return json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/").replace("<!--", "<\\!--")
 
 
-def page(data):
+def page(data, d3_js):
     head_title, head_sub = TEMPLATES["page"]
     return (PAGE.replace("@@TITLE@@", head_title)
             .replace("@@HEADING@@", computed.render(head_title))
             .replace("@@SUB@@", computed.render(head_sub, edition=data["edition"], made_on=data["made_on"]))
-            .replace("@@D3@@", D3_URL).replace("@@WEB@@", WEB)
-            .replace("@@DATA@@", _json(data)))
+            .replace("@@WEB@@", WEB)
+            .replace("@@DATA@@", _json(data))
+            .replace("@@D3JS@@", d3_js))  # last, so no other placeholder is searched inside the library
 
 
-def build(register, crosswalk_path, master, decks, geometry, out, edition=None):
+def build(register, crosswalk_path, master, decks, geometry, out, edition=None, d3=None):
     refuse_existing(out)
+    try:
+        d3_js = Path(d3).read_text(encoding="utf-8")
+    except (OSError, TypeError, ValueError) as e:
+        raise Stop(1, f"stop: cannot read the d3 library file: {e}")
+    if "</script" in d3_js.lower():
+        raise Stop(1, "stop: the d3 library text contains a closing script tag; it cannot be embedded")
     rows, _, _, edition = load_inputs(register, None, None, edition)
     master_rows = _read(master)
     names = {r["country"]: r["iso3"] for r in master_rows}
@@ -326,18 +357,18 @@ def build(register, crosswalk_path, master, decks, geometry, out, edition=None):
         raise Stop(1, f"stop: cannot read the geometry file: {e}")
     data = {"edition": edition, "made_on": made_on(), "views": views,
             "countries": countries(topo, master_rows, frame)}
-    Path(out).write_text(page(data), encoding="utf-8")
+    Path(out).write_text(page(data, d3_js), encoding="utf-8")
     return Path(out), data
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    for a in ("--register", "--crosswalk", "--master", "--decks", "--geometry", "--out"):
+    for a in ("--register", "--crosswalk", "--master", "--decks", "--geometry", "--out", "--d3"):
         ap.add_argument(a, required=True)
     ap.add_argument("--edition")
     a = ap.parse_args(argv)
     try:
-        out, data = build(a.register, a.crosswalk, a.master, a.decks, a.geometry, a.out, a.edition)
+        out, data = build(a.register, a.crosswalk, a.master, a.decks, a.geometry, a.out, a.edition, a.d3)
     except Stop as e:
         print(str(e), file=sys.stderr)
         return e.code
@@ -449,7 +480,9 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
   <footer>Colours, counts and texts are computed from the approved map register. The text for each country is the same text as the hover text on the map slides.</footer>
 </div>
 <script type="application/json" id="map-data">@@DATA@@</script>
-<script src="@@D3@@"></script>
+<script>/* d3 7.9.0, embedded so the page runs offline */
+@@D3JS@@
+</script>
 <script>
 (function () {
   var data = JSON.parse(document.getElementById("map-data").textContent);

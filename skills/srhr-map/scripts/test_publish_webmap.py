@@ -106,6 +106,15 @@ TOPO = {"type": "Topology", "transform": {"scale": [1, 1], "translate": [0, 40]}
         "arcs": [ring(10, 10), ring(12, 10), ring(14, 10), ring(16, 10), ring(18, 10), ring(20, 10)]}
 GEO = TMP / "countries.json"
 GEO.write_text(json.dumps(TOPO), encoding="utf-8")
+FAKE_D3 = "/* fake d3 (ISC) */ window.fakeD3 = 1;"
+D3 = TMP / "d3.min.js"
+D3.write_text(FAKE_D3, encoding="utf-8")
+
+
+def sri(data: bytes) -> str:
+    import base64
+    import hashlib
+    return "sha512-" + base64.b64encode(hashlib.sha512(data).digest()).decode()
 
 
 def run(argv):
@@ -119,8 +128,8 @@ def run(argv):
 
 
 def args(out):
-    return ["--register", str(REG), "--crosswalk", str(CROSS), "--master", str(MASTER), "--decks", str(DECKS),
-            "--geometry", str(GEO), "--out", str(out)]
+    return ["--register", str(REG), "--crosswalk", str(CROSS), "--master", str(MASTER), "--d3", str(D3),
+            "--decks", str(DECKS), "--geometry", str(GEO), "--out", str(out)]
 
 
 def embedded(text):
@@ -209,8 +218,35 @@ def main():
     check("page_dark_tokens", "prefers-color-scheme: dark" in text and ':root[data-theme="dark"]' in text)
     check("page_viewport_gutter", "max(16px, env(safe-area-inset-left, 0px))" in text)
     srcs = re.findall(r'<script[^>]+src="([^"]+)"', text)
-    check("scripts_pinned_on_allowed_cdn", srcs and all(
-        re.match(r"https" + r"://cdnjs\.cloudflare\.com/ajax/libs/[\w.-]+/\d+\.\d+\.\d+/", s) for s in srcs), srcs)
+    # d3 embedded (Session 5): the page runs offline and where the CDN is blocked
+    check("no_external_scripts", srcs == [], srcs)
+    check("d3_embedded_inline", FAKE_D3 in text, "")
+    check("d3_before_map_script", 0 <= text.find(FAKE_D3) < text.find("d3.zoom()"), "")
+    check("d3_sri_pinned_7_9_0", pwm.D3_SRI.startswith("sha512-vc58qvvB") and "/7.9.0/" in pwm.D3_URL, pwm.D3_SRI)
+    bad = TMP / "d3_bad.min.js"
+    bad.write_text("tampered", encoding="utf-8")
+    try:
+        pwm.fetch_d3(bad)
+        refused = False
+    except pwm.Stop:
+        refused = True
+    check("fetch_d3_refuses_wrong_hash", refused and bad.read_text(encoding="utf-8") == "tampered")
+    keep = pwm.D3_SRI
+    pwm.D3_SRI = sri(FAKE_D3.encode("utf-8"))
+    try:
+        pwm.fetch_d3(D3)
+        accepted = True
+    except pwm.Stop:
+        accepted = False
+    pwm.D3_SRI = keep
+    check("fetch_d3_accepts_matching_cache", accepted)
+    evil = TMP / "d3_evil.min.js"
+    evil.write_text("var s = '</script><b>';", encoding="utf-8")
+    eo = TMP / "webmap_evil.html"
+    a = args(eo)
+    a[a.index("--d3") + 1] = str(evil)
+    code, log = run(a)
+    check("refuses_library_closing_script", code == 1 and not eo.exists(), (code, log))
     check("no_local_path_in_page", not re.search(r"[A-Za-z]:\\\\", text))
 
     # --- zoom (Task 7 amendment, Session 5): buttons, wheel and pinch on every view ---

@@ -60,6 +60,8 @@ def make_root(root: Path):
     write_csv(root / "intelligence_tool" / "source_register.csv", ["source_id", "source", "publisher", "url"],
                   [{"source_id": "src_a", "source": "Source A", "publisher": "Agency A", "url": ""}])
     (root / "publish" / "_geometry" / "countries-50m.json").write_text(json.dumps(twm.TOPO), encoding="utf-8")
+    (root / "publish" / "_geometry" / "d3-7.9.0.min.js").write_text(twm.FAKE_D3, encoding="utf-8")
+    twm.pwm.D3_SRI = twm.sri(twm.FAKE_D3.encode("utf-8"))  # the cache check accepts the invented library
     for m, tips in trc.TIPS.items():
         sps = "".join(f'<p:sp><p:nvSpPr><p:cNvPr id="{i + 2}" name="Country: {html.escape(c)}">'
                       f'<a:hlinkHover r:id="" tooltip="{html.escape(t)}"/></p:cNvPr></p:nvSpPr></p:sp>'
