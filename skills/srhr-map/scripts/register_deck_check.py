@@ -24,7 +24,10 @@ TIP = re.compile(r'<p:cNvPr[^>]*name="Country: ([^"]+)"[^>]*>\s*<a:hlink\w+[^>]*
 B_TIP = re.compile(r": (\d+) grant streams? in (\d{4})$")
 C_TIP = re.compile(r"^[^:]+: (.+?)\. (?:Grants \w+ to \w+ \d{4}: (.+?)|No grant stream \w+ to \w+ \d{4})\.(?: (.*))?$")
 C_PARTNER = re.compile(r"Partner country on a joint (.+?) grant led by (.+?)\.")
-D_RATE = re.compile(r"2024 rate:? (.+?)(?: per 100,000)?; trend:? (.+?)(?: since 2015)?[;.]")
+# Map D: ONE rate year for every output (deck check, swap, web colour, legend, title, tooltip). The deck
+# sentences hold these years as fixed words, so moving to a newer year is a deck text change (phase e).
+RATE_YEAR, TREND_BASE_YEAR = "2024", "2015"
+D_RATE = re.compile(rf"{RATE_YEAR} rate:? (.+?)(?: per 100,000)?; trend:? (.+?)(?: since {TREND_BASE_YEAR})?[;.]")
 D_FOCUS = re.compile(r"plan focus: (.+?);")
 D_SERVICES = re.compile(r"HIV services 2025: (.+)$")
 MAP_INDICATOR = {"A": "ippf_membership", "B": "ippf_grant_streams_count", "C": "ippf_funding_streams"}
@@ -57,7 +60,7 @@ def _one(by, iso3, indicator, year=None):
 
 
 def _trend(by, iso3):
-    r15, r24 = _one(by, iso3, D_INDICATORS[0], 2015), _one(by, iso3, D_INDICATORS[0], 2024)
+    r15, r24 = _one(by, iso3, D_INDICATORS[0], TREND_BASE_YEAR), _one(by, iso3, D_INDICATORS[0], RATE_YEAR)
     if not (r15 and r24):
         return "no data"
     return f"{round((float(r24['value']) / float(r15['value']) - 1) * 100):+d}%"
@@ -132,14 +135,14 @@ def compare(m: str, register_rows: list, tips: dict, names: dict, crosswalk: lis
             if deck_half != reg_half:
                 p(name, f"partner dots deck {sorted(deck_half)}, register {sorted(reg_half)}")
         else:
-            rate = _one(by, iso, D_INDICATORS[0], 2024)
+            rate = _one(by, iso, D_INDICATORS[0], RATE_YEAR)
             want_rate, want_trend = (rate["value_display"] if rate else "no data"), _trend(by, iso)
             mm = D_RATE.search(tip)
             if not mm:
                 p(name, f"cannot read tip {tip!r}")
                 continue
             if mm.group(1) != want_rate:
-                p(name, f"2024 rate deck {mm.group(1)!r}, register {want_rate!r}")
+                p(name, f"{RATE_YEAR} rate deck {mm.group(1)!r}, register {want_rate!r}")
             if mm.group(2) != want_trend:
                 p(name, f"trend deck {mm.group(2)!r}, recomputed from register {want_trend!r}")
             status = in_reg[iso][next(i for i in in_reg[iso])][0]["member_status"]

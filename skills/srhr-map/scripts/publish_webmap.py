@@ -259,6 +259,15 @@ def _active_rows(rows, indicator):
     return [r for r in rows if r["indicator_id"] == indicator and r["member_status"] != "withdrawn"]
 
 
+def _rates(rows):
+    return [r for r in rows if r["indicator_id"] == rdc.D_INDICATORS[0] and r["value"].strip()]
+
+
+def newer_rate_years(rows):
+    """Rate years in the register later than rdc.RATE_YEAR: reported by the build, never shown on map D."""
+    return sorted({r["reference_year"] for r in _rates(rows) if r["reference_year"] > rdc.RATE_YEAR})
+
+
 def view(m, rows, crosswalk, colours, deck_tips, inv, names):
     by = rdc._index(rows)
     v = {"id": m, "name": MAP_NAMES[m], "tips": tips_for(m, deck_tips, by, names, crosswalk),
@@ -309,10 +318,9 @@ def view(m, rows, crosswalk, colours, deck_tips, inv, names):
                                  "members": sorted(held.get(k, ()))})
         v["legend_title"] = "Membership status"
     else:
-        rates = [r for r in rows if r["indicator_id"] == rdc.D_INDICATORS[0] and r["value"].strip()]
-        year = max((r["reference_year"] for r in rates), default="")
-        latest = {r["iso3"]: float(r["value"]) for r in rates if r["reference_year"] == year}
-        v["colour"] = {iso: computed.d_class(x) for iso, x in latest.items()}
+        rates = _rates(rows)
+        v["colour"] = {r["iso3"]: computed.d_class(float(r["value"])) for r in rates
+                       if r["reference_year"] == rdc.RATE_YEAR}
         unit = next((r["unit"] for r in rates if r["unit"]), "")
         for i in range(len(computed.D_BANDS) + 1):
             n = sum(1 for c in v["colour"].values() if c == i)
@@ -342,8 +350,8 @@ def _titles(m, rows, crosswalk, members, v):
         vals = dict(year=max((r["reference_year"] for r in st), default=""), n=len(st), reached=reached,
                     none=len(st) - reached)
     else:
-        rates = [r for r in rows if r["indicator_id"] == rdc.D_INDICATORS[0] and r["value"].strip()]
-        vals = dict(year=max((r["reference_year"] for r in rates), default=""), n=len(v["colour"]),
+        rates = _rates(rows)
+        vals = dict(year=rdc.RATE_YEAR, n=len(v["colour"]),
                     unit=next((r["unit"] for r in rates if r["unit"]), ""))
     return computed.render(title, **vals), computed.render(sub, **vals)
 
@@ -378,6 +386,10 @@ def build(register, crosswalk_path, master, decks, geometry, out, edition=None, 
         raise Stop(1, "stop: the d3 library text contains a closing script tag; it cannot be embedded")
     rows, _, _, edition = load_inputs(register, None, None, edition)
     master_rows = _read(master)
+    newer = newer_rate_years(rows)
+    if newer:
+        print(f"note: the register has HIV rates for {', '.join(newer)}; map D still shows {rdc.RATE_YEAR} "
+              "(register_deck_check.RATE_YEAR), as the decks do. Moving year changes the deck sentences.")
     views, frame = build_views(rows, crosswalk_path, master_rows, decks)
     try:
         geo_bytes = Path(geometry).read_bytes()

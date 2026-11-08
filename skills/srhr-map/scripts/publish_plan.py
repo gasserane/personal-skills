@@ -33,7 +33,7 @@ import register_deck_check as rdc  # noqa: E402
 
 COLUMNS = ["deck", "slide", "shape_name", "kind", "field", "old", "new"]
 TEXT_KINDS = {"label": ("ippf_grant_streams_count", None), "badge": ("ippf_funding_streams", None),
-              "matrix_total": ("ippf_funding_streams", None), "rate_label": (rdc.D_INDICATORS[0], "2024")}
+              "matrix_total": ("ippf_funding_streams", None), "rate_label": (rdc.D_INDICATORS[0], rdc.RATE_YEAR)}
 ALWAYS_REVIEW = ("title", "subtitle", "printed_list", "footer")
 CHANGE_REVIEW = ("fill", "chart", "rate_bar", "focus", "svc")
 
@@ -86,7 +86,7 @@ def new_tip(m, tip, by, iso, crosswalk):
         if want:
             edits.append((*mm.span(2), want))
         return _spans(tip, edits)
-    rate = rdc._one(by, iso, rdc.D_INDICATORS[0], 2024)
+    rate = rdc._one(by, iso, rdc.D_INDICATORS[0], rdc.RATE_YEAR)
     mm = rdc.D_RATE.search(tip)
     if not mm:
         raise Structure(f"cannot read tip {tip!r}")

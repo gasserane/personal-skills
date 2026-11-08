@@ -339,6 +339,20 @@ def main():
         pwm.page = real_page
     check("failed_build_leaves_no_partial_file", not failing.exists())
 
+    # one rate year for map D (Session A ruling): colour, legend, title, tooltip, swap and deck check
+    rate_year = getattr(rdc, "RATE_YEAR", None)
+    check("rate_year_is_one_constant", rate_year == "2024" and getattr(rdc, "TREND_BASE_YEAR", None) == "2015"
+          and pp.TEXT_KINDS.get("rate_label", (None, None))[1] == rate_year, (rate_year, pp.TEXT_KINDS.get("rate_label")))
+    newer = [full({"iso3": "ONE", "indicator_id": "ecdc_hiv_diagnosis_rate", "value": "4.4", "reference_year": "2024"}),
+             full({"iso3": "ONE", "indicator_id": "ecdc_hiv_diagnosis_rate", "value": "25.0", "reference_year": "2025"}),
+             full({"iso3": "ONE", "indicator_id": "ecdc_hiv_diagnosis_rate", "value": "2.0", "reference_year": "2015"})]
+    vd = pwm.view("D", newer, crosswalk, {}, {}, [], NAMES)
+    check("D_colour_uses_rate_year_not_latest", vd["colour"].get("ONE") == computed.d_class(4.4), vd["colour"])
+    check("D_legend_counts_rate_year", sum(x["count"] for x in vd["legend"]) == 1
+          and next(x["count"] for x in vd["legend"] if x["key"] == computed.d_class(4.4)) == 1, vd["legend"])
+    check("D_subtitle_names_rate_year", "2024" in vd["subtitle"] and "2025" not in vd["subtitle"], vd["subtitle"])
+    check("D_newer_rate_year_reported", getattr(pwm, "newer_rate_years", lambda r: None)(newer) == ["2025"])
+
     # pins: the standalone CLI refuses a library or geometry that is not the pinned one
     pwm.D3_SRI = REAL_D3_SRI
     o4 = TMP / "pin" / "webmap_2031.html"
