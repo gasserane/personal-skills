@@ -34,6 +34,7 @@ SUBTITLES = {"A": "Countries where an IPPF member association or collaborative p
 # (CIEDE2000 >= 21 against --map-land). Ane chose this 2026-11-08 (phase e task 7).
 F_COLOURS = ("#00313C", "#71C5E8", "#D5DE7C")
 STATUS_ORDER = ("full member", "associate member", "Collaborative Partner")
+KNOWN_STATUSES = STATUS_ORDER + ("withdrawn",)  # any other member_status stops the build (review minor 3)
 STATUS_LABELS = {"full member": "Full member", "associate member": "Associate member",
                  "Collaborative Partner": "Collaborative Partner"}
 HOVER = {
@@ -123,10 +124,16 @@ def summary_views(rows: list, master_rows: list):
     """([view A, view F, view D], frame): the summary page's maps in the dict shape publish_webmap.page
     draws. Every hover string comes from HOVER and register values; deck ScreenTips are never read.
     frame = the active member countries (design 4.1)."""
+    for r in rows:
+        if r["member_status"] not in KNOWN_STATUSES:
+            raise Stop(1, f"stop: member_status {r['member_status']!r} in the register row iso3 {r['iso3']}, "
+                          f"indicator {r['indicator_id']}, year {r['reference_year']} is not one of "
+                          + ", ".join(KNOWN_STATUSES) + ". It would be counted in the headline and share a "
+                          "colour; correct the register, nothing written.")
     name = {r["iso3"]: r["country"] for r in master_rows}
     nm = lambda iso: name.get(iso, iso)  # noqa: E731
     status = computed.member_status_classes(rows)
-    order = list(STATUS_ORDER) + sorted(set(status.values()) - set(STATUS_ORDER))
+    order = list(STATUS_ORDER)
 
     a = _view("A", _year(rows, "ippf_membership"), "Membership")
     a["colour"] = dict(status)

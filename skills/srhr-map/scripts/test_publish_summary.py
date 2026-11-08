@@ -138,6 +138,13 @@ def main():
     record("D_missing_rate_hover", D.get("tips", {}).get("XBB") == f"Bland: no {ps.rdc.RATE_YEAR} data"
            and "XBB" not in D.get("colour", {}), D.get("tips"))
     record("frame_is_members", frame == {"XAA", "XBB", "XCC"}, frame)
+    # review minor 3: a status outside the four known ones stops, naming the status and the row
+    try:
+        ps.summary_views(rows3 + [row("XEE", "ippf_funding_streams", "1", "Stream Q", status="observer")], master3)
+        record("unknown_status_stops", False, "no Stop")
+    except Stop as e:
+        record("unknown_status_stops", e.code == 1 and "'observer'" in str(e) and "XEE" in str(e)
+               and "ippf_funding_streams" in str(e), str(e))
     record("titles_from_templates", A.get("title") == "IPPF members and partners, 2026"
            and F.get("title") == "IPPF funding to members, 2026"
            and D.get("title") == f"New HIV diagnoses, {ps.rdc.RATE_YEAR}", [v.get("title") for v in views])
