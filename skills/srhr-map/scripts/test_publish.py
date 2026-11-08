@@ -7,6 +7,7 @@ invented topology (no network). Countries, codes and streams are made up. Run:
 import csv
 import html
 import io
+import hashlib
 import json
 import os
 import re
@@ -63,6 +64,8 @@ def make_root(root: Path):
     (root / "publish" / "_geometry" / "countries-50m.json").write_text(json.dumps(twm.TOPO), encoding="utf-8")
     (root / "publish" / "_geometry" / "d3-7.9.0.min.js").write_text(twm.FAKE_D3, encoding="utf-8")
     twm.pwm.D3_SRI = twm.sri(twm.FAKE_D3.encode("utf-8"))  # the cache check accepts the invented library
+    twm.pwm.GEOMETRY_SHA256 = hashlib.sha256(
+        (root / "publish" / "_geometry" / "countries-50m.json").read_bytes()).hexdigest()  # and the invented topology
     for m, tips in trc.TIPS.items():
         sps = "".join(f'<p:sp><p:nvSpPr><p:cNvPr id="{i + 2}" name="Country: {html.escape(c)}">'
                       f'<a:hlinkHover r:id="" tooltip="{html.escape(t)}"/></p:cNvPr></p:nvSpPr></p:sp>'

@@ -109,6 +109,19 @@ GEO.write_text(json.dumps(TOPO), encoding="utf-8")
 FAKE_D3 = "/* fake d3 (ISC) */ window.fakeD3 = 1;"
 D3 = TMP / "d3.min.js"
 D3.write_text(FAKE_D3, encoding="utf-8")
+# The build refuses any library or geometry that is not the pinned one, so the invented fixtures get
+# their own pins here; the pin tests below restore the real ones.
+REAL_D3_SRI, REAL_GEO_SHA = pwm.D3_SRI, getattr(pwm, "GEOMETRY_SHA256", None)
+
+
+def _pin_fixtures():
+    import base64
+    import hashlib
+    pwm.D3_SRI = "sha512-" + base64.b64encode(hashlib.sha512(FAKE_D3.encode("utf-8")).digest()).decode()
+    pwm.GEOMETRY_SHA256 = hashlib.sha256(GEO.read_bytes()).hexdigest()
+
+
+_pin_fixtures()
 
 
 def sri(data: bytes) -> str:
@@ -222,7 +235,7 @@ def main():
     check("no_external_scripts", srcs == [], srcs)
     check("d3_embedded_inline", FAKE_D3 in text, "")
     check("d3_before_map_script", 0 <= text.find(FAKE_D3) < text.find("d3.zoom()"), "")
-    check("d3_sri_pinned_7_9_0", pwm.D3_SRI.startswith("sha512-vc58qvvB") and "/7.9.0/" in pwm.D3_URL, pwm.D3_SRI)
+    check("d3_sri_pinned_7_9_0", REAL_D3_SRI.startswith("sha512-vc58qvvB") and "/7.9.0/" in pwm.D3_URL, REAL_D3_SRI)
     bad = TMP / "d3_bad.min.js"
     bad.write_text("tampered", encoding="utf-8")
     try:
@@ -325,6 +338,44 @@ def main():
     finally:
         pwm.page = real_page
     check("failed_build_leaves_no_partial_file", not failing.exists())
+
+    # pins: the standalone CLI refuses a library or geometry that is not the pinned one
+    pwm.D3_SRI = REAL_D3_SRI
+    o4 = TMP / "pin" / "webmap_2031.html"
+    code, log = run(args(o4))
+    check("cli_refuses_d3_not_matching_pin", code == 1 and not o4.exists() and "d3" in log, (code, log[-200:]))
+    _pin_fixtures()
+    check("geometry_sha256_pinned", REAL_GEO_SHA is not None and REAL_GEO_SHA.startswith("04342cdc")
+          and len(REAL_GEO_SHA) == 64, REAL_GEO_SHA)
+    pwm.GEOMETRY_SHA256 = REAL_GEO_SHA or "04342cdc"
+    code, log = run(args(o4))
+    check("cli_refuses_geometry_not_matching_pin", code == 1 and not o4.exists(), (code, log[-200:]))
+    badgeo = TMP / "geo_bad.json"
+    badgeo.write_text("{}", encoding="utf-8")
+    try:
+        pwm.fetch_geometry(badgeo)
+        refused = False
+    except pwm.Stop:
+        refused = True
+    check("fetch_geometry_refuses_wrong_cache", refused and badgeo.read_text(encoding="utf-8") == "{}")
+    _pin_fixtures()
+    import urllib.error
+    real_open = pwm.urllib.request.urlopen
+
+    def offline(*a, **k):
+        raise urllib.error.URLError("planted: no network")
+    pwm.urllib.request.urlopen = offline
+    outcomes = []
+    for fn, target in ((pwm.fetch_d3, TMP / "net" / "d3.js"), (pwm.fetch_geometry, TMP / "net" / "geo.json")):
+        try:
+            fn(target)
+            outcomes.append("no error")
+        except pwm.Stop as e:
+            outcomes.append(("stop", e.code, target.exists()))
+        except Exception as e:  # noqa: BLE001 - the RED state
+            outcomes.append(repr(e))
+    pwm.urllib.request.urlopen = real_open
+    check("network_error_is_a_stop_nothing_written", outcomes == [("stop", 1, False)] * 2, outcomes)
 
     # --- refusals ---
     code, log = run(args(out))

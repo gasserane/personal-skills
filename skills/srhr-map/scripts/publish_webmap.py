@@ -27,6 +27,7 @@ import hashlib
 import json
 import re
 import sys
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -40,6 +41,8 @@ from publish_workbook import Stop, _read, claimed, load_inputs, made_on, refuse_
 
 WEB = "https" + "://"  # split so public_repo_clean does not read the scheme as a drive letter
 GEOMETRY_URL = WEB + "cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json"
+# sha256 of that file as downloaded and cached in Task 7 (prefix 04342cdc recorded then; full value 2026-11-08).
+GEOMETRY_SHA256 = "04342cdc1e3016bcd7db1630de95684d67b79fe3c8c460321e87aef469502394"
 D3_URL = WEB + "cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"
 # Integrity hash cdnjs publishes for d3 7.9.0 d3.min.js (read from the cdnjs API, 2026-11-08).
 D3_SRI = "sha512-vc58qvvBdrDR4etbxMdlTt4GBQk1qjvyORR2nrsPsFPyrs+/u5c3+1Ct6upOgdZoIl7eq6k3a1UPDSNAQi/32A=="
@@ -146,18 +149,41 @@ def countries(topo, master_rows, frame_isos):
     return out
 
 
+def _download(url, what):
+    try:
+        with urllib.request.urlopen(url, timeout=60) as r:
+            return r.read()
+    except (urllib.error.URLError, OSError) as e:
+        raise Stop(1, f"stop: cannot download the {what} ({e}); nothing written. Check the network, or place "
+                      "the cached file by hand.") from None
+
+
+def _geometry_ok(data: bytes):
+    if hashlib.sha256(data).hexdigest() != GEOMETRY_SHA256:
+        raise Stop(1, "stop: the geometry file does not match the pinned world-atlas hash; delete it and run again")
+
+
 def fetch_geometry(dest: Path) -> str:
-    """Download the pinned topology once into dest (never overwritten); return its sha256."""
+    """Download the pinned topology once into dest; refuse any file (cached or downloaded) whose hash differs."""
     dest = Path(dest)
-    if not dest.exists():
+    if dest.exists():
+        data = dest.read_bytes()
+    else:
+        data = _download(GEOMETRY_URL, "geometry")
+        _geometry_ok(data)
         dest.parent.mkdir(parents=True, exist_ok=True)
-        with urllib.request.urlopen(GEOMETRY_URL, timeout=60) as r:
-            dest.write_bytes(r.read())
-    return hashlib.sha256(dest.read_bytes()).hexdigest()
+        dest.write_bytes(data)
+    _geometry_ok(data)
+    return GEOMETRY_SHA256
 
 
 def _sri(data: bytes) -> str:
     return "sha512-" + base64.b64encode(hashlib.sha512(data).digest()).decode()
+
+
+def _d3_ok(data: bytes, name: str):
+    if _sri(data) != D3_SRI:
+        raise Stop(1, f"stop: {name} does not match the pinned d3 integrity hash; delete it and run again")
 
 
 def fetch_d3(dest: Path) -> str:
@@ -166,14 +192,12 @@ def fetch_d3(dest: Path) -> str:
     if dest.exists():
         data = dest.read_bytes()
     else:
-        with urllib.request.urlopen(D3_URL, timeout=60) as r:
-            data = r.read()
+        data = _download(D3_URL, "d3 library")
         if _sri(data) != D3_SRI:
             raise Stop(1, "stop: the downloaded d3 does not match the pinned integrity hash; nothing written")
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(data)
-    if _sri(data) != D3_SRI:
-        raise Stop(1, f"stop: {dest.name} does not match the pinned d3 integrity hash; delete it and run again")
+    _d3_ok(data, dest.name)
     return D3_SRI
 
 
@@ -345,16 +369,20 @@ def page(data, d3_js):
 def build(register, crosswalk_path, master, decks, geometry, out, edition=None, d3=None):
     refuse_existing(out)
     try:
-        d3_js = Path(d3).read_text(encoding="utf-8")
+        d3_bytes = Path(d3).read_bytes()
+        d3_js = d3_bytes.decode("utf-8")
     except (OSError, TypeError, ValueError) as e:
         raise Stop(1, f"stop: cannot read the d3 library file: {e}")
+    _d3_ok(d3_bytes, Path(d3).name)  # the standalone CLI embeds only the pinned library, as publish.py does
     if "</script" in d3_js.lower():
         raise Stop(1, "stop: the d3 library text contains a closing script tag; it cannot be embedded")
     rows, _, _, edition = load_inputs(register, None, None, edition)
     master_rows = _read(master)
     views, frame = build_views(rows, crosswalk_path, master_rows, decks)
     try:
-        topo = json.loads(Path(geometry).read_text(encoding="utf-8"))
+        geo_bytes = Path(geometry).read_bytes()
+        _geometry_ok(geo_bytes)
+        topo = json.loads(geo_bytes.decode("utf-8"))
     except (OSError, ValueError) as e:
         raise Stop(1, f"stop: cannot read the geometry file: {e}")
     data = {"edition": edition, "made_on": made_on(), "views": views,
