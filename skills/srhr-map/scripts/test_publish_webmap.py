@@ -294,6 +294,9 @@ def main():
         s, round_trip = "", str(e)
     check("json_round_trips_comment_and_script", round_trip is True, round_trip)
     check("json_no_raw_open_angle", "<" not in s, s)
+    fresh = TMP / "new_edition" / "publish" / "webmap_2031.html"
+    code, log = run(args(fresh))
+    check("build_creates_output_folder", code == 0 and fresh.exists(), (code, log[-300:]))
 
     # --- refusals ---
     code, log = run(args(out))

@@ -359,6 +359,7 @@ def build(register, crosswalk_path, master, decks, geometry, out, edition=None, 
         raise Stop(1, f"stop: cannot read the geometry file: {e}")
     data = {"edition": edition, "made_on": made_on(), "views": views,
             "countries": countries(topo, master_rows, frame)}
+    Path(out).parent.mkdir(parents=True, exist_ok=True)  # a new edition's publish folder may not exist yet
     Path(out).write_text(page(data, d3_js), encoding="utf-8")
     return Path(out), data
 
