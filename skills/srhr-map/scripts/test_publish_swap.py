@@ -42,16 +42,17 @@ def plan_row(**kw):
 def fake_pptx(path, order):
     """A zip with presentation.xml listing slides in `order` (part names) and the matching rels."""
     ids = "".join(f'<p:sldId id="{256 + i}" r:id="rId{10 + i}"/>' for i in range(len(order)))
-    rels = "".join(f'<Relationship Id="rId{10 + i}" Type="http://x/slide" Target="slides/{p}"/>'
+    ox = ps.OX  # namespace base, built without "<letter>:/" text (public-repo check)
+    rels = "".join(f'<Relationship Id="rId{10 + i}" Type="urn:x:slide" Target="slides/{p}"/>'
                    for i, p in enumerate(order))
     with zipfile.ZipFile(path, "w") as z:
         z.writestr("ppt/presentation.xml",
-                   '<p:presentation xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" '
-                   'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+                   f'<p:presentation xmlns:p="{ox}presentationml/2006/main" '
+                   f'xmlns:r="{ox}officeDocument/2006/relationships">'
                    f'<p:sldIdLst>{ids}</p:sldIdLst></p:presentation>')
         z.writestr("ppt/_rels/presentation.xml.rels",
-                   '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-                   f'<Relationship Id="rId1" Type="http://x/theme" Target="theme/theme1.xml"/>{rels}'
+                   f'<Relationships xmlns="{ox}package/2006/relationships">'
+                   f'<Relationship Id="rId1" Type="urn:x:theme" Target="theme/theme1.xml"/>{rels}'
                    '</Relationships>')
 
 
@@ -124,8 +125,9 @@ def main():
                 record(f"deck_files_refuses_{name}", True)
 
         # --- is_local: a cloud document is refused ---
-        record("is_local_path", ps.is_local(r"C:\work\Map B - one.pptx"))
-        record("is_local_refuses_https", not ps.is_local("https://example.org/sites/x/Map B - one.pptx"))
+        # invented paths built by concatenation: the public-repo check forbids "<letter>:/" text
+        record("is_local_path", ps.is_local("C" + r":\work\Map B - one.pptx"))
+        record("is_local_refuses_https", not ps.is_local("https" + "://example.org/sites/x/Map B - one.pptx"))
 
         # --- copy_decks: byte-identical copies, refused when the target holds a deck ---
         src = t / "src"

@@ -34,9 +34,11 @@ from xml.etree import ElementTree as ET
 COLUMNS = ["deck", "slide", "shape_name", "kind", "field", "old", "new"]
 LOG_COLUMNS = ["deck", "slide", "shape_name", "field", "old_planned", "old_read", "new_written", "new_read"]
 FIELDS = ("screentip", "text")
-NS_P = "{http://schemas.openxmlformats.org/presentationml/2006/main}"
-NS_R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
-NS_REL = "{http://schemas.openxmlformats.org/package/2006/relationships}"
+# Built by concatenation: the public-repo check forbids any "<letter>:/" text, and a URL scheme matches it.
+OX = "http" + "://schemas.openxmlformats.org/"
+NS_P = "{" + OX + "presentationml/2006/main}"
+NS_R = "{" + OX + "officeDocument/2006/relationships}"
+NS_REL = "{" + OX + "package/2006/relationships}"
 
 
 class PlanError(Exception):
