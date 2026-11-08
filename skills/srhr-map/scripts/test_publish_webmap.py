@@ -373,7 +373,9 @@ def main():
     # with the two old lines restored the output reproduced 84b9e9c4..., so nothing else moved.
     # Re-pinned in phase e review minor 6 (hover falls back to the country name in show()); with the old show()
     # line restored the output reproduced 9af44131..., so nothing else moved.
-    gold ={"edition": "2031", "made_on": "2031-01-02", "countries": [{"iso3": "XAA", "name": "A & <b>", "paths": []}],
+    # Re-pinned in phase e review minor 7 (<html lang="en"> after the doctype); with that line removed the output
+    # reproduced 82fbb570..., so nothing else moved.
+    gold = {"edition": "2031", "made_on": "2031-01-02", "countries": [{"iso3": "XAA", "name": "A & <b>", "paths": []}],
             "views": [{"id": "A", "name": "N", "title": "T", "subtitle": "S", "legend_title": "L", "legend": [],
                        "filters": [], "colour": {}, "tips": {"XAA": "A's tip"}}]}
     got = hashlib.sha256(pwm.page(gold, "LIBRARY").encode("utf-8")).hexdigest()
