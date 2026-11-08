@@ -327,7 +327,9 @@ def _titles(m, rows, crosswalk, members, v):
 # --- page -------------------------------------------------------------------------------------------
 
 def _json(data):
-    return json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/").replace("<!--", "<\\!--")
+    # "<" occurs only inside JSON strings, so < keeps the JSON valid while no "</script" or "<!--"
+    # can end or confuse the script element that holds it.
+    return json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
 
 
 def page(data, d3_js):

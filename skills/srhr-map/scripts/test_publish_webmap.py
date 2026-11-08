@@ -285,6 +285,16 @@ def main():
     leg = {x["key"]: x["colour"] for x in vc["legend"]}
     check("colour_C_by_deck_position_with_gap", leg.get("associate member") == pwm.PALETTE["C"][1], leg)
 
+    # --- session A minors (final review of phase d) ---
+    risky = {"t": "a <!-- b </script> c <SCRIPT d"}
+    try:
+        s = pwm._json(risky)
+        round_trip = json.loads(s) == risky
+    except ValueError as e:
+        s, round_trip = "", str(e)
+    check("json_round_trips_comment_and_script", round_trip is True, round_trip)
+    check("json_no_raw_open_angle", "<" not in s, s)
+
     # --- refusals ---
     code, log = run(args(out))
     check("refuses_existing_out", code == 2 and out.read_text(encoding="utf-8") == text, (code, log))
