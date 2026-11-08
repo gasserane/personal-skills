@@ -6,6 +6,7 @@ stream name, member association name or ma_code, and no hover text from a deck S
 string comes from the templates in this file and the register values. Geometry, the embedded d3 and
 the page frame are reused from publish_webmap.py. Exit 1 = input error, exit 2 = the target exists.
 """
+import argparse
 import csv
 import html
 import re
@@ -282,3 +283,105 @@ def load_allow(path) -> set:
                     if (r.get("term") or "").strip() and (r.get("ticked_by") or "").strip()}
     except FileNotFoundError:
         return set()
+
+
+# --- build and command line -----------------------------------------------------------------------------
+
+def partner_band_changes(rows: list) -> list:
+    """Countries whose funding band depends on counting partner streams (design 4.3): a build note."""
+    a, b = computed.funding_band(rows, True), computed.funding_band(rows, False)
+    return sorted(i for i in a if a[i] != b.get(i))
+
+
+def _d3_text(d3):
+    try:
+        data = Path(d3).read_bytes()
+        text = data.decode("utf-8")
+    except (OSError, TypeError, ValueError) as e:
+        raise Stop(1, f"stop: cannot read the d3 library file: {e}")
+    pw._d3_ok(data, Path(d3).name)
+    if "</script" in text.lower():
+        raise Stop(1, "stop: the d3 library text contains a closing script tag; it cannot be embedded")
+    return text
+
+
+def _topo(geometry):
+    try:
+        data = Path(geometry).read_bytes()
+        pw._geometry_ok(data)
+        return json.loads(data.decode("utf-8"))
+    except (OSError, ValueError) as e:
+        raise Stop(1, f"stop: cannot read the geometry file: {e}")
+
+
+def summary_page_text(rows, master_rows, who, cfg, topo, d3_js, edition, made):
+    """(page text, data, notes) for the summary page; publish.py check calls the same parts."""
+    head = headline(rows, who)
+    if head["outside"]:
+        raise Stop(1, "stop: counted in the headline but missing from the WHO European Region list: "
+                      + ", ".join(head["outside"]) + ". Check config/who_europe.csv; nothing written.")
+    views, frame = summary_views(rows, master_rows)
+    shapes = pw.countries(topo, master_rows, frame)
+    drawn = {c["iso3"] for c in shapes if c["iso3"] and c["paths"]}
+    notes = region_notes(master_rows, who, drawn, set(frame))
+    newer = pw.newer_rate_years(rows)
+    if newer:
+        notes.append(f"note: the register has HIV rates for {', '.join(newer)}; map D shows {rdc.RATE_YEAR} "
+                     "(register_deck_check.RATE_YEAR)")
+    moved = partner_band_changes(rows)
+    if moved:
+        notes.append("note: counting partner streams moves these countries to another funding band: " + ", ".join(moved))
+    data = {"edition": edition, "made_on": made, "headline": {"n": head["n"], "m": head["m"]},
+            "views": views, "countries": shapes}
+    text = pw.page(data, d3_js, header_html(head, edition, made), footer_html(cfg),
+                   title=_e(PAGE_TITLE.format(edition=edition)))
+    return text, data, notes
+
+
+def build_summary(register, ma_codes, crosswalk, master, who, page_cfg, geometry, d3, out, edition=None, allow=None):
+    """Write the summary page; nothing is written when any check stops the build (the scan runs on the
+    finished page text before the file is opened)."""
+    pw.refuse_existing(out)
+    d3_js = _d3_text(d3)
+    rows, _, _, edition = pw.load_inputs(register, None, None, edition)
+    master_rows = pw._read(master)
+    who_set = load_who(who)
+    cfg = load_page_cfg(page_cfg)
+    terms = forbidden_terms(crosswalk, ma_codes)
+    allowed = load_allow(allow) if allow else set()
+    text, data, notes = summary_page_text(rows, master_rows, who_set, cfg, _topo(geometry), d3_js, edition,
+                                          pw.made_on())
+    for n in notes:
+        print(n)
+    hits = scan(page_strings(text), terms, allowed)
+    if hits:
+        raise Stop(1, "stop: the summary page would show a stream, member association name or ma_code; nothing "
+                      "written." + "".join(f"\n  {t!r} in {s[:120]!r}" for t, s in hits))
+    with pw.claimed(out, encoding="utf-8") as fh:
+        fh.write(text)
+    return Path(out), data
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    for a in ("--register", "--ma-codes", "--crosswalk", "--master", "--who", "--page-config", "--geometry", "--d3",
+              "--out"):
+        ap.add_argument(a, required=True)
+    ap.add_argument("--edition")
+    ap.add_argument("--allow")
+    a = ap.parse_args(argv)
+    try:
+        out, data = build_summary(a.register, a.ma_codes, a.crosswalk, a.master, a.who, a.page_config, a.geometry,
+                                  a.d3, a.out, a.edition, a.allow)
+    except Stop as e:
+        print(str(e), file=sys.stderr)
+        return e.code
+    for v in data["views"]:
+        print(f"{v['id']}: {len(v['colour'])} coloured, {len(v['tips'])} tooltips")
+    print(f"headline: {data['headline']['n']} of {data['headline']['m']}")
+    print(f"wrote {out}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

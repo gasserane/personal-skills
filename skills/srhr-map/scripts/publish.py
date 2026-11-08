@@ -8,10 +8,15 @@ Steps (each runs alone; `all` chains them in this order):
   workbook  publish/<edition>/map_data_<edition>.xlsx
   dataset   publish/<edition>/powerbi_dataset_<edition>.csv and .xlsx
   webmap    publish/<edition>/webmap_<edition>.html (geometry cached once in publish/_geometry/)
+  summary   publish/<edition>/webmap_summary_<edition>.html, the page for donors and partners (phase e):
+            headline and three maps, no stream or member association names; needs no decks. Reads
+            config/who_europe.csv, config/summary_page.csv, config/ma_codes.csv and, when present,
+            config/summary_scan_allow.csv
   check     every output against the register: decks (register_deck_check), every workbook
             cell and link, every dataset cell (csv and xlsx), every web map colour, tooltip, legend,
-            filter and title. Exit 0 only when all agree.
-  all       plan, then swap only when the plan is empty or --apply is given, then the three builders
+            filter and title, and the summary page (views, headline, forbidden-text scan). Exit 0 only
+            when all agree.
+  all       plan, then swap only when the plan is empty or --apply is given, then the four builders
             (an output that exists is kept, never rebuilt), then check
 
 Paths come from the map root: map_register/map_register_<edition>.csv (default edition: the latest
@@ -34,11 +39,12 @@ import computed  # noqa: E402
 import deck_shapes  # noqa: E402
 import publish_dataset  # noqa: E402
 import publish_plan  # noqa: E402
+import publish_summary  # noqa: E402
 import publish_webmap  # noqa: E402
 import publish_workbook  # noqa: E402
 import register_deck_check as rdc  # noqa: E402
 
-STEPS = ("plan", "swap", "workbook", "dataset", "webmap", "check", "all")
+STEPS = ("plan", "swap", "workbook", "dataset", "webmap", "summary", "check", "all")
 NEEDS_DECKS = ("plan", "swap", "webmap", "check", "all")
 
 
@@ -82,6 +88,11 @@ class Paths:
         self.workbook = self.out / f"map_data_{edition}.xlsx"
         self.dataset = self.out / f"powerbi_dataset_{edition}.csv"
         self.webmap = self.out / f"webmap_{edition}.html"
+        self.summary = self.out / f"webmap_summary_{edition}.html"
+        self.ma_codes = root / "config" / "ma_codes.csv"
+        self.who = root / "config" / "who_europe.csv"
+        self.page_cfg = root / "config" / "summary_page.csv"
+        self.allow = root / "config" / "summary_scan_allow.csv"
 
 
 def _csv(path):
@@ -145,6 +156,18 @@ def step_webmap(p):
                               "--edition", p.edition])
     if rc:
         raise Stop(rc, "stop: web map step")
+
+
+def step_summary(p):
+    if not p.summary.exists():
+        publish_webmap.fetch_geometry(p.geometry)
+        publish_webmap.fetch_d3(p.d3)
+    rc = publish_summary.main(["--register", str(p.register), "--ma-codes", str(p.ma_codes), "--crosswalk",
+                               str(p.crosswalk), "--master", str(p.master), "--who", str(p.who), "--page-config",
+                               str(p.page_cfg), "--geometry", str(p.geometry), "--d3", str(p.d3),
+                               "--out", str(p.summary), "--edition", p.edition, "--allow", str(p.allow)])
+    if rc:
+        raise Stop(rc, "stop: summary step")
 
 
 # --- check ------------------------------------------------------------------------------------------
@@ -256,6 +279,39 @@ def check_webmap(p, reg, crosswalk):
     return probs
 
 
+def check_summary(p, reg):
+    """The kept summary page: views and headline re-derived from the register now, and the
+    forbidden-text scan run again on the page as it is on disk."""
+    import json
+    text = p.summary.read_text(encoding="utf-8")
+    m = re.search(r'<script type="application/json" id="map-data">(.*?)</script>', text, re.S)
+    if not m:
+        return ["no embedded map data"]
+    got = json.loads(m.group(1))
+    probs = []
+    try:
+        master = _csv(p.master)
+        views, _ = publish_summary.summary_views(reg, master)
+        head = publish_summary.headline(reg, publish_summary.load_who(p.who))
+        terms = publish_summary.forbidden_terms(p.crosswalk, p.ma_codes)
+        allowed = publish_summary.load_allow(p.allow)
+    except publish_workbook.Stop as e:
+        return [str(e)]
+    gv = {v["id"]: v for v in got.get("views", [])}
+    for v in json.loads(json.dumps(views)):
+        for field in ("colour", "tips", "legend", "filters", "title", "subtitle", "legend_title"):
+            if gv.get(v["id"], {}).get(field) != v.get(field):
+                probs.append(f"summary map {v['id']} {field} differ from the register")
+    if got.get("headline") != {"n": head["n"], "m": head["m"]}:
+        probs.append(f"headline data {got.get('headline')}, the register gives {head['n']} of {head['m']}")
+    sentence = publish_summary.HEADLINE.format(n=head["n"], m=head["m"])
+    if sentence not in publish_summary.page_strings(text):
+        probs.append(f"headline text on the page is not '{sentence}'")
+    for t, s in publish_summary.scan(publish_summary.page_strings(text), terms, allowed):
+        probs.append(f"forbidden term {t!r} in {s[:80]!r}")
+    return probs
+
+
 def step_check(p):
     reg = _csv(p.register)
     crosswalk = [(r["key"], r["label"]) for r in _csv(p.crosswalk)]
@@ -266,7 +322,8 @@ def step_check(p):
     bad += rc != 0
     for name, path, fn in (("workbook", p.workbook, lambda: check_workbook(p, reg)),
                            ("dataset", p.dataset, lambda: check_dataset(p, reg)),
-                           ("webmap", p.webmap, lambda: check_webmap(p, reg, crosswalk))):
+                           ("webmap", p.webmap, lambda: check_webmap(p, reg, crosswalk)),
+                           ("summary", p.summary, lambda: check_summary(p, reg))):
         if not path.exists():
             print(f"FAIL {name}: {path.name} missing in {path.parent}")
             bad += 1
@@ -288,7 +345,7 @@ def step_all(p, apply=False):
     if n:
         step_swap(p, plan, apply=True)
     for name, target, fn in (("workbook", p.workbook, step_workbook), ("dataset", p.dataset, step_dataset),
-                             ("webmap", p.webmap, step_webmap)):
+                             ("webmap", p.webmap, step_webmap), ("summary", p.summary, step_summary)):
         if target.exists():
             print(f"kept {target.name}: it exists and is never rebuilt")
             continue
@@ -317,7 +374,8 @@ def main(argv=None):
         elif a.step == "all":
             step_all(p, a.apply)
         else:
-            {"workbook": step_workbook, "dataset": step_dataset, "webmap": step_webmap, "check": step_check}[a.step](p)
+            {"workbook": step_workbook, "dataset": step_dataset, "webmap": step_webmap, "summary": step_summary,
+             "check": step_check}[a.step](p)
     except (Stop, publish_workbook.Stop) as e:
         print(str(e), file=sys.stderr)
         return e.code

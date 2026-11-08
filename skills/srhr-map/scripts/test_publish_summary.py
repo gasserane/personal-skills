@@ -234,6 +234,62 @@ def main():
     record("scan_allow_clears_only_ticked", ps.scan(["Word and Stream Q"], {"Word", "Stream Q"}, {"Word"})
            == [("Stream Q", "Word and Stream Q")], "")
 
+    # --- Task 6: the partner note and build_summary / main ---
+    pr = mem_a + [row("XAA", "ippf_funding_streams", "0", "none"),
+                  row("XAA", "ippf_funding_streams_partner", "Stream Q")]
+    record("partner_band_changes_named", ps.partner_band_changes(pr) == ["XAA"]
+           and ps.partner_band_changes(rows3) == [], ps.partner_band_changes(pr))
+
+    import io
+    from contextlib import redirect_stderr, redirect_stdout
+    import test_publish_webmap as twm  # invented register, topology and pinned fake d3
+
+    def cli(argv):
+        o, e = io.StringIO(), io.StringIO()
+        with redirect_stdout(o), redirect_stderr(e):
+            code = ps.main(argv)
+        return code, o.getvalue() + e.getvalue()
+
+    with tempfile.TemporaryDirectory() as d:
+        d = Path(d)
+        codes6 = d / "ma_codes.csv"
+        codes6.write_text("ma_code,iso3,org_name\n777,ONE,Org Invented One\n", encoding="utf-8")
+        who6 = _who_file(d, "iso3,country\nONE,Country One\nTWO,Country Two\nGON,Country Gone\nZZZ,Zland\n", "who6.csv")
+        cfg6 = d / "page.csv"
+        cfg6.write_text("key,value\ncontact,x@example.org\nauthor_unit,Unit\ndisclosure,Text.\n", encoding="utf-8")
+
+        def argv6(out, who=who6, cfg=cfg6):
+            return ["--register", str(twm.REG), "--ma-codes", str(codes6), "--crosswalk", str(twm.CROSS),
+                    "--master", str(twm.MASTER), "--who", str(who), "--page-config", str(cfg),
+                    "--geometry", str(twm.GEO), "--d3", str(twm.D3), "--out", str(out)]
+
+        out = d / "pub" / "webmap_summary_2031.html"
+        code, log = cli(argv6(out))
+        record("build_writes_page", code == 0 and out.exists(), log)
+        record("build_prints_headline_and_views", "headline: 2 of 4" in log and "A: 2 coloured, 2 tooltips" in log, log)
+        text = out.read_text(encoding="utf-8") if out.exists() else ""
+        data = ps.json.loads(re.search(r'id="map-data">(.*?)</script>', text, re.S).group(1)) if text else {}
+        record("build_embeds_headline", data.get("headline") == {"n": 2, "m": 4}, data.get("headline"))
+        record("build_page_has_no_deck_or_stream_text", text and not ps.scan(ps.page_strings(text),
+               ps.forbidden_terms(twm.CROSS, codes6), set()) and "Country One: MA with core grant" not in text, "")
+        record("build_notes_region", "not on the WHO" in log and "NOC" in log and "ZZZ" in log, log)
+
+        code, log = cli(argv6(out))
+        record("build_never_overwrites", code == 2, (code, log))
+
+        who_small = _who_file(d, "iso3,country\nONE,Country One\n", "who_small.csv")
+        out2 = d / "pub" / "outside.html"
+        code, log = cli(argv6(out2, who=who_small))
+        record("build_refuses_outside_member", code == 1 and not out2.exists() and "TWO" in log, (code, log))
+
+        bad_cfg = d / "bad_page.csv"
+        bad_cfg.write_text("key,value\ncontact,x@example.org\nauthor_unit,Stream two team\ndisclosure,Text.\n",
+                           encoding="utf-8")
+        out3 = d / "pub" / "scan_hit.html"
+        code, log = cli(argv6(out3, cfg=bad_cfg))
+        record("build_refuses_scan_hit_before_write", code == 1 and not out3.exists() and "Stream two" in log,
+               (code, log))
+
     print(f"{sum(results)}/{len(results)} cases ok")
     sys.exit(0 if all(results) else 1)
 

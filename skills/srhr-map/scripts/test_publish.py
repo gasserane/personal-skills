@@ -59,6 +59,13 @@ def make_root(root: Path):
                   [{"key": k, "label": v, "group": "g", "colour": ""} for k, v in trc.CROSS])
     write_csv(root / "intelligence_tool" / "master_countries.csv", ["country", "iso3", "m49"],
                   [{"country": n, "iso3": i, "m49": twm.M49[i]} for n, i in trc.NAMES.items()])
+    write_csv(root / "config" / "ma_codes.csv", ["ma_code", "iso3", "org_name"],
+              [{"ma_code": "777", "iso3": "ONE", "org_name": "Org Invented One"}])
+    write_csv(root / "config" / "who_europe.csv", ["iso3", "country"],
+              [{"iso3": i, "country": n} for n, i in trc.NAMES.items()])
+    write_csv(root / "config" / "summary_page.csv", ["key", "value"],
+              [{"key": "contact", "value": "x@example.org"}, {"key": "author_unit", "value": "Unit"},
+               {"key": "disclosure", "value": "Text."}])
     write_csv(root / "intelligence_tool" / "source_register.csv", ["source_id", "source", "publisher", "url"],
                   [{"source_id": "src_a", "source": "Source A", "publisher": "Agency A", "url": ""}])
     (root / "publish" / "_geometry" / "countries-50m.json").write_text(json.dumps(twm.TOPO), encoding="utf-8")
@@ -116,7 +123,8 @@ def main():
     # --- builders ---
     for sub, target in (("workbook", pub / f"map_data_{ED}.xlsx"),
                         ("dataset", pub / f"powerbi_dataset_{ED}.csv"),
-                        ("webmap", pub / f"webmap_{ED}.html")):
+                        ("webmap", pub / f"webmap_{ED}.html"),
+                        ("summary", pub / f"webmap_summary_{ED}.html")):
         code, log = run(sub, *base)
         check(f"{sub}_exit_0", code == 0 and target.exists(), (code, log))
     code, log = run("webmap", *base)
@@ -125,8 +133,26 @@ def main():
     # --- check agrees ---
     code, log = run("check", *base)
     check("check_exit_0_when_all_agree", code == 0, log)
-    for part in ("decks", "workbook", "dataset", "webmap"):
+    for part in ("decks", "workbook", "dataset", "webmap", "summary"):
         check(f"check_reports_{part}", f"ok   {part}" in log, log)
+    code, log = run("summary", "--map-root", str(root))
+    check("summary_needs_no_decks", code == 2 and "never overwritten" in log, (code, log))
+
+    # --- check fails on a hand-edited headline in the kept summary page ---
+    sm = pub / f"webmap_summary_{ED}.html"
+    s_text = sm.read_text(encoding="utf-8")
+    sm.write_text(s_text.replace("work in 2 of the 3", "work in 9 of the 3", 1), encoding="utf-8")
+    code, log = run("check", *base)
+    check("check_summary_flags_stale_headline", "work in 2 of the 3" in s_text and code == 1
+          and "FAIL summary" in log and "headline" in log, log)
+    sm.write_text(s_text.replace('"headline":{"n":2', '"headline":{"n":9', 1), encoding="utf-8")
+    code, log = run("check", *base)
+    check("check_summary_flags_stale_headline_data", '"headline":{"n":2' in s_text and code == 1
+          and "FAIL summary" in log, log)
+    sm.write_text(s_text.replace("Point at or tap", "Stream two: point at or tap", 1), encoding="utf-8")
+    code, log = run("check", *base)
+    check("check_summary_reruns_scan", code == 1 and "FAIL summary" in log and "Stream two" in log, log)
+    sm.write_text(s_text, encoding="utf-8")
 
     # --- check fails on a planted change in an output ---
     data = pub / f"powerbi_dataset_{ED}.csv"
@@ -202,7 +228,8 @@ def main():
     p3 = root3 / "publish" / ED
     check("all_exit_0", code == 0, log)
     check("all_writes_every_output", all((p3 / n).exists() for n in (
-        f"map_data_{ED}.xlsx", f"powerbi_dataset_{ED}.csv", f"powerbi_dataset_{ED}.xlsx", f"webmap_{ED}.html")),
+        f"map_data_{ED}.xlsx", f"powerbi_dataset_{ED}.csv", f"powerbi_dataset_{ED}.xlsx", f"webmap_{ED}.html",
+        f"webmap_summary_{ED}.html")),
         [p.name for p in p3.glob("*")])
     code, log = run("all", *b3)
     check("all_second_run_keeps_outputs", code == 0 and "kept" in log, log)
