@@ -63,6 +63,9 @@ def load_who(path) -> set:
             rd = csv.DictReader(f)
             rd.fieldnames = [c.strip() for c in (rd.fieldnames or [])]
             if "iso3" not in rd.fieldnames:
+                if any(";" in c for c in rd.fieldnames):
+                    raise Stop(1, f"stop: {Path(path).name} uses semicolons between columns (Excel on a "
+                                  "comma-decimal computer saves it so); save it again as CSV with commas")
                 raise Stop(1, f"stop: {Path(path).name} has no iso3 column")
             out = {(r.get("iso3") or "").strip().upper() for r in rd}
     except OSError as e:

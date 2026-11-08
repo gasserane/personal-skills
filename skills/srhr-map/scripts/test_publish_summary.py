@@ -70,6 +70,13 @@ def main():
             record("load_who_refuses_missing_file", False, "no Stop")
         except Stop as e:
             record("load_who_refuses_missing_file", e.code == 1, e.code)
+        # review minor 4: Excel on a comma-decimal machine saves semicolons; the message names that, not "no iso3"
+        try:
+            ps.load_who(_who_file(d, "iso3;country\r\nXAA;Aland\r\n", "semi.csv", bom=True))
+            record("load_who_names_semicolon_delimiter", False, "no Stop")
+        except Stop as e:
+            record("load_who_names_semicolon_delimiter", e.code == 1 and "semicolon" in str(e)
+                   and "no iso3 column" not in str(e), str(e))
         clean = ps.load_who(_who_file(d, "iso3,country\nXAA,Aland\nXBB,Bland\n", "clean.csv"))
         excel = ps.load_who(_who_file(d, "iso3,country\r\nxaa,Aland\r\n XBB ,Bland\r\n,\r\n\r\n", "excel.csv", bom=True))
         record("load_who_excel_variant", clean == excel == {"XAA", "XBB"}, (clean, excel))
