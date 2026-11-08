@@ -20,6 +20,7 @@ import argparse
 import csv
 import re
 import sys
+from contextlib import contextmanager
 from datetime import date
 from pathlib import Path
 
@@ -137,13 +138,14 @@ def about_lines(edition, rows):
     return TITLE.format(**f), [t.format(**f) for t in ABOUT_TEMPLATES]
 
 
-def write(out, edition, rows):
+def write(out, edition, rows, fh=None):
+    """Write the workbook to out, or into fh (a file `claimed` opened for out) when given."""
     pkg = rw.brand_package()
     if pkg is None:
         print("note: the organisation's reporting package was not found; the workbook has the brand colours "
               "but no logo, and the brand checker will flag it")
     out.parent.mkdir(parents=True, exist_ok=True)
-    wb = xlsxwriter.Workbook(str(out))
+    wb = xlsxwriter.Workbook(fh if fh is not None else str(out))
     fm = rw._formats(wb, pkg, rw._brand(pkg))
 
     about = wb.add_worksheet("About")
@@ -189,12 +191,35 @@ def write(out, edition, rows):
     return out
 
 
+def _exists(out):
+    return Stop(2, f"stop: {out.name} already exists in {out.parent}. It is never overwritten, because a "
+                   "person may have edited it. Move or rename it first if a new build is really wanted.")
+
+
 def refuse_existing(*targets):
-    """Stop (exit 2) before anything is written when any target file already exists."""
+    """Stop (exit 2) before any work starts when a target file already exists (early, friendly check;
+    `claimed` is what makes the write itself safe)."""
     for out in map(Path, targets):
         if out.exists():
-            raise Stop(2, f"stop: {out.name} already exists in {out.parent}. It is never overwritten, because a "
-                          "person may have edited it. Move or rename it first if a new build is really wanted.")
+            raise _exists(out)
+
+
+@contextmanager
+def claimed(out, binary=False, **open_kw):
+    """Open a NEW file for writing (mode "x"): a file that appeared after refuse_existing is never
+    overwritten (exit 2). A failure while writing removes the half-written file."""
+    out = Path(out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        fh = open(out, "xb" if binary else "x", **open_kw)
+    except FileExistsError:
+        raise _exists(out) from None
+    try:
+        with fh:
+            yield fh
+    except BaseException:
+        out.unlink(missing_ok=True)
+        raise
 
 
 def load_inputs(register_path, sources_path, master_path, edition=None):
@@ -219,7 +244,9 @@ def load_inputs(register_path, sources_path, master_path, edition=None):
 def build(register_path, sources_path, master_path, out, edition=None):
     refuse_existing(out)
     register, sources, countries, edition = load_inputs(register_path, sources_path, master_path, edition)
-    return write(Path(out), edition, value_rows(register, sources, countries))
+    rows = value_rows(register, sources, countries)
+    with claimed(out, binary=True) as fh:
+        return write(Path(out), edition, rows, fh)
 
 
 def main(argv=None):

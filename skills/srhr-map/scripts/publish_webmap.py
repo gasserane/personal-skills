@@ -36,7 +36,7 @@ import computed  # noqa: E402
 import deck_shapes  # noqa: E402
 import publish_plan as pp  # noqa: E402
 import register_deck_check as rdc  # noqa: E402
-from publish_workbook import Stop, _read, load_inputs, made_on, refuse_existing  # noqa: E402
+from publish_workbook import Stop, _read, claimed, load_inputs, made_on, refuse_existing  # noqa: E402
 
 WEB = "https" + "://"  # split so public_repo_clean does not read the scheme as a drive letter
 GEOMETRY_URL = WEB + "cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json"
@@ -359,8 +359,9 @@ def build(register, crosswalk_path, master, decks, geometry, out, edition=None, 
         raise Stop(1, f"stop: cannot read the geometry file: {e}")
     data = {"edition": edition, "made_on": made_on(), "views": views,
             "countries": countries(topo, master_rows, frame)}
-    Path(out).parent.mkdir(parents=True, exist_ok=True)  # a new edition's publish folder may not exist yet
-    Path(out).write_text(page(data, d3_js), encoding="utf-8")
+    text = page(data, d3_js)
+    with claimed(out, encoding="utf-8") as fh:  # creates a new edition's folder; never overwrites (mode "x")
+        fh.write(text)
     return Path(out), data
 
 

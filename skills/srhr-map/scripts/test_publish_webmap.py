@@ -297,6 +297,34 @@ def main():
     fresh = TMP / "new_edition" / "publish" / "webmap_2031.html"
     code, log = run(args(fresh))
     check("build_creates_output_folder", code == 0 and fresh.exists(), (code, log[-300:]))
+    race = TMP / "race" / "webmap_2031.html"
+    real_page = pwm.page
+
+    def planted(*a, **k):
+        race.parent.mkdir(parents=True, exist_ok=True)
+        race.write_text("made by someone else", encoding="utf-8")
+        return real_page(*a, **k)
+    pwm.page = planted
+    try:
+        code, log = run(args(race))
+    except Exception as e:  # noqa: BLE001 - the RED state is an uncaught error or an overwrite
+        code, log = "raised", repr(e)
+    finally:
+        pwm.page = real_page
+    check("race_file_appearing_after_check_kept", code == 2
+          and race.read_text(encoding="utf-8") == "made by someone else", (code, log[-200:]))
+    failing = TMP / "fail" / "webmap_2031.html"
+
+    def boom(*a, **k):
+        raise RuntimeError("planted failure while writing")
+    pwm.page = boom
+    try:
+        run(args(failing))
+    except RuntimeError:
+        pass
+    finally:
+        pwm.page = real_page
+    check("failed_build_leaves_no_partial_file", not failing.exists())
 
     # --- refusals ---
     code, log = run(args(out))

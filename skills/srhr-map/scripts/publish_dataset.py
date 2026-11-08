@@ -88,21 +88,24 @@ def _csv_cell(v):
     return "" if v is None else str(v)
 
 
-def write_csv(path, rows):
-    with open(path, "w", encoding="utf-8-sig", newline="") as f:
-        w = csv.writer(f, lineterminator="\r\n")
-        w.writerow(DATASET_COLUMNS)
-        for r in rows:
-            w.writerow([_csv_cell(r[h]) for h in DATASET_COLUMNS])
+def write_csv(path, rows, fh=None):
+    """Write the csv to path, or into fh (a text file `claimed` opened for path) when given."""
+    if fh is None:
+        with open(path, "w", encoding="utf-8-sig", newline="") as f:
+            return write_csv(path, rows, f)
+    w = csv.writer(fh, lineterminator="\r\n")
+    w.writerow(DATASET_COLUMNS)
+    for r in rows:
+        w.writerow([_csv_cell(r[h]) for h in DATASET_COLUMNS])
     return path
 
 
-def write_xlsx(path, rows):
+def write_xlsx(path, rows, fh=None):
     pkg = rw.brand_package()
     if pkg is None:
         print("note: the organisation's reporting package was not found; the workbook has the brand colours "
               "but no logo, and the brand checker will flag it")
-    wb = xlsxwriter.Workbook(str(path))
+    wb = xlsxwriter.Workbook(fh if fh is not None else str(path))
     fm = rw._formats(wb, pkg, rw._brand(pkg))
     num = wb.add_format({**{"font_name": rw._brand(pkg)["font"]["name"], "font_size": rw._brand(pkg)["font"]["size"]},
                          "border": 1, "border_color": rw._brand(pkg)["colours"]["platinum"], "valign": "top"})
@@ -143,8 +146,9 @@ def build(register_path, sources_path, master_path, out_dir, edition=None):
     c, x = out_dir / f"powerbi_dataset_{edition}.csv", out_dir / f"powerbi_dataset_{edition}.xlsx"
     pw.refuse_existing(c, x)
     rows = dataset_rows(register, sources, countries, edition)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    return write_csv(c, rows), write_xlsx(x, rows)
+    # both targets are claimed before either is written: if the xlsx cannot be claimed, the csv is removed
+    with pw.claimed(c, encoding="utf-8-sig", newline="") as fc, pw.claimed(x, binary=True) as fx:
+        return write_csv(c, rows, fc), write_xlsx(x, rows, fx)
 
 
 def main(argv=None):

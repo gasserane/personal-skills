@@ -147,6 +147,24 @@ def main():
     check("existing target: exit 2, names the file, file unchanged",
           code == 2 and out.name in msg and sha(out) == before, f"code {code}: {msg}")
 
+    # race: a file that appears after the early check and before the write is never overwritten
+    race = TMP / "race" / "map_data_2031.xlsx"
+    real_rows = pw.value_rows
+
+    def planted(*a, **k):
+        race.parent.mkdir(parents=True, exist_ok=True)
+        race.write_bytes(b"made by someone else")
+        return real_rows(*a, **k)
+    pw.value_rows = planted
+    try:
+        code, msg = run(args[:-1] + [str(race)])
+    except Exception as e:  # noqa: BLE001 - the RED state is an uncaught error or an overwrite
+        code, msg = "raised", repr(e)
+    finally:
+        pw.value_rows = real_rows
+    check("race: file appearing after the check is kept, exit 2",
+          code == 2 and race.read_bytes() == b"made by someone else", f"{code}: {msg[-200:]}")
+
     empty = write_csv(TMP / "map_register_2032.csv", pw.REGISTER_FIELDS, [])
     code, msg = run(["--register", str(empty), "--sources", str(SRC), "--master", str(MASTER),
                      "--out", str(TMP / "e.xlsx")])

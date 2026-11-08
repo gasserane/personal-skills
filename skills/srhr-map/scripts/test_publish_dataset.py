@@ -129,6 +129,25 @@ def main():
           code == 2 and "powerbi_dataset_2031.xlsx" in msg and not (d2 / "powerbi_dataset_2031.csv").exists(),
           f"{code}: {msg}")
 
+    # race: files that appear after the early check and before the write are never overwritten
+    d3_ = TMP / "race"
+    real_rows = pd_.dataset_rows
+
+    def planted(*a, **k):
+        d3_.mkdir(parents=True, exist_ok=True)
+        (d3_ / "powerbi_dataset_2031.csv").write_bytes(b"made by someone else")
+        return real_rows(*a, **k)
+    pd_.dataset_rows = planted
+    try:
+        code, msg = run(args(d3_))
+    except Exception as e:  # noqa: BLE001 - the RED state is an uncaught error or an overwrite
+        code, msg = "raised", repr(e)
+    finally:
+        pd_.dataset_rows = real_rows
+    check("race: csv appearing after the check is kept, exit 2, xlsx not written",
+          code == 2 and (d3_ / "powerbi_dataset_2031.csv").read_bytes() == b"made by someone else"
+          and not (d3_ / "powerbi_dataset_2031.xlsx").exists(), f"{code}: {msg[-200:]}")
+
     print(f"{len(FAILS)} failure(s)")
     sys.exit(1 if FAILS else 0)
 
