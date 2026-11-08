@@ -339,6 +339,13 @@ def main():
         pwm.page = real_page
     check("failed_build_leaves_no_partial_file", not failing.exists())
 
+    # highlight never reorders country paths (DOM order = keyboard Tab order)
+    check("highlight_does_not_reorder_paths", ".raise()" not in script and ".lower()" not in script, "")
+    check("highlight_overlay_path", re.search(r'g\.append\("path"\)\.attr\("class", "hl"\)', script) is not None
+          and "path.hl" in text and re.search(r"path\.hl\s*\{[^}]*pointer-events: *none", text) is not None, "")
+    check("highlight_follows_shown_country", re.search(r'hl\.attr\("d", d3\.select\(this\)\.attr\("d"\)\)', script)
+          is not None, "")
+
     doc = pwm.__doc__ or ""
     check("docstring_says_d3_embedded", "loads one pinned script" not in doc and "artifact" not in doc
           and re.search(r"embeds .*d3", doc, re.S) is not None, doc[-400:])

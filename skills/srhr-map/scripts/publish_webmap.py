@@ -506,6 +506,7 @@ path.c { stroke: var(--map-line); stroke-width: .6; cursor: default; vector-effe
 path.c.has-tip { cursor: pointer; }
 path.c.dim { fill: var(--map-off) !important; }
 path.c.hot { stroke: var(--accent); stroke-width: 1.6; }
+path.hl { fill: none; stroke: var(--accent); stroke-width: 1.6; vector-effect: non-scaling-stroke; pointer-events: none; }
 aside { min-width: 0; display: grid; gap: 18px; }
 aside h3 { font: 600 .78rem var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 6px; }
 ul.legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
@@ -577,6 +578,9 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
     .attr("class", "ctx").attr("d", path);
   var sel = g.selectAll("path.c").data(shapes.filter(function (c) { return c.iso3; }).map(feat)).join("path")
     .attr("class", "c").attr("d", path).attr("data-iso", function (d) { return d.properties.iso3; });
+  // the highlight is drawn by one overlay path on top; country paths never move, so the DOM order
+  // (and the keyboard Tab order) stays as built
+  var hl = g.append("path").attr("class", "hl").attr("aria-hidden", "true").style("display", "none");
   var tip = document.getElementById("tip"), readout = document.getElementById("readout");
   var cur = null, filter = null;
 
@@ -635,9 +639,10 @@ footer { margin-top: 28px; font-size: .82rem; color: var(--muted); max-width: 75
     var box = document.getElementById("map").getBoundingClientRect();
     var x = (ev.clientX || box.left + box.width / 2) - box.left + 12, y = (ev.clientY || box.top + 20) - box.top + 12;
     tip.style.left = Math.min(x, box.width - tip.offsetWidth - 4) + "px"; tip.style.top = y + "px";
-    d3.select(this).classed("hot", true).raise();
+    d3.select(this).classed("hot", true);
+    hl.attr("d", d3.select(this).attr("d")).style("display", null);
   }
-  function hide() { tip.hidden = true; d3.select(this).classed("hot", false); }
+  function hide() { tip.hidden = true; d3.select(this).classed("hot", false); hl.style("display", "none"); }
   sel.on("mousemove", show).on("mouseleave", hide).on("focus", show).on("blur", hide).on("click", show);
 
   function render(id) {
