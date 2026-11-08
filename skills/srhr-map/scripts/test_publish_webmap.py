@@ -369,11 +369,13 @@ def main():
     # with the old route line restored the output reproduced the f202a06 golden d1e8179b..., so nothing else moved.
     # Re-pinned again (same task) when the tab label learned data.tab_letters (summary drops "Map X: "); with the
     # old tab line restored the output reproduced 23025e4b..., so nothing else moved. Internal data has no flag.
+    # Re-pinned in the dark-accent fix (S3 review item b: dark --accent #FF6A3D -> #EB3300, both dark blocks);
+    # with the two old lines restored the output reproduced 84b9e9c4..., so nothing else moved.
     gold = {"edition": "2031", "made_on": "2031-01-02", "countries": [{"iso3": "XAA", "name": "A & <b>", "paths": []}],
             "views": [{"id": "A", "name": "N", "title": "T", "subtitle": "S", "legend_title": "L", "legend": [],
                        "filters": [], "colour": {}, "tips": {"XAA": "A's tip"}}]}
     got = hashlib.sha256(pwm.page(gold, "LIBRARY").encode("utf-8")).hexdigest()
-    check("internal_page_unchanged", got == "84b9e9c4d949680de97241cd2322cd4592013cdc2cf5855bd6466a63f2f64232", got)
+    check("internal_page_unchanged", got == "9af44131d505e6190a969fb0ee9d9a6121d9786411f4d83df3bda2ecdd00f5a0", got)
     slot = pwm.page(gold, "LIBRARY", header_html="<h1>HEAD-SLOT</h1>", footer_html="FOOT-SLOT", title="TITLE-SLOT")
     check("page_slots_filled", "<h1>HEAD-SLOT</h1>" in slot and "<footer>FOOT-SLOT</footer>" in slot
           and "<title>TITLE-SLOT</title>" in slot and "hover text on the map slides" not in slot
@@ -384,6 +386,21 @@ def main():
     head = pg.encode("utf-8")[:1024].decode("utf-8", "ignore").lower()
     check("page_starts_with_doctype", pg.lstrip().lower().startswith("<!doctype html>"), pg[:80])
     check("page_declares_utf8_early", '<meta charset="utf-8">' in head, head[:200])
+
+    # every --accent (light and both dark blocks) draws the focus ring and hover stroke on the light map card
+    # #F3F5F4: WCAG 1.4.11 asks 3:1 for that (S3 final review item b; dark #FF6A3D measured under it)
+    def lum(hexc):
+        ch = [int(hexc[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+        ch = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in ch]
+        return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2]
+
+    def contrast(a, b):
+        hi, lo = sorted((lum(a), lum(b)), reverse=True)
+        return (hi + 0.05) / (lo + 0.05)
+
+    accents = re.findall(r"--accent: *(#[0-9A-Fa-f]{6})", pwm.PAGE)
+    low = [(a, round(contrast(a, "#F3F5F4"), 2)) for a in accents if contrast(a, "#F3F5F4") < 3.0]
+    check("accent_contrast_on_map_card", len(accents) >= 3 and not low, (len(accents), low))
 
     # one rate year for map D (Session A ruling): colour, legend, title, tooltip, swap and deck check
     rate_year = getattr(rdc, "RATE_YEAR", None)

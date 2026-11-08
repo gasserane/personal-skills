@@ -479,11 +479,11 @@ PAGE = r"""<!doctype html>
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0E1E22; --surface: #132A30; --ink: #E8EEEE; --ink-2: #B9C7C9; --muted: #8FA2A6;
-  --line: #2A4249; --land: #1C343A; --land-line: #0E1E22; --off: #23393F; --accent: #FF6A3D;
+  --line: #2A4249; --land: #1C343A; --land-line: #0E1E22; --off: #23393F; --accent: #EB3300;
   --tip-bg: #00313C; --tip-ink: #FFFFFF; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0E1E22; --surface: #132A30; --ink: #E8EEEE; --ink-2: #B9C7C9; --muted: #8FA2A6;
-  --line: #2A4249; --land: #1C343A; --land-line: #0E1E22; --off: #23393F; --accent: #FF6A3D;
+  --line: #2A4249; --land: #1C343A; --land-line: #0E1E22; --off: #23393F; --accent: #EB3300;
   --tip-bg: #00313C; --tip-ink: #FFFFFF; color-scheme: dark }
 body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--body); margin: 0; }
 .wrap { max-width: 1180px; margin: 0 auto; padding-block: 24px 40px;
