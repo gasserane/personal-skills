@@ -383,8 +383,8 @@ def main():
     # phase e review minor 7: the page declares its language (WCAG 3.1.1)
     check("page_html_lang_en", re.search(r"<!doctype html>\s*<html lang=\"en\">", pwm.PAGE) is not None
           and '<html lang="en">' in pwm.page(gold, "LIBRARY"), pwm.PAGE[:80])
-    # phase e review minor 6 (Ane 2026-11-08 21:56, both pages): a country with no tip (withdrawn, non-member,
-    # grey context) shows its name only on hover; it stays out of the Tab order (tabindex still keyed on v.tips)
+    # phase e review minor 6 (Ane 2026-11-08 21:56, both pages): a master-list country with no tip (withdrawn,
+    # non-member) shows its name only on hover (grey context shapes carry no listener); it stays out of the Tab order (tabindex still keyed on v.tips)
     check("hover_falls_back_to_country_name",
           re.search(r"t = v\.tips\[d\.properties\.iso3\] \|\| d\.properties\.name;", pwm.PAGE) is not None
           and '.attr("tabindex", iso in v.tips ? 0 : null)' in pwm.PAGE, "")
