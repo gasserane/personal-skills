@@ -42,9 +42,11 @@ Rules that hold in every step:
 - Never open an existing register edition for writing. `apply` writes the new edition and backs it up before any rewrite.
 - Use `--topic HIV` or `--topic funding` to refresh one topic only.
 
-## Refresh mode in Claude Code
+## Where refresh runs: Claude Code
 
-The same commands run in Claude Code. There, the review workbook gets the full IPPF brand (logo, header and footer) when the organisation's reporting package is found: set `WORK_FOLDER_ROOT` to the work folder, or run from inside it. In Cowork the workbook uses the brand colours and font without the logo.
+Refresh runs in Claude Code, not Cowork: Cowork could not open the synced "SRHR map data" folder. Start Claude Code from your usual work folder, never from inside "SRHR map data", and pass `--map-root` to every command.
+
+The review workbook gets the full IPPF brand (logo, header and footer) when the organisation's reporting package is found: set `WORK_FOLDER_ROOT` to the work folder, or run from inside it. Without that package, the workbook uses the brand colours and font without the logo.
 
 ## Other scripts here
 
