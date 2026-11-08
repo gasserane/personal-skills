@@ -9,6 +9,7 @@ import html
 import io
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -145,6 +146,46 @@ def main():
     wm.write_text(text, encoding="utf-8")
     code, log = run("check", *base)
     check("check_green_again_after_restore", code == 0, log)
+
+    # --- check sees stale values: change one register value (same rows, same ticks, same coloured set),
+    #     rebuild only the dataset; the kept workbook and web map must still fail (final review I-1) ---
+    regp = root / "map_register" / f"map_register_{ED}.csv"
+    reg_keep = regp.read_bytes()
+    with open(regp, encoding="utf-8", newline="") as f:
+        rr = list(csv.DictReader(f))
+    hit = next(r for r in rr if r["indicator_id"] == "ecdc_hiv_diagnosis_rate" and r["value"].strip())
+    hit["value"] = hit["value_display"] = str(float(hit["value"]) + 30)
+    write_csv(regp, list(rr[0]), rr)
+    for n in (f"powerbi_dataset_{ED}.csv", f"powerbi_dataset_{ED}.xlsx"):
+        (pub / n).rename(pub / (n + ".old"))
+    code, log = run("dataset", *base)
+    code, log = run("check", *base)
+    check("check_fails_stale_workbook_value", code == 1 and "FAIL workbook" in log, log)
+    check("check_fails_stale_webmap_value", code == 1 and "FAIL webmap" in log, log)
+    check("check_dataset_ok_after_rebuild", "ok   dataset" in log, log)
+    regp.write_bytes(reg_keep)
+    for n in (f"powerbi_dataset_{ED}.csv", f"powerbi_dataset_{ED}.xlsx"):
+        (pub / n).unlink()
+        (pub / (n + ".old")).rename(pub / n)
+    # the dataset .xlsx is checked against the register too, not only the csv
+    from openpyxl import load_workbook
+    xp = pub / f"powerbi_dataset_{ED}.xlsx"
+    x_keep = xp.read_bytes()
+    wb = load_workbook(xp)
+    wb["Data"]["G2"] = str(wb["Data"]["G2"].value) + "9"
+    wb.save(xp)
+    code, log = run("check", *base)
+    check("check_fails_on_planted_dataset_xlsx_change", code == 1 and "FAIL dataset" in log, log)
+    xp.write_bytes(x_keep)
+    # a hand edit of a web map tooltip
+    text = wm.read_text(encoding="utf-8")
+    m_ = re.search(r'"tips":\{"[A-Z]{3}":"', text)
+    wm.write_text(text[:m_.end()] + "EDITED " + text[m_.end():], encoding="utf-8")
+    code, log = run("check", *base)
+    check("check_fails_on_edited_webmap_tip", code == 1 and "FAIL webmap" in log, log)
+    wm.write_text(text, encoding="utf-8")
+    code, log = run("check", *base)
+    check("check_green_after_restoring_all", code == 0, log)
 
     # --- check fails when an output is missing ---
     root2 = make_root(TMP / "root2")

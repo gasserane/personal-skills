@@ -203,6 +203,22 @@ def _ordered(labels, deck_order, key=None):
     return [x for x in deck_order if x in labels] + rest
 
 
+def _deck_colour(m, labels, deck_order, low=False):
+    """{label: colour}: a class keeps the colour of its position in the full deck legend, so an edition
+    with an empty class does not shift every later class one step; labels the deck lacks follow it."""
+    norm = (lambda x: x.lower()) if low else (lambda x: x)
+    deck = [norm(x) for x in deck_order]
+    pal = PALETTE[m]
+    out, j = {}, len(deck)
+    for lab in labels:
+        if norm(lab) in deck:
+            i = deck.index(norm(lab))
+        else:
+            i, j = j, j + 1
+        out[lab] = pal[min(i, len(pal) - 1)]
+    return out
+
+
 def tips_for(m, deck_tips, by, names, crosswalk):
     """{iso3: tooltip}: the deck tip with register values in its spans (publish_plan.new_tip)."""
     in_reg = pp._in_register(m, by)
@@ -227,11 +243,13 @@ def view(m, rows, crosswalk, colours, deck_tips, inv, names):
     if m in ("A", "B"):
         classes = computed.country_classes(m, rows, crosswalk)
         counts = computed.class_counts(m, rows, crosswalk)
-        order = _ordered(counts, _deck_order(inv, "Filter button: "),
+        deck_order = _deck_order(inv, "Filter button: ")
+        order = _ordered(counts, deck_order,
                          key=(lambda s: int(re.match(r"\d+", s).group())) if m == "B" else (lambda s: -counts[s][0]))
-        for i, lab in enumerate(order):
+        cols = _deck_colour(m, order, deck_order)
+        for lab in order:
             n, h = counts[lab]
-            col = PALETTE[m][min(i, len(PALETTE[m]) - 1)]
+            col = cols[lab]
             isos = sorted(iso for iso, cs in classes.items() if lab in cs)
             v["legend"].append({"key": lab, "label": lab, "count": n, "half": h, "colour": col, "text": _text(lab, n, h)})
             v["filters"].append({"key": lab, "text": _text(lab, n, h), "colour": col, "members": isos})
@@ -246,9 +264,10 @@ def view(m, rows, crosswalk, colours, deck_tips, inv, names):
         deck = [x.lower() for x in _deck_order(inv, "Legend text: ")]
         order = sorted(statuses, key=lambda s: (deck.index(s.lower()) if s.lower() in deck else len(deck),
                                                 -statuses[s], s))
-        for i, st in enumerate(order):
+        cols = _deck_colour("C", order, deck, low=True)
+        for st in order:
             v["legend"].append({"key": st, "label": st[:1].upper() + st[1:], "count": statuses[st], "half": 0,
-                                "colour": PALETTE["C"][min(i, len(PALETTE["C"]) - 1)],
+                                "colour": cols[st],
                                 "text": _text(st[:1].upper() + st[1:], statuses[st])})
         v["colour"] = {r["iso3"]: r["member_status"] for r in streams}
         held = {}
@@ -331,6 +350,20 @@ def build(register, crosswalk_path, master, decks, geometry, out, edition=None, 
         raise Stop(1, "stop: the d3 library text contains a closing script tag; it cannot be embedded")
     rows, _, _, edition = load_inputs(register, None, None, edition)
     master_rows = _read(master)
+    views, frame = build_views(rows, crosswalk_path, master_rows, decks)
+    try:
+        topo = json.loads(Path(geometry).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        raise Stop(1, f"stop: cannot read the geometry file: {e}")
+    data = {"edition": edition, "made_on": made_on(), "views": views,
+            "countries": countries(topo, master_rows, frame)}
+    Path(out).write_text(page(data, d3_js), encoding="utf-8")
+    return Path(out), data
+
+
+def build_views(rows, crosswalk_path, master_rows, decks):
+    """([view per map A-D], set of iso3 with a tip): everything the page shows that comes from the
+    register and the decks. `publish.py check` calls it too, so a kept page is compared field by field."""
     names = {r["country"]: r["iso3"] for r in master_rows}
     xw = _read(crosswalk_path)
     crosswalk = [(r["key"], r["label"]) for r in xw]
@@ -351,14 +384,7 @@ def build(register, crosswalk_path, master, decks, geometry, out, edition=None, 
                           "this is a structure change for phase (e).")
         views.append(v)
         frame |= set(v["tips"])
-    try:
-        topo = json.loads(Path(geometry).read_text(encoding="utf-8"))
-    except (OSError, ValueError) as e:
-        raise Stop(1, f"stop: cannot read the geometry file: {e}")
-    data = {"edition": edition, "made_on": made_on(), "views": views,
-            "countries": countries(topo, master_rows, frame)}
-    Path(out).write_text(page(data, d3_js), encoding="utf-8")
-    return Path(out), data
+    return views, frame
 
 
 def main(argv=None):

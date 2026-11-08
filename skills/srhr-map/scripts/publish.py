@@ -8,8 +8,9 @@ Steps (each runs alone; `all` chains them in this order):
   workbook  publish/<edition>/map_data_<edition>.xlsx
   dataset   publish/<edition>/powerbi_dataset_<edition>.csv and .xlsx
   webmap    publish/<edition>/webmap_<edition>.html (geometry cached once in publish/_geometry/)
-  check     every output against the register: decks (register_deck_check), workbook rows and
-            confirmations, dataset values, web map colours. Exit 0 only when all agree.
+  check     every output against the register: decks (register_deck_check), every workbook
+            cell and link, every dataset cell (csv and xlsx), every web map colour, tooltip, legend,
+            filter and title. Exit 0 only when all agree.
   all       plan, then swap only when the plan is empty or --apply is given, then the three builders
             (an output that exists is kept, never rebuilt), then check
 
@@ -148,54 +149,110 @@ def step_webmap(p):
 
 # --- check ------------------------------------------------------------------------------------------
 
-def _key(r):
-    return (r["iso3"], r["indicator_id"], r["reference_year"], r["value"])
+def _diff(where, got, want, limit=3):
+    """Problem lines for cell-by-cell differences between two lists of rows (lists of strings)."""
+    out = []
+    if len(got) != len(want):
+        out.append(f"{where}: {len(got)} rows, the register gives {len(want)}")
+    bad = [(i, g, w) for i, (g, w) in enumerate(zip(got, want), start=2) if g != w]
+    for i, g, w in bad[:limit]:
+        cols = [c for c, (x, y) in enumerate(zip(g, w)) if x != y] or ["row length"]
+        out.append(f"{where} row {i}: column(s) {cols} hold {[g[c] for c in cols if isinstance(c, int)]}, "
+                   f"the register gives {[w[c] for c in cols if isinstance(c, int)]}")
+    if len(bad) > limit:
+        out.append(f"{where}: {len(bad) - limit} more row(s) differ")
+    return out
+
+
+def _inputs(p):
+    rows, sources, countries, _ = publish_workbook.load_inputs(p.register, p.sources, p.master, p.edition)
+    return rows, sources, countries
 
 
 def check_workbook(p, reg):
+    """Every Values cell, every link target and the table range, against the rows the register gives now."""
     from openpyxl import load_workbook
-    ws = load_workbook(p.workbook, read_only=True)["Values"]
-    rows = list(ws.iter_rows(min_row=2, values_only=True))
-    col = publish_workbook.VALUE_COLUMNS.index("Confirmed")
-    unticked = sum(1 for r in reg if not r["ticked_by"].strip())
-    shown = sum(1 for r in rows if r[col] == publish_workbook.NOT_CONFIRMED)
+    rows, sources, countries = _inputs(p)
+    want_rows = publish_workbook.value_rows(rows, sources, countries)
+    ws = load_workbook(p.workbook)["Values"]
+    cols = publish_workbook.VALUE_COLUMNS
+    link = cols.index("Source link")
     probs = []
-    if len(rows) != len(reg):
-        probs.append(f"{len(rows)} value rows, the register holds {len(reg)}")
-    if shown != unticked:
-        probs.append(f"{shown} rows marked not yet confirmed, the register has {unticked} unticked")
+    head = [c.value for c in ws[1]][:len(cols)]
+    if head != cols:
+        probs.append(f"Values columns {head}, expected {cols}")
+    got, links = [], []
+    for r in ws.iter_rows(min_row=2):
+        got.append(["" if c.value is None else str(c.value) for c in r[:len(cols)]])
+        links.append(r[link].hyperlink.target if r[link].hyperlink else "")
+    want = [[(publish_workbook.OPEN_LINK if v["_url"] else publish_workbook.NO_LINK) if h == "Source link"
+             else str(v[h]) for h in cols] for v in want_rows]
+    probs += _diff("Values", got, want)
+    if links != [v["_url"] for v in want_rows][:len(links)] or len(links) != len(want_rows):
+        probs.append("source links differ from the source register")
+    ref = ws.tables["MapValues"].ref if "MapValues" in ws.tables else None
+    if ref != f"A1:{chr(64 + len(cols))}{len(want_rows) + 1}":
+        probs.append(f"table range {ref}, the register needs A1:{chr(64 + len(cols))}{len(want_rows) + 1}")
     return probs
 
 
 def check_dataset(p, reg):
-    rows = _csv(p.dataset)
+    """The csv and the xlsx, column order and every cell, against the rows the register gives now."""
+    from openpyxl import load_workbook
+    rows, sources, countries = _inputs(p)
+    cols = publish_dataset.DATASET_COLUMNS
+    want_rows = publish_dataset.dataset_rows(rows, sources, countries, p.edition)
+    want = [[publish_dataset._csv_cell(r[h]) for h in cols] for r in want_rows]
+    with open(p.dataset, encoding="utf-8-sig", newline="") as f:
+        got = list(csv.reader(f))
     probs = []
-    if len(rows) != len(reg):
-        probs.append(f"{len(rows)} rows, the register holds {len(reg)}")
-    if sorted(map(_key, rows)) != sorted(map(_key, reg)):
-        diff = sorted(set(map(_key, rows)) ^ set(map(_key, reg)))[:3]
-        probs.append(f"values differ from the register, e.g. {diff}")
+    if not got or got[0] != cols:
+        probs.append(f"csv columns {got[0] if got else []}, expected {cols}")
+    probs += _diff("csv", got[1:], want)
+    xlsx = p.dataset.with_suffix(".xlsx")
+    if not xlsx.exists():
+        return probs + [f"{xlsx.name} missing"]
+    wb = load_workbook(xlsx, read_only=True)
+    try:  # a read-only workbook holds the file open on Windows until closed
+        num = cols.index("value_number")
+        xr = []
+        for i, r in enumerate(wb[publish_dataset.DATA_SHEET].iter_rows(values_only=True)):
+            cells = list(r[:len(cols)])
+            if i and isinstance(cells[num], (int, float)):
+                cells[num] = publish_dataset._csv_cell(float(cells[num]))
+            xr.append(["" if c is None else str(c) for c in cells])
+    finally:
+        wb.close()
+    if not xr or xr[0] != cols:
+        probs.append(f"xlsx columns {xr[0] if xr else []}, expected {cols}")
+    probs += _diff("xlsx", xr[1:], [[w[c] if c != num or not w[c] else publish_dataset._csv_cell(float(w[c]))
+                                     for c in range(len(cols))] for w in want])
     return probs
 
 
 def check_webmap(p, reg, crosswalk):
+    """Each view's colours, tooltips, legend, filters and titles, against what the register and decks give now."""
     text = p.webmap.read_text(encoding="utf-8")
     m = re.search(r'<script type="application/json" id="map-data">(.*?)</script>', text, re.S)
     if not m:
         return ["no embedded map data"]
     import json
-    views = {v["id"]: v for v in json.loads(m.group(1).replace("<\\/", "</"))["views"]}
-    want = {m_: set(computed.country_classes(m_, reg, crosswalk)) for m_ in "AB"}
-    want["C"] = {r["iso3"] for r in reg if r["indicator_id"] == "ippf_funding_streams" and r["member_status"] != "withdrawn"}
-    rates = [r for r in reg if r["indicator_id"] == rdc.D_INDICATORS[0] and r["value"].strip()]
-    year = max((r["reference_year"] for r in rates), default="")
-    want["D"] = {r["iso3"] for r in rates if r["reference_year"] == year}
+    got = {v["id"]: v for v in json.loads(m.group(1).replace("<\\/", "</"))["views"]}
+    try:
+        views, _ = publish_webmap.build_views(reg, p.crosswalk, _csv(p.master), p.decks)
+    except publish_webmap.Stop as e:
+        return [str(e)]
     probs = []
-    for k in "ABCD":
-        got = set(views.get(k, {}).get("colour", {}))
-        if got != want[k]:
-            probs.append(f"map {k} colours {len(got)} countries, the register {len(want[k])} "
-                         f"(differ: {sorted(got ^ want[k])[:4]})")
+    for v in json.loads(json.dumps(views)):
+        g = got.get(v["id"], {})
+        for field in ("colour", "tips", "legend", "filters", "title", "subtitle", "legend_title"):
+            if g.get(field) != v.get(field):
+                gv, wv = g.get(field), v.get(field)
+                if isinstance(wv, dict) and isinstance(gv, dict):
+                    keys = sorted(k for k in set(gv) | set(wv) if gv.get(k) != wv.get(k))
+                    probs.append(f"map {v['id']} {field} differ for {keys[:4]}")
+                else:
+                    probs.append(f"map {v['id']} {field} differ from the register")
     return probs
 
 

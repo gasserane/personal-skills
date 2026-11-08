@@ -269,6 +269,22 @@ def main():
           'sel.on("mousemove", show).on("mouseleave", hide).on("focus", show).on("blur", hide).on("click", show)'
           in script)
 
+    # --- class colour follows the deck legend position, not the position among classes present ---
+    def inv_rows(prefix, labels):
+        return [{"kind": "legend_count", "shape_name": f"{prefix}{lab}", "current": f"{lab} (1)"} for lab in labels]
+    b_deck = ["0 grant streams", "1 grant stream", "2 grant streams", "3 grant streams", "4+ grant streams"]
+    gap_rows = [full({"iso3": "ONE", "indicator_id": "ippf_grant_streams_count", "value": "0", "reference_year": "2026"}),
+                full({"iso3": "TWO", "indicator_id": "ippf_grant_streams_count", "value": "3", "reference_year": "2026"})]
+    vb = pwm.view("B", gap_rows, crosswalk, {}, {}, inv_rows("Filter button: ", b_deck), NAMES)
+    leg = {x["key"]: x["colour"] for x in vb["legend"]}
+    check("colour_B_by_deck_position_with_gap", leg.get("3 grant streams") == pwm.PALETTE["B"][3], leg)
+    c_deck = ["Full member", "Associate member", "Collaborative Partner"]
+    assoc = [full({"iso3": "ONE", "indicator_id": "ippf_funding_streams", "member_status": "associate member",
+                   "value_display": "", "reference_year": "2026"})]
+    vc = pwm.view("C", assoc, crosswalk, {}, {}, inv_rows("Legend text: ", c_deck), NAMES)
+    leg = {x["key"]: x["colour"] for x in vc["legend"]}
+    check("colour_C_by_deck_position_with_gap", leg.get("associate member") == pwm.PALETTE["C"][1], leg)
+
     # --- refusals ---
     code, log = run(args(out))
     check("refuses_existing_out", code == 2 and out.read_text(encoding="utf-8") == text, (code, log))

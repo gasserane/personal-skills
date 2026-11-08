@@ -201,6 +201,44 @@ def main():
             got = f"raised {e}"
         record(f"write_text_late_bound_{old}->{new}", got == new, got)
 
+    # --- --apply: a PowerPoint error on one deck (e.g. a locked file) must not lose the log of the
+    #     decks already saved, and must end in exit 1, not a traceback ---
+    import types
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        for k in "AB":
+            fake_pptx(t / f"Map {k} - one.pptx", ["slide1.xml"])
+        write_csv(t / "plan.csv", [plan_row(deck="A"), plan_row(deck="B")])
+        fake_client = types.SimpleNamespace(Dispatch=lambda name: object())
+        saved = {k: sys.modules.get(k) for k in ("win32com", "win32com.client")}
+        sys.modules["win32com"] = types.SimpleNamespace(client=fake_client)
+        sys.modules["win32com.client"] = fake_client
+        real_apply = ps.apply_deck
+
+        def fake_apply(app, path, rows, stamp):
+            if "Map B" in str(path):
+                raise RuntimeError("simulated COM error: file locked")
+            return [{"deck": r["deck"], "slide": r["slide"], "shape_name": r["shape_name"], "field": r["field"],
+                     "old_planned": r["old"], "old_read": r["old"], "new_written": r["new"], "new_read": r["new"]}
+                    for r in rows]
+        ps.apply_deck = fake_apply
+        log = t / "log.csv"
+        try:
+            code = ps.main(["--decks", str(t), "--plan", str(t / "plan.csv"), "--apply", "--log", str(log)])
+            err = ""
+        except Exception as e:  # noqa: BLE001
+            code, err = None, f"raised {e!r}"
+        finally:
+            ps.apply_deck = real_apply
+            for k, v in saved.items():
+                if v is None:
+                    sys.modules.pop(k, None)
+                else:
+                    sys.modules[k] = v
+        rows = list(csv.DictReader(open(log, encoding="utf-8"))) if log.exists() else []
+        record("apply_com_error_exit_1_no_traceback", code == 1, err or code)
+        record("apply_com_error_keeps_log_of_saved_decks", [r["deck"] for r in rows] == ["A"], rows)
+
     print(f"{sum(results)}/{len(results)} cases ok")
     sys.exit(0 if all(results) else 1)
 

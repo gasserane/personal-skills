@@ -252,19 +252,25 @@ def main(argv=None) -> int:
     import win32com.client  # only needed with --apply
     app = win32com.client.Dispatch("PowerPoint.Application")
     log, code = [], 0
-    for k, path in files.items():
-        try:
-            got = apply_deck(app, path, [r for r in rows if r["deck"] == k], stamp)
-            log += got
-            print(f"map {k}: {len(got)} swap(s) written and read back, saved")
-        except PlanError as e:
-            print(f"FAIL map {k}: {e}")
-            code = 1
-    with open(log_path, "w", encoding="utf-8", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=LOG_COLUMNS)
-        w.writeheader()
-        w.writerows(log)
-    print(f"swap log: {log_path}")
+    try:
+        for k, path in files.items():
+            try:
+                got = apply_deck(app, path, [r for r in rows if r["deck"] == k], stamp)
+                log += got
+                print(f"map {k}: {len(got)} swap(s) written and read back, saved")
+            except PlanError as e:
+                print(f"FAIL map {k}: {e}")
+                code = 1
+            except Exception as e:  # noqa: BLE001  a PowerPoint (COM) error, e.g. a locked file
+                print(f"FAIL map {k}: PowerPoint error ({e}); compare the deck with its copy in _backup before any re-run")
+                code = 1
+    finally:
+        # Written even when a later deck fails, so the decks already saved keep their record.
+        with open(log_path, "w", encoding="utf-8", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=LOG_COLUMNS)
+            w.writeheader()
+            w.writerows(log)
+        print(f"swap log: {log_path}")
     return code
 
 
