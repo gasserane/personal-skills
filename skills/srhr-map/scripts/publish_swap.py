@@ -31,6 +31,9 @@ import zipfile
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
+sys.path.insert(0, str(Path(__file__).parent))
+import register_deck_check as rdc  # noqa: E402
+
 COLUMNS = ["deck", "slide", "shape_name", "kind", "field", "old", "new"]
 LOG_COLUMNS = ["deck", "slide", "shape_name", "field", "old_planned", "old_read", "new_written", "new_read"]
 FIELDS = ("screentip", "text")
@@ -103,7 +106,7 @@ def log_problems(log_rows):
 def deck_files(folder, letters):
     out = {}
     for k in sorted(letters):
-        found = sorted(Path(folder).glob(f"Map {k} - *.pptx"))
+        found = sorted(Path(folder).glob(rdc.deck_glob(k)))
         if len(found) != 1:
             raise PlanError(f"map {k}: {len(found)} deck file(s) in {folder}, need exactly 1")
         out[k] = found[0]
@@ -121,10 +124,10 @@ def _sha(path):
 def copy_decks(src, dst):
     """Copy every 'Map X - *.pptx' from src into dst; [(name, sha256 src, sha256 copy)]."""
     src, dst = Path(src), Path(dst)
-    decks = sorted(src.glob("Map [A-D] - *.pptx"))
+    decks = sorted(src.glob(rdc.deck_glob("[A-D]")))
     if not decks:
         raise PlanError(f"no deck in {src}")
-    if dst.exists() and list(dst.glob("Map [A-D] - *.pptx")):
+    if dst.exists() and list(dst.glob(rdc.deck_glob("[A-D]"))):
         raise PlanError(f"{dst} already holds a deck; an edition folder is never overwritten")
     dst.mkdir(parents=True, exist_ok=True)
     out = []

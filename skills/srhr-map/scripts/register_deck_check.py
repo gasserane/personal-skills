@@ -34,6 +34,11 @@ MAP_INDICATOR = {"A": "ippf_membership", "B": "ippf_grant_streams_count", "C": "
 D_INDICATORS = ("ecdc_hiv_diagnosis_rate", "ippf_bp_hiv_focus", "ippf_hiv_services")
 
 
+def deck_glob(m):
+    """The one deck file pattern every step uses (check, inventory, web map, swap, copy): "Map A - <name>.pptx"."""
+    return f"Map {m} - *.pptx"
+
+
 def deck_tips(pptx: Path) -> list:
     """[(slide name, {country: tip})] for every slide that carries country ScreenTips."""
     out = []
@@ -178,9 +183,9 @@ def main(argv=None) -> int:
     crosswalk = [(r["key"], r["label"]) for r in _csv(args.crosswalk)]
     total = 0
     for m in "ABCD":
-        decks = sorted(args.decks.glob(f"Map {m} *.pptx"))
+        decks = sorted(args.decks.glob(deck_glob(m)))
         if len(decks) != 1:
-            print(f"FAIL map {m}: expected one deck 'Map {m} *.pptx', found {len(decks)}")
+            print(f"FAIL map {m}: expected one deck '{deck_glob(m)}', found {len(decks)}")
             total += 1
             continue
         views = deck_tips(decks[0])

@@ -415,6 +415,17 @@ def main():
     pwm.urllib.request.urlopen = real_open
     check("network_error_is_a_stop_nothing_written", outcomes == [("stop", 1, False)] * 2, outcomes)
 
+    # --- one deck file pattern everywhere (Session A, minor 11): "Map X - *.pptx" ---
+    import shutil
+    extra = TMP / "decks_extra"
+    shutil.copytree(DECKS, extra)
+    (extra / "Map A old.pptx").write_bytes((DECKS / "Map A - invented.pptx").read_bytes())
+    ea = args(TMP / "extra" / "webmap_2031.html")
+    ea[ea.index("--decks") + 1] = str(extra)
+    code, log = run(ea)
+    check("deck_pattern_ignores_name_without_dash", code == 0, (code, log[-200:]))
+    check("deck_pattern_one_constant", getattr(rdc, "deck_glob", lambda m: None)("A") == "Map A - *.pptx")
+
     # --- refusals ---
     code, log = run(args(out))
     check("refuses_existing_out", code == 2 and out.read_text(encoding="utf-8") == text, (code, log))

@@ -417,9 +417,9 @@ def build_views(rows, crosswalk_path, master_rows, decks):
     colours = {r["key"]: "#" + r["colour"].strip().lstrip("#") for r in xw if r.get("colour", "").strip()}
     views, frame = [], set()
     for m in "ABCD":
-        found = sorted(Path(decks).glob(f"Map {m} *.pptx"))
+        found = sorted(Path(decks).glob(rdc.deck_glob(m)))
         if len(found) != 1:
-            raise Stop(1, f"stop: expected one deck 'Map {m} *.pptx' in the decks folder, found {len(found)}")
+            raise Stop(1, f"stop: expected one deck '{rdc.deck_glob(m)}' in the decks folder, found {len(found)}")
         slides = rdc.deck_tips(found[0])
         if not slides:
             raise Stop(1, f"stop: no country ScreenTips in {found[0].name}")

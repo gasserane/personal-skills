@@ -168,9 +168,9 @@ def main(argv=None) -> int:
     names = {r["country"]: r["iso3"] for r in rdc._csv(args.master)}
     rows, missing = [], []
     for m in "ABCD":
-        decks = sorted(args.decks.glob(f"Map {m} *.pptx"))
+        decks = sorted(args.decks.glob(rdc.deck_glob(m)))
         if len(decks) != 1:
-            print(f"FAIL map {m}: expected one deck 'Map {m} *.pptx', found {len(decks)}")
+            print(f"FAIL map {m}: expected one deck '{rdc.deck_glob(m)}', found {len(decks)}")
             return 1
         got = inventory(decks[0], names)
         missing += cross_check(decks[0], got)
