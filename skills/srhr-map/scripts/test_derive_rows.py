@@ -127,6 +127,22 @@ def test_partner_half_dot_suppressed_by_full():
         check("clean ledger has no problems", problems == [], str(problems))
 
 
+def test_overview_only_stream_reaches_funding_streams():
+    # A stream block in the projects sheet may hold only an empty placeholder row while the overview already
+    # lists the countries that hold it; the by-stream map must still show those countries.
+    with tempfile.TemporaryDirectory() as tmp:
+        p = ledger_file(tmp, [
+            {"Funding source": "Alpha grant 2026", "Country": "Country A"},
+            {"Funding source": "Beta fund", "Country": ""},  # placeholder row, no country yet
+        ], ["Beta fund 2026"],
+            [[None, "Country A", "MA", "EU", "A", ""], [None, "Country B", "MA", "EU", "B", "x"]])
+        rows, problems = dr.from_ledger(p, EDITION, STREAMS, COUNTRIES)
+        full = {r["iso3"]: (r["value"], r["value_display"]) for r in rows if r["indicator_id"] == "ippf_funding_streams"}
+        check("overview-only stream gives the country its by-stream row",
+              full == {"XAA": ("1", "Stream A"), "XBB": ("1", "Stream B")}, str(full))
+        check("overview-only stream raises no problem", problems == [], str(problems))
+
+
 def test_country_with_org_in_brackets():
     with tempfile.TemporaryDirectory() as tmp:
         p = ledger_file(tmp, [{"Funding source": "Beta fund", "Country": "Country A (Org One) "}], [],

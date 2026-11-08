@@ -173,7 +173,9 @@ def from_ledger(path, edition, streams, countries):
     _, pr_rows, err = dc._read(path, spec["ledger_projects"], edition)
     if err:
         return [], problems + [err]
-    full, partners, source = {iso: set() for iso in held_ov}, [], ""
+    # a country holds a stream when either sheet says so: a stream block in the projects sheet can still be an
+    # empty placeholder while the overview already lists its countries
+    full, partners, source = {iso: set(keys) for iso, keys in held_ov.items()}, [], ""
     for _, r in pr_rows:
         if (r.get("Funding source") or "").strip():
             source = r["Funding source"]
