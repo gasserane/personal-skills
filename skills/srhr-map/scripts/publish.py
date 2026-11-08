@@ -295,13 +295,24 @@ def check_summary(p, reg):
         head = publish_summary.headline(reg, publish_summary.load_who(p.who))
         terms = publish_summary.forbidden_terms(p.crosswalk, p.ma_codes)
         allowed = publish_summary.load_allow(p.allow)
+        footer = publish_summary.footer_html(publish_summary.load_page_cfg(p.page_cfg))
     except publish_workbook.Stop as e:
         return [str(e)]
-    gv = {v["id"]: v for v in got.get("views", [])}
+    if head["outside"]:
+        probs.append("counted in the headline but missing from the WHO European Region list: "
+                     + ", ".join(head["outside"]))
+    gv = {v.get("id"): v for v in got.get("views", [])}
+    extra = sorted(str(i) for i in set(gv) - {v["id"] for v in views})
+    if extra:
+        probs.append(f"summary page has view id(s) the register does not give: {', '.join(extra)}")
     for v in json.loads(json.dumps(views)):
-        for field in ("colour", "tips", "legend", "filters", "title", "subtitle", "legend_title"):
+        for field in ("name", "colour", "tips", "legend", "filters", "title", "subtitle", "legend_title"):
             if gv.get(v["id"], {}).get(field) != v.get(field):
                 probs.append(f"summary map {v['id']} {field} differ from the register")
+    if got.get("tab_letters") is not False:
+        probs.append(f"tab_letters is {got.get('tab_letters')!r}; the summary page shows no map letters (false)")
+    if footer not in text:
+        probs.append("footer text differs from config/summary_page.csv")
     if got.get("headline") != {"n": head["n"], "m": head["m"]}:
         probs.append(f"headline data {got.get('headline')}, the register gives {head['n']} of {head['m']}")
     sentence = publish_summary.HEADLINE.format(n=head["n"], m=head["m"])

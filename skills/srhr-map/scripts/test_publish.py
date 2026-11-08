@@ -152,6 +152,38 @@ def main():
     sm.write_text(s_text.replace("Point at or tap", "Stream two: point at or tap", 1), encoding="utf-8")
     code, log = run("check", *base)
     check("check_summary_reruns_scan", code == 1 and "FAIL summary" in log and "Stream two" in log, log)
+    # review minor 5: view names, extra view ids, tab_letters, footer text, outside list, a stale tip
+    s_data = json.loads(re.search(r'id="map-data">(.*?)</script>', s_text, re.S).group(1))
+    stale = json.loads(json.dumps(s_data))
+    first = sorted(stale["views"][0]["tips"])[0]
+    stale["views"][0]["tips"][first] += " (old)"
+    extra = json.loads(json.dumps(s_data))
+    extra["views"].append(dict(extra["views"][0], id="Z"))
+    for case, edited, want in (
+            ("check_summary_flags_view_name", s_text.replace('"name":"Members and partners"', '"name":"Members"', 1),
+             "name"),
+            ("check_summary_flags_extra_view_id", s_text.replace(json.dumps(s_data["views"], separators=(",", ":")),
+                                                                 json.dumps(extra["views"], separators=(",", ":")), 1),
+             "Z"),
+            ("check_summary_flags_tab_letters", s_text.replace('"tab_letters":false', '"tab_letters":true', 1),
+             "tab_letters"),
+            ("check_summary_flags_footer_text", s_text.replace("Prepared by Unit.", "Prepared by Old Unit.", 1),
+             "footer"),
+            ("check_summary_flags_stale_tip", s_text.replace(json.dumps(s_data["views"], separators=(",", ":")),
+                                                             json.dumps(stale["views"], separators=(",", ":")), 1),
+             "tips")):
+        sm.write_text(edited, encoding="utf-8")
+        code, log = run("check", *base)
+        check(case, edited != s_text and code == 1 and "FAIL summary" in log and want in log.split("FAIL summary")[-1],
+              (edited != s_text, code, log[-400:]))
+    sm.write_text(s_text, encoding="utf-8")
+    who_path = root / "config" / "who_europe.csv"
+    who_keep = who_path.read_bytes()
+    who_path.write_text("iso3,country\nONE,Country One\nGON,Country Gone\nXQX,Country Invented\n", encoding="utf-8")
+    code, log = run("check", *base)
+    check("check_summary_flags_outside_list", code == 1 and "FAIL summary" in log and "TWO" in log
+          and "WHO European Region" in log, log[-400:])
+    who_path.write_bytes(who_keep)
     sm.write_text(s_text, encoding="utf-8")
 
     # --- check fails on a planted change in an output ---
