@@ -118,7 +118,7 @@ def main():
     f_cols = {lg["key"]: lg["colour"] for lg in F.get("legend", [])}
     record("F_colours_dream_crystal_pear_tint", f_cols == {"core": "#00313C", "other": "#71C5E8", "none": "#D5DE7C"}
            and [f["colour"] for f in F.get("filters", [])] == ["#00313C", "#71C5E8", "#D5DE7C"], f_cols)
-    land = re.search(r"--map-land:\s*(#[0-9A-Fa-f]{6})", ps.pw.PAGE).group(1).upper()
+    land = re.search(r"--map-land:[ ]*(#[0-9A-Fa-f]{6})", ps.pw.PAGE).group(1).upper()
     route = re.search(r"function route\(\) \{ var m = /(.+?)/\.exec", ps.pw.PAGE)
     record("every_view_reachable_by_its_tab_hash", route is not None and all(
         re.match(route.group(1), "#map-" + v["id"].lower()) for v in views), route and route.group(1))
