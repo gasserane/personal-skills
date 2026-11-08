@@ -109,6 +109,14 @@ def test_change_id_stable():
     check("partner rows of two streams get two ids", p1 != p2, f"{p1} {p2}")
 
 
+def test_missing_needs_a_non_empty_old_value():
+    """A country whose last-edition value is empty never had a value, so nothing went missing."""
+    base = [row("XAA", SVC, 2024, ""), row("XBB", SVC, 2024, "  "), row("XCC", SVC, 2024, 4)]
+    changes = cr.compare(base, [], COV)
+    missing = sorted(c.iso3 for c in changes if c.kind == "missing")
+    check("missing only where the last edition held a non-empty value", missing == ["XCC"], str(changes))
+
+
 def test_unknown_codes_reach_the_country_line():
     """I2: a country with an unticked code gets its own Must-check line naming that code."""
     base = [row(f"X{c}A", "ippf_hiv_services", 2024, 100) for c in "ABC"]

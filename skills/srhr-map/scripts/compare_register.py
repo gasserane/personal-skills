@@ -7,8 +7,8 @@ Kinds:
   new           the key (country, indicator, year) is not in the last edition
   revised       the key is there with a different value (value only: display text is hand-written
                 evidence a refresh cannot reproduce; funding streams compare the set of stream keys)
-  missing       a country held a covered indicator in the last edition but has no row for the
-                covered year in the new files
+  missing       a country held a non-empty value for a covered indicator in the last edition but
+                has no row for the covered year in the new files
   focus_change  a business-plan HIV focus rating differs from the country's previous plan year
 """
 import hashlib
@@ -138,6 +138,8 @@ def compare(baseline, proposed, covered):
     for ind, cov in covered.items():
         have = {k[0] for k in seen if k[1] == ind and k[2] == str(cov["year"])}
         for iso3 in sorted(held.get(ind, set()) - have):
+            if not (earlier[(iso3, ind)].get("value") or "").strip():
+                continue  # the last edition held no value, so nothing went missing
             changes.append(Change(_id("missing", iso3, ind, cov["year"]), "missing", f"{ind} {cov['year']}", iso3,
                                   ind, str(cov["year"]), earlier.get((iso3, ind)), None,
                                   "The file at the link has no value for this country. Correct = it really "
