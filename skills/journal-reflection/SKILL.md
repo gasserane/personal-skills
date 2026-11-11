@@ -120,3 +120,5 @@ Do not invent reflections. Do not auto-answer the prompts. Prompts go to the use
 If Ane references an existing output by path and asks to improve, iterate, or expand it, the protocol activates. Read the file first, edit scope-bounded via the Edit tool, preserve out-of-scope content byte-identical, and return the EDIT-PRESERVATION DELIVERY summary.
 
 Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists.
+
+The AI-use disclaimer (governance-rules.md `ai-use-disclaimer`) does not apply here: journal entries are Ane's private notes and carry none.

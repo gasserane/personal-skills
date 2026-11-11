@@ -51,7 +51,7 @@ If a bucket is empty, say so. Do not invent content to fill it.
 ## Step 4 — Route each bucket
 
 **Deliverables (auto-file).** Propose a path under the work folder, save with the
-Write tool, and name it in the summary. Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists.
+Write tool, and name it in the summary. Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists. Apply the AI-use disclaimer (governance-rules.md `ai-use-disclaimer`): every file written for a human reader ends with the fixed line, naming the Claude model actually running. Memory files, wiki entries and handoffs carry none.
 
 **Decisions / rules / lessons (confirm each).** For each item, propose the target
 — a memory file under the memory dir, a wiki entry, or a feedback memory — and

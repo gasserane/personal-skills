@@ -53,7 +53,7 @@ Set `mode` to `appraisal` for a non-procurement comparison; see `references/mode
 python scripts/selection_toolkit.py build selection-spec.json --out "3 Selection toolkit"
 ```
 
-Writes `selection-master.xlsx` plus `scorer-<name>.xlsx` per panel member. Separate files, never one shared workbook: independent scoring is the control that makes a panel mean worth computing, and a shared file removes it the moment the second person opens it.
+Writes `selection-master.xlsx` plus `scorer-<name>.xlsx` per panel member. Apply the AI-use disclaimer (governance-rules.md `ai-use-disclaimer`): every file written for a human reader ends with the fixed line, naming the Claude model actually running. In each workbook it sits under the source line (`add_source_footer` with `ai_disclaimer_model="Claude <model actually running>"`). Separate files, never one shared workbook: independent scoring is the control that makes a panel mean worth computing, and a shared file removes it the moment the second person opens it.
 
 ### 4. Verify by execution — this is the part that earns the skill
 

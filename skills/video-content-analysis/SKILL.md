@@ -39,7 +39,7 @@ If consent metadata is incomplete (status set but no `documented_in` / `document
 
 ### Step 3 — invoke the orchestrator
 
-Use Bash to run the venv Python with a one-line `analyze_video(...)` call. Force the ffmpeg PATH extension before the run. Pass the captured kwargs.
+Use Bash to run the venv Python with a one-line `analyze_video(...)` call. Apply the AI-use disclaimer (governance-rules.md `ai-use-disclaimer`): every file written for a human reader ends with the fixed line, naming the Claude model actually running. Pass `ai_disclaimer_model="Claude <model actually running>"` to the builder; never copy a model name from an example or an older file. Force the ffmpeg PATH extension before the run. Pass the captured kwargs.
 
 ```powershell
 $env:PATH = "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.1-full_build\bin;$env:PATH"
@@ -61,6 +61,7 @@ result = analyze_video(
     brand_summary=<True OR False>,
     output_dir=<PATH OR None>,
     m365_caption_path=<PATH OR None>,
+    ai_disclaimer_model="Claude <model actually running>",
 )
 print("MANIFEST:", result.manifest_path)
 print("SUMMARY:", result.summary_path)

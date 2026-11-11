@@ -219,7 +219,7 @@ Every calibration run should end by naming what changes in the next run. Feed th
 
 Recipes, the exact import lists, the branded-table helper and the glossary pattern are in `references/word-export.md`. Brand values come from `ane_package.reporting.brand.IPPF_FORMAT_TEMPLATE`; hard-coding a colour, font or number format is a regression.
 
-Every generator carries an edit-preservation staleness warning in its docstring, naming the .docx it builds and pointing at `mel_wiki/wiki/concepts/edit-preservation-protocol.md`. Apply that protocol whenever the target file already exists.
+Every generator carries an edit-preservation staleness warning in its docstring, naming the .docx it builds and pointing at `mel_wiki/wiki/concepts/edit-preservation-protocol.md`. Apply that protocol whenever the target file already exists. Apply the AI-use disclaimer (governance-rules.md `ai-use-disclaimer`): every file written for a human reader ends with the fixed line, naming the Claude model actually running. Pass `ai_disclaimer_model="Claude <model actually running>"` to the builder; never copy a model name from an example or an older file. A table-first build on `_open_branded_base()` adds the line itself as the last paragraph, from `ane_package.reporting.brand.ai_disclaimer_text`.
 
 **AI disclosure.** Both outputs close with the disclosure line: the model, that scoring judgement and recommendations need human verification before use, and that AI is not an author and not a source. For a blind run, state that the donor evaluation was present and deliberately not opened, because that sequence is what makes the comparison a test rather than a reconstruction.
 

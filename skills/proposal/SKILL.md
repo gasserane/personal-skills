@@ -47,9 +47,9 @@ If `validate_handback` raises, or `report.ok` is false, send Vi back to `proposa
 ## Step 5 — Emit the pack
 ```python
 from ane_package.proposals.pack import build_pack
-manifest = build_pack(profile, out_dir, data=data)
+manifest = build_pack(profile, out_dir, data=data, ai_disclaimer_model="Claude <model actually running>")
 ```
-The pack carries the seven artefacts plus a README control sheet, all IPPF-branded. Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists — if the output folder already holds an edited pack, treat Ane's content as canonical and edit scope-bounded, do not regenerate from scratch.
+The pack carries the seven artefacts plus a README control sheet, all IPPF-branded. Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists — if the output folder already holds an edited pack, treat Ane's content as canonical and edit scope-bounded, do not regenerate from scratch. Apply the AI-use disclaimer (governance-rules.md `ai-use-disclaimer`): every file written for a human reader ends with the fixed line, naming the Claude model actually running. Pass `ai_disclaimer_model="Claude <model actually running>"` to the builder; never copy a model name from an example or an older file.
 
 ## Step 6 — Disclosure and scope boundary
 - Add the AI-disclosure colophon per `mel_wiki/wiki/concepts/ai-use-in-publications.md`. AI is never an author.

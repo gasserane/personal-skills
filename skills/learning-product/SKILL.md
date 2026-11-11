@@ -330,3 +330,5 @@ This skill is also registered as a Vi specialist `learning-product-designer` at 
 If Ane references an existing output by path and asks to improve, iterate, or expand it, the protocol activates. Read the file first, edit scope-bounded via the Edit tool, preserve out-of-scope content byte-identical, and return the EDIT-PRESERVATION DELIVERY summary.
 
 Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists.
+
+Apply the AI-use disclaimer (governance-rules.md `ai-use-disclaimer`): every file written for a human reader ends with the fixed line, naming the Claude model actually running. Pass `ai_disclaimer_model="Claude <model actually running>"` to the builder; never copy a model name from an example or an older file.

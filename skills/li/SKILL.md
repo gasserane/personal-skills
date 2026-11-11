@@ -92,7 +92,7 @@ Cross-references: `mel_wiki/wiki/calibration.md` ingestion priorities for Caribb
 **ADD (conversational or document-assisted).**
 1. Either capture fields from Ane's description, OR read the artefact Ane points at (proposal / logframe / ToC / evaluation ToR) with the Read tool and draft a dossier.
 2. Show the drafted dossier in full. Do NOT write yet.
-3. On Ane's confirmation, write the dossier to a temp `.json` (Write tool) and run `python -m ane_package.orchestration.programmes upsert <temp.json>` from the work-folder root. Confirm: `✅ Saved programme: [name].`
+3. On Ane's confirmation, write the dossier to a temp `.json` (Write tool) and run `python -m ane_package.orchestration.programmes upsert <temp.json>` from the work-folder root. The AI-use disclaimer (governance-rules.md `ai-use-disclaimer`) does not apply here: wiki pages, catalogue entries and dossier data files carry none. Confirm: `✅ Saved programme: [name].`
 
 **LIST-PROGRAMMES.** Run `python -m ane_package.orchestration.programmes index`. Empty → "No programmes in the store yet — /li add-programme to seed one."
 

@@ -37,9 +37,10 @@ If the project is not yet awarded, skip this step; the pack flags "baseline = su
 ## Step 4 — Build the pack
 ```python
 from ane_package.proposals.implementation_pack import build_implementation_pack
-manifest = build_implementation_pack(profile, baseline, out_dir)
+manifest = build_implementation_pack(profile, baseline, out_dir,
+                                     ai_disclaimer_model="Claude <model actually running>")
 ```
-Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists — if the output folder already holds an edited pack, treat Ane's content as canonical and edit scope-bounded, do not regenerate from scratch.
+Apply mel_wiki/wiki/concepts/edit-preservation-protocol.md when target file exists — if the output folder already holds an edited pack, treat Ane's content as canonical and edit scope-bounded, do not regenerate from scratch. Apply the AI-use disclaimer (governance-rules.md `ai-use-disclaimer`): every file written for a human reader ends with the fixed line, naming the Claude model actually running. Pass `ai_disclaimer_model="Claude <model actually running>"` to the builder; never copy a model name from an example or an older file.
 
 ## Step 5 — Optional reporting cycle (only when Ane asks for a populated report)
 Delegate to Vi to spawn `mel-report-writer` (draft the narrative from tracker status) and `contribution-plausibility-analyst` (judge whether indicator progress supports the outcome claims). Neither is needed for the pack to be usable.
