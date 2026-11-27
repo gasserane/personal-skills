@@ -21,7 +21,7 @@ This skill complements rather than duplicates `/test` (harness only) and `/li li
 ### Step 1 — Harness state (fast, mechanical)
 
 Run in this order:
-1. `python tests/run_tests.py` (static; report the count it prints, never a remembered one)
+1. `python tests/run_tests.py` (static; report the count it prints, never a remembered one). **If a policy plugin refuses the call** (seen 2026-11-27: `cc-plugin-sec-default` and `cc-plugin-privacy` refuse any Bash command whose text names this script, because it holds the account e-mail literals for the git-identity check), do not retry variants and do not reword the command to slip past: ask Ane to run `! python tests/run_tests.py` and `! python tests/run_tests.py --output` herself, write "harness not run by me" in the brief until her output lands, and record the printed counts from her run. The same refusal reaches any later command whose text names the script, including a `grep` for it, so keep its name out of command text for the rest of the session. Importing the module (`import run_tests as rt`) was allowed, so `SKILLS_DIR`, `SKILL_BUDGETS` and the overlay counting function stay reachable that way.
 2. `python tests/run_tests.py --output` (fixture mode; some fixtures may be deliberately uncaptured)
 
 Parse failures. Each `[FAIL]` line goes into the findings list with file:line as shown. Do NOT re-run the failures or attempt fixes; just record.
@@ -47,7 +47,7 @@ For each finding, capture: file path, line number where shown, what's wrong, sug
 Read in parallel:
 - `agent-improvements/{ann,vi,li,researcher,community}-overlay.md` — file sizes (cap 35KB) and Active-entries count (cap 10). If either breaches: flag for compression CURATE, not just archive-only CURATE. The `community-overlay.md` (claimed-space feedback log, created 2026-05-06) is monitored for the same caps.
 - `agent-improvements/coordination-log.md` — count entries with `STATUS: OPEN`.
-- `agent-improvements/_pending-ingest.md` — count rows with `Status: PENDING`. Surface to Ane for action.
+- `agent-improvements/_pending-ingest.md` — count rows with `Status: PENDING`. Surface to Ane for action. **Read the status column, never grep the word.** The file's header and row text both contain "pending" ("Pending Ane approval" notes travel inside insight cells), so `grep -ci pending` reports rows that are APPROVED. Print the last cell of each table row (`awk -F'|' '/^\| 20/ {print $(NF-1)}'`) and count only cells that start with PENDING. On 2026-11-27 the grep route reported two pending rows when all twelve were APPROVED, and the wrong finding reached the brief. The real signal in that file is usually the other one: APPROVED rows that Li has not yet moved to `_pending-ingest-archive.md`.
 - `agent-improvements/PROPOSED-*.md` — `Status:` field on each. Flag any `AWAITING APPROVAL` older than 7 days.
 
 ### Step 4 — Hygiene (low severity, visible clutter)
