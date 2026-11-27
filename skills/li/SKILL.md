@@ -135,85 +135,32 @@ Idempotent: already-staged or approved return IDs are skipped (the writer scans 
 
 ### BIBLIO Operation (Phase 1, added 2026-05-23)
 
-The managed-bibliography gate. Mirrors the FEEDBACK pattern: stage in a
-gitignored file, approve into canonical surfaces via a verbatim gate, never
-auto-write.
+The managed-bibliography gate. Mirrors the FEEDBACK pattern: stage in a gitignored file, approve into canonical surfaces via a verbatim gate, never auto-write.
 
-**Harness gate on new DOIs (added 2026-07-22).** Any operation that adds a
-new DOI-bearing citation to `domain-standards*.md` or `frameworks/*.md`
-(INGEST-FROM-RESEARCHER, INGEST-DOCUMENT, INGEST-AD-HOC, APPROVE-INGEST, or
-manual framework-page creation) must run
-`python -m ane_package.bibliography.sync` from the work-folder root before
-commit. The harness check `biblio:framework-page DOIs covered in Zotero`
-FAILs on any framework-page DOI absent from the Zotero cache (proven
-2026-07-22, pleasure-based-srhr INGEST: 293/294 until the sync ran). The
-sync is idempotent; it needs the Zotero write key.
+**Harness gate on new DOIs (added 2026-07-22).** Any operation that adds a new DOI-bearing citation to `domain-standards*.md` or `frameworks/*.md` (INGEST-FROM-RESEARCHER, INGEST-DOCUMENT, INGEST-AD-HOC, APPROVE-INGEST, or manual framework-page creation) must run `python -m ane_package.bibliography.sync` from the work-folder root before commit. The harness check `biblio:framework-page DOIs covered in Zotero` FAILs on any framework-page DOI absent from the Zotero cache (proven 2026-07-22, pleasure-based-srhr INGEST: 293/294 until the sync ran). The sync is idempotent; it needs the Zotero write key.
 
-**DOIs inside publisher URLs trip the gate too (2026-11-04).** A link such as
-`utrechtlawreview.org/articles/10.36633/ulr.1080` fails it until a Zotero
-record carries that DOI. Fix the one field: read the item, set `data['DOI']`,
-`update_item`, assert only `DOI` changed, then `sync.write_cache`. Never use
-`add_or_update` (rebuilds the payload, can overwrite title and creators, or
-create a duplicate). Writes to the group library need Ane's approval.
+**DOIs inside publisher URLs trip the gate too (2026-11-04).** A link such as `utrechtlawreview.org/articles/10.36633/ulr.1080` fails it until a Zotero record carries that DOI. Fix the one field: read the item, set `data['DOI']`, `update_item`, assert only `DOI` changed, then `sync.write_cache`. Never use `add_or_update` (rebuilds the payload, can overwrite title and creators, or create a duplicate). Writes to the group library need Ane's approval.
 
 Sub-commands:
 
-- `/li biblio sync` — one-shot push current wiki citations → Zotero. Walks
-  every wiki citation surface (scope extended 2026-07-22): both
-  `domain-standards*.md` files at the wiki root plus `frameworks/`,
-  `concepts/`, `indicators/`, `sources/`, `lenses/`, and `glossaries/`
-  (`log.md` excluded — append-only history may carry since-corrected
-  citations); calls `BibliographyStore.add_or_update` for each DOI; populates
-  the `wiki_pages` field on each Zotero record. The harness gate
-  `biblio:framework-page DOIs covered in Zotero` enforces the same scope, so
-  any new DOI on these surfaces fails the harness until this sync runs.
-  Known limitation: DOIs absent from CrossRef (e.g. some UTP book DOIs) are
-  skipped for metadata refresh; the Zotero record itself is unaffected.
+- `/li biblio sync` — one-shot push current wiki citations → Zotero. Walks every wiki citation surface (scope extended 2026-07-22): both `domain-standards*.md` files at the wiki root plus `frameworks/`, `concepts/`, `indicators/`, `sources/`, `lenses/`, and `glossaries/` (`log.md` excluded — append-only history may carry since-corrected citations); calls `BibliographyStore.add_or_update` for each DOI; populates the `wiki_pages` field on each Zotero record. The harness gate `biblio:framework-page DOIs covered in Zotero` enforces the same scope, so any new DOI on these surfaces fails the harness until this sync runs. Known limitation: DOIs absent from CrossRef (e.g. some UTP book DOIs) are skipped for metadata refresh; the Zotero record itself is unaffected.
 
-- **Non-DOI sources (guidance PDFs, blog posts, books, living repos).** Push
-  them too: `add_or_update` falls back to URL matching, so it stays idempotent.
-  Set `item_type` (report / blogPost / book / document) and send only fields
-  valid for THAT type — `_record_to_data` always emits publicationTitle/volume/
-  DOI, which blogPost rejects (it takes `blogTitle`). A rejected write returns
-  `created=True` with an EMPTY key: re-probe by URL, empty key means failure.
+- **Non-DOI sources (guidance PDFs, blog posts, books, living repos).** Push them too: `add_or_update` falls back to URL matching, so it stays idempotent. Set `item_type` (report / blogPost / book / document) and send only fields valid for THAT type — `_record_to_data` always emits publicationTitle/volume/ DOI, which blogPost rejects (it takes `blogTitle`). A rejected write returns `created=True` with an EMPTY key: re-probe by URL, empty key means failure.
 
-- `/li biblio check` — run the candidate-surfacer (`surface_candidates`)
-  across the full Zotero group library. Stages any returned candidates in
-  `agent-improvements/_pending-biblio-updates.md`.
+- `/li biblio check` — run the candidate-surfacer (`surface_candidates`) across the full Zotero group library. Stages any returned candidates in `agent-improvements/_pending-biblio-updates.md`.
 
-- `/li show-biblio-updates` — list all pending rows from the staging file
-  with their Row ID, detection sources, old/proposed citation, and Tier-A
-  targets.
+- `/li show-biblio-updates` — list all pending rows from the staging file with their Row ID, detection sources, old/proposed citation, and Tier-A targets.
 
 - `/li approve-biblio-update [id]` — branch on the row's `detection_source`:
-  - **`crossref-correction`** (additive — erratum/corrigendum/correction):
-    build an APPEND-style `PropagationPlan` — `old_citation_substring` = the
-    article DOI link as it appears on the citation line (e.g.
-    `](https://doi.org/<article-doi>).`), `new_citation_text` = the same
-    substring with the companion note inserted before the closing token (e.g.
-    `](https://doi.org/<article-doi>). Erratum (YYYY): [<update-doi>](https://doi.org/<update-doi>).`).
-    The article DOI is NEVER swapped. The companion DOI is the row's
-    `proposed_doi`; label/year come from `proposed_citation`. On success, write
-    the resolved tag `biblio-correction-noted:<update-doi>` to the Zotero record
-    via `BibliographyStore(read_only=False)` so `/li biblio check` does not
-    re-stage it, then set the row's status to `approved`.
-  - **`crossref-retraction` / `crossref-version` / `crossref-edition-candidate`**:
-    the existing DOI-swap propagation — fire `propagate_approved_update` against
-    the four Tier-A targets (domain-standards.md,
-    domain-standards-domain-specific.md, the matching frameworks/*.md page, the
-    claude.ai mirror), scope-bounded per the edit-preservation protocol. On
-    success, the row's status becomes `approved`.
-  - Tier-B `secondary_mentions` are reported but not edited in either branch;
-    user fires `propagate-secondary` for those if wanted.
+  - **`crossref-correction`** (additive — erratum/corrigendum/correction): build an APPEND-style `PropagationPlan` — `old_citation_substring` = the article DOI link as it appears on the citation line (e.g. `](https://doi.org/<article-doi>).`), `new_citation_text` = the same substring with the companion note inserted before the closing token (e.g. `](https://doi.org/<article-doi>). Erratum (YYYY): [<update-doi>](https://doi.org/<update-doi>).`). The article DOI is NEVER swapped. The companion DOI is the row's `proposed_doi`; label/year come from `proposed_citation`. On success, write the resolved tag `biblio-correction-noted:<update-doi>` to the Zotero record via `BibliographyStore(read_only=False)` so `/li biblio check` does not re-stage it, then set the row's status to `approved`.
+  - **`crossref-retraction` / `crossref-version` / `crossref-edition-candidate`**: the existing DOI-swap propagation — fire `propagate_approved_update` against the four Tier-A targets (domain-standards.md, domain-standards-domain-specific.md, the matching frameworks/*.md page, the claude.ai mirror), scope-bounded per the edit-preservation protocol. On success, the row's status becomes `approved`.
+  - Tier-B `secondary_mentions` are reported but not edited in either branch; user fires `propagate-secondary` for those if wanted.
 
-- `/li reject-biblio-update [id] — [reason]` — sets the row's status to
-  `rejected:<reason>`. No edits to canonical surfaces.
+- `/li reject-biblio-update [id] — [reason]` — sets the row's status to `rejected:<reason>`. No edits to canonical surfaces.
 
-- `/li propagate-secondary [id] [path]` — targeted manual follow-up on one
-  Tier-B mention site. Same propagator function, single-file target.
+- `/li propagate-secondary [id] [path]` — targeted manual follow-up on one Tier-B mention site. Same propagator function, single-file target.
 
-All approval/rejection actions preserve the verbatim row in the staging file
-(status field is the only thing that mutates).
+All approval/rejection actions preserve the verbatim row in the staging file (status field is the only thing that mutates).
 
 Spec: `docs/superpowers/specs/2026-05-23-bibliography-zotero-design.md`.
 
