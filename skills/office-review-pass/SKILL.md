@@ -1,6 +1,6 @@
 ---
 name: office-review-pass
-description: 'Work on a Word deliverable inside the .docx itself: read and engage reviewer comments, insert review findings as margin comments authored as Ane into her working copy, apply real Word tracked changes a counterparty can accept or reject, make scoped formatting-preserving fixes via Word COM, or add a branded glossary and verified source annex. Use when Ane hands over a commented or hand-edited .docx for review, markup, or in-file edits. Distinct from ane-voice (prose voice only, never touches the file), localise (target-language work), check-deliverable (read-only QA verdict), meeting-notes marginalia (reads comments, never writes them), and tor-procurement (builds ToRs).'
+description: 'Work on a Word deliverable inside the .docx itself: read and engage reviewer comments, insert review findings as margin comments authored as Ane into her working copy, apply real Word tracked changes a counterparty can accept or reject, make scoped formatting-preserving fixes via Word COM, or add a branded glossary and verified source annex. Use when Ane hands over a commented or hand-edited .docx for review, markup, or in-file edits. Distinct from ane-voice (prose voice only, never touches the file), localise (target-language work), check-deliverable (read-only QA verdict), meeting-notes marginalia (reads comments, never writes them), and tor-procurement (builds ToRs). This personal copy wins for Ane; the deliverable-doctor plugin copy is for colleagues.'
 model: opus
 ---
 
